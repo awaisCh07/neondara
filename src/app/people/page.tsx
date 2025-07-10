@@ -72,15 +72,16 @@ export default function PeoplePage() {
       // Calculate balances
       const peopleWithBalances = peopleData.map(person => {
         const personEntries = entriesData.filter(entry => entry.personId === person.id && entry.giftType === 'Money');
-        let balance = 0;
+        let given = 0;
+        let received = 0;
         personEntries.forEach(entry => {
-          if (entry.direction === 'received') {
-            balance += entry.amount || 0;
+          if (entry.direction === 'given') {
+            given += entry.amount || 0;
           } else {
-            balance -= entry.amount || 0;
+            received += entry.amount || 0;
           }
         });
-        return { ...person, balance };
+        return { ...person, balance: given - received };
       });
 
       setPeople(peopleWithBalances.sort((a,b) => a.name.localeCompare(b.name)));
@@ -118,10 +119,17 @@ export default function PeoplePage() {
   };
   
   const getBalanceColor = (balance: number) => {
-    if (balance > 0) return 'text-green-600';
-    if (balance < 0) return 'text-red-600';
+    if (balance > 0) return 'text-red-600';
+    if (balance < 0) return 'text-green-600';
     return 'text-muted-foreground';
   }
+  
+  const getBalanceText = (balance: number) => {
+    if (balance === 0) return "All square";
+    if (balance > 0) return "You owe them";
+    return "They owe you";
+  }
+
 
   const filteredPeople = useMemo(() => {
     return people.filter(person => 
@@ -227,10 +235,10 @@ export default function PeoplePage() {
               </CardHeader>
               <CardContent className="flex-grow">
                 <p className={`text-3xl font-bold ${getBalanceColor(person.balance)}`}>
-                  {new Intl.NumberFormat().format(person.balance)}
+                  {new Intl.NumberFormat().format(Math.abs(person.balance))}
                 </p>
                  <p className={`text-sm mt-1 ${getBalanceColor(person.balance)}`}>
-                  {person.balance === 0 ? "All square" : person.balance > 0 ? "You are owed" : "You owe them"}
+                  {getBalanceText(person.balance)}
                 </p>
               </CardContent>
               <CardFooter>

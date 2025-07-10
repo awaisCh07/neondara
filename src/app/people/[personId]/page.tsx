@@ -78,7 +78,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
           }
         }
       });
-      setBalance({ given, received, net: received - given });
+      setBalance({ given, received, net: given - received });
 
     } catch (error) {
       console.error("Error fetching person details: ", error);
@@ -191,8 +191,8 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
     );
   }
 
-  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-green-600' : 'text-red-600';
-  const balanceText = balance.net === 0 ? "You are all square" : balance.net > 0 ? `You are owed ${new Intl.NumberFormat().format(balance.net)}` : `You owe ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
+  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-red-600' : 'text-green-600';
+  const balanceText = balance.net === 0 ? "You are all square" : balance.net > 0 ? `You owe ${new Intl.NumberFormat().format(balance.net)}` : `${person.name} owes you ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
 
 
   return (

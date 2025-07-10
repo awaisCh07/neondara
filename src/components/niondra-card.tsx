@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useLanguage } from './language-provider';
 
 interface NiondraCardProps {
   entry: Omit<NiondraEntry, 'userId'>;
@@ -29,17 +30,24 @@ interface NiondraCardProps {
   personName?: string;
 }
 
-const occasionIcons: Record<NiondraEntry['occasion'], React.ReactNode> = {
-  Wedding: <Heart className="h-4 w-4" aria-label="Wedding" />,
-  Birth: <Gift className="h-4 w-4" aria-label="Birth" />,
-  Housewarming: <Home className="h-4 w-4" aria-label="Housewarming" />,
-  Other: <PartyPopper className="h-4 w-4" aria-label="Other occasion" />,
-};
-
 export function NiondraCard({ entry, onEdit, onDelete, personName }: NiondraCardProps) {
+  const { t } = useLanguage();
+  
+  const occasionIcons: Record<NiondraEntry['occasion'], React.ReactNode> = {
+    Wedding: <Heart className="h-4 w-4" aria-label="Wedding" />,
+    Birth: <Gift className="h-4 w-4" aria-label="Birth" />,
+    Housewarming: <Home className="h-4 w-4" aria-label="Housewarming" />,
+    Other: <PartyPopper className="h-4 w-4" aria-label="Other occasion" />,
+  };
+
+  const getOccasionTranslation = (occasion: NiondraEntry['occasion']) => {
+    const key = `occasion${occasion}` as 'occasionWedding' | 'occasionBirth' | 'occasionHousewarming' | 'occasionOther';
+    return t(key);
+  }
+
   const isGiven = entry.direction === 'given';
   const nameToDisplay = personName || entry.person;
-  const title = isGiven ? `To: ${nameToDisplay}` : `From: ${nameToDisplay}`;
+  const title = isGiven ? `${t('to')}: ${nameToDisplay}` : `${t('from')}: ${nameToDisplay}`;
   
   const giftDisplay = entry.giftType === 'Money' && entry.amount 
     ? `${new Intl.NumberFormat().format(entry.amount)} ${entry.description}` 
@@ -56,13 +64,13 @@ export function NiondraCard({ entry, onEdit, onDelete, personName }: NiondraCard
               <span className="text-muted-foreground/50">|</span>
               <div className="flex items-center gap-1">
                 {occasionIcons[entry.occasion]}
-                <span>{entry.occasion}</span>
+                <span>{getOccasionTranslation(entry.occasion)}</span>
               </div>
             </div>
           </div>
            <Badge variant={isGiven ? "secondary" : "default"} className="capitalize">
             {isGiven ? <ArrowUpRight className="h-4 w-4 mr-1" /> : <ArrowDownLeft className="h-4 w-4 mr-1" />}
-            {entry.direction}
+            {isGiven ? t('directionGiven') : t('directionReceived')}
           </Badge>
         </div>
       </CardHeader>
@@ -86,27 +94,27 @@ export function NiondraCard({ entry, onEdit, onDelete, personName }: NiondraCard
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onEdit(entry)}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit
+                {t('edit')}
               </DropdownMenuItem>
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
+                  {t('delete')}
                 </DropdownMenuItem>
               </AlertDialogTrigger>
             </DropdownMenuContent>
           </DropdownMenu>
            <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogTitle>{t('deleteConfirmTitle')}</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete this ledger entry.
+                {t('deleteConfirmDescription')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
               <AlertDialogAction onClick={() => onDelete(entry.id)} className="bg-destructive hover:bg-destructive/90">
-                Delete
+                {t('delete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

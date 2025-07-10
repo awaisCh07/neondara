@@ -11,6 +11,7 @@ import { NiondraTimeline } from './niondra-timeline';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './auth-provider';
 import { AppLayout } from './layout';
+import { useLanguage } from './language-provider';
 
 export function LedgerView() {
   const [entries, setEntries] = useState<NiondraEntry[]>([]);
@@ -20,6 +21,7 @@ export function LedgerView() {
   const [editingEntry, setEditingEntry] = useState<NiondraEntry | undefined>(undefined);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useLanguage();
   
   const fetchData = async () => {
     if (!user) {
@@ -67,7 +69,7 @@ export function LedgerView() {
     } catch (error) {
       console.error("Error fetching data: ", error);
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to fetch ledger data.",
         variant: "destructive",
       });
@@ -83,7 +85,7 @@ export function LedgerView() {
 
   const handleAddEntry = async (newEntry: Omit<NiondraEntry, 'id' | 'userId' | 'person'>) => {
     if (!user) {
-        toast({ title: "Error", description: "You must be logged in to add an entry.", variant: "destructive" });
+        toast({ title: t('error'), description: "You must be logged in to add an entry.", variant: "destructive" });
         return;
     }
     try {
@@ -93,14 +95,14 @@ export function LedgerView() {
         date: Timestamp.fromDate(newEntry.date),
       });
       toast({
-        title: "Success",
-        description: "New entry added to the ledger.",
+        title: t('success'),
+        description: t('entryAddedSuccess'),
       });
       fetchData(); // Refetch all data
     } catch (error) {
       console.error("Error adding entry: ", error);
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to add new entry.",
         variant: "destructive",
       });
@@ -116,14 +118,14 @@ export function LedgerView() {
         date: Timestamp.fromDate(dataToUpdate.date),
       });
       toast({
-        title: "Success",
-        description: "Entry has been updated.",
+        title: t('success'),
+        description: t('entryUpdatedSuccess'),
       });
       fetchData(); // Refetch all data
     } catch (error) {
       console.error("Error updating entry: ", error);
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to update entry.",
         variant: "destructive",
       });
@@ -134,14 +136,14 @@ export function LedgerView() {
     try {
       await deleteDoc(doc(db, "niondra_entries", entryId));
       toast({
-        title: "Success",
-        description: "Entry has been deleted.",
+        title: t('success'),
+        description: t('entryDeletedSuccess'),
       });
       fetchData();
     } catch (error) {
       console.error("Error deleting entry: ", error);
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to delete entry.",
         variant: "destructive",
       });
@@ -184,22 +186,22 @@ export function LedgerView() {
     <AppLayout onExport={handleExport}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-headline">Ledger History</h1>
+            <h1 className="text-4xl font-headline">{t('ledgerHistory')}</h1>
             <Button size="sm" onClick={() => handleOpenSheet()}>
             <PlusCircle className="mr-2 h-4 w-4" />
-                Add Entry
+                {t('addEntry')}
             </Button>
         </div>
         {loading ? (
           <div className="text-center py-16 text-muted-foreground">
-            <p>Loading ledger...</p>
+            <p>{t('loadingLedger')}</p>
           </div>
         ) : (
           <NiondraTimeline 
             entries={entries} 
+            people={people} 
             onEdit={handleOpenSheet} 
             onDelete={handleDeleteEntry}
-            people={people} 
           />
         )}
       </div>

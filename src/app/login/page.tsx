@@ -1,4 +1,4 @@
-// src/app/login/page.tsx
+
 "use client";
 
 import { useState } from 'react';
@@ -10,8 +10,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from 'next/link';
+import { useLanguage } from '@/components/language-provider';
+import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
+  const { language, t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -33,19 +36,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className={cn("flex items-center justify-center min-h-screen bg-background", language === 'ur' ? 'font-urdu' : 'font-body')}>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">{t('loginTitle')}</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account.
+            {t('loginDescription')}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="grid gap-4">
             {error && <p className="text-sm font-medium text-destructive">{error}</p>}
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -56,7 +59,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -68,12 +71,12 @@ export default function LoginPage() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? t('signingIn') : t('signIn')}
             </Button>
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{' '}
+              {t('noAccount')}{' '}
               <Link href="/signup" className="underline">
-                Sign up
+                {t('signUp')}
               </Link>
             </div>
           </CardFooter>

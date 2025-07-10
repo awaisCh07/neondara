@@ -25,6 +25,7 @@ import { format } from "date-fns"
 import type { NiondraEntry, Person } from "@/lib/types"
 import { Textarea } from "./ui/textarea"
 import { useEffect } from "react"
+import { useLanguage } from "./language-provider"
 
 const formSchema = z.object({
   direction: z.enum(['given', 'received'], { required_error: "Please select a direction." }),
@@ -76,6 +77,7 @@ interface NiondraEntrySheetProps {
 }
 
 export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEntry, entry, people }: NiondraEntrySheetProps) {
+    const { t } = useLanguage();
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
     });
@@ -115,9 +117,9 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{entry ? 'Edit Entry' : 'Add New Entry'}</SheetTitle>
+          <SheetTitle>{entry ? t('editEntry') : t('addNewEntry')}</SheetTitle>
           <SheetDescription>
-            Record a Niondra exchange. Fill in the details below.
+            {t('entrySheetDescription')}
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -127,7 +129,7 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
               name="direction"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel>Direction *</FormLabel>
+                  <FormLabel>{t('direction')} *</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -138,13 +140,13 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
                         <FormControl>
                           <RadioGroupItem value="given" />
                         </FormControl>
-                        <FormLabel className="font-normal">Given</FormLabel>
+                        <FormLabel className="font-normal">{t('directionGiven')}</FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="received" />
                         </FormControl>
-                        <FormLabel className="font-normal">Received</FormLabel>
+                        <FormLabel className="font-normal">{t('directionReceived')}</FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
@@ -157,11 +159,11 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
               name="personId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Person *</FormLabel>
+                  <FormLabel>{t('person')} *</FormLabel>
                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a person" />
+                        <SelectValue placeholder={t('person')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -179,7 +181,7 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date of Occasion *</FormLabel>
+                  <FormLabel>{t('dateOfOccasion')} *</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -220,18 +222,18 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
               name="occasion"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Occasion *</FormLabel>
+                  <FormLabel>{t('occasion')} *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select an occasion" />
+                        <SelectValue placeholder={t('occasion')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Wedding">Wedding</SelectItem>
-                      <SelectItem value="Birth">Birth</SelectItem>
-                      <SelectItem value="Housewarming">Housewarming</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
+                      <SelectItem value="Wedding">{t('occasionWedding')}</SelectItem>
+                      <SelectItem value="Birth">{t('occasionBirth')}</SelectItem>
+                      <SelectItem value="Housewarming">{t('occasionHousewarming')}</SelectItem>
+                      <SelectItem value="Other">{t('occasionOther')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -244,17 +246,17 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
               name="giftType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gift Type *</FormLabel>
+                  <FormLabel>{t('giftType')} *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a gift type" />
+                        <SelectValue placeholder={t('giftType')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Money">Money</SelectItem>
-                      <SelectItem value="Sweets">Sweets</SelectItem>
-                      <SelectItem value="Item">Item</SelectItem>
+                      <SelectItem value="Money">{t('giftTypeMoney')}</SelectItem>
+                      <SelectItem value="Sweets">{t('giftTypeSweets')}</SelectItem>
+                      <SelectItem value="Item">{t('giftTypeItem')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -268,7 +270,7 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
                     name="amount"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Amount *</FormLabel>
+                            <FormLabel>{t('amount')} *</FormLabel>
                             <FormControl>
                                 <Input type="number" placeholder="e.g., 100" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} />
                             </FormControl>
@@ -283,9 +285,9 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{giftType === 'Money' ? 'Currency *' : 'Description *'}</FormLabel>
+                  <FormLabel>{giftType === 'Money' ? `${t('currency')} *` : `${t('description')} *`}</FormLabel>
                   <FormControl>
-                    <Input placeholder={giftType === 'Money' ? "e.g., USD, CAD" : "e.g., Box of mithai"} {...field} />
+                    <Input placeholder={giftType === 'Money' ? t('currencyPlaceholder') : t('descriptionPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -297,16 +299,16 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes</FormLabel>
+                  <FormLabel>{t('notes')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Any additional remarks..." {...field} />
+                    <Textarea placeholder={t('notesPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <SheetFooter>
-                <Button type="submit">{entry ? 'Save Changes' : 'Add Entry'}</Button>
+                <Button type="submit">{entry ? t('saveChanges') : t('addEntry')}</Button>
             </SheetFooter>
           </form>
         </Form>

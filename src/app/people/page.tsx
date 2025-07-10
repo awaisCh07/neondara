@@ -64,7 +64,7 @@ type PersonWithBalance = Person & {
 
 export default function PeoplePage() {
   const { user } = useAuth();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [people, setPeople] = useState<PersonWithBalance[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -111,7 +111,7 @@ export default function PeoplePage() {
 
     } catch (error) {
       console.error("Error fetching people and balances: ", error);
-      toast({ title: "Error", description: "Could not fetch your contacts.", variant: "destructive" });
+      toast({ title: t('error'), description: "Could not fetch your contacts.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -131,13 +131,13 @@ export default function PeoplePage() {
         relation: data.relation,
         userId: user.uid,
       });
-      toast({ title: "Success", description: `${data.name} has been added.` });
+      toast({ title: t('success'), description: `${data.name} has been added.` });
       reset();
       setIsDialogOpen(false);
       fetchPeopleAndBalances();
     } catch (error) {
        console.error("Error adding person: ", error);
-       toast({ title: "Error", description: "Failed to add person.", variant: "destructive" });
+       toast({ title: t('error'), description: "Failed to add person.", variant: "destructive" });
     }
   };
   
@@ -148,9 +148,9 @@ export default function PeoplePage() {
   }
   
   const getBalanceText = (balance: number) => {
-    if (balance === 0) return "All square";
-    if (balance > 0) return "You will receive"; // You gave more
-    return "You will give"; // You received more
+    if (balance === 0) return t('allSquare');
+    if (balance > 0) return t('youWillReceive'); // You gave more
+    return t('youWillGive'); // You received more
   }
 
   const getRelationDisplay = (relationKey: string) => {
@@ -174,43 +174,43 @@ export default function PeoplePage() {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Link href="/" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
           <ArrowLeft className="mr-2 h-4 w-4"/>
-          Back to Ledger
+          {t('backToLedger')}
       </Link>
       <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
         <h1 className="text-4xl font-headline flex items-center gap-2">
             <Users/>
-            People & Balances
+            {t('peopleAndBalances')}
         </h1>
         <div className="flex items-center gap-4">
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                placeholder="Search by name..."
+                placeholder={t('searchByName')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 w-full sm:w-64"
-                aria-label="Search people"
+                aria-label={t('searchByName')}
                 />
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 <Button>
                 <UserPlus className="mr-2 h-4 w-4" />
-                Add Person
+                {t('addPerson')}
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                <DialogTitle>Add a New Person</DialogTitle>
+                <DialogTitle>{t('addNewPersonTitle')}</DialogTitle>
                 <DialogDescription>
-                    Add a new friend or relative to your ledger.
+                    {t('addNewPersonDescription')}
                 </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(handleAddPerson)}>
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="name" className="text-right">
-                        Name
+                        {t('name')}
                     </Label>
                     <div className="col-span-3">
                         <Input id="name" {...register('name')} className="w-full" />
@@ -219,7 +219,7 @@ export default function PeoplePage() {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="relation" className="text-right">
-                        Relation
+                        {t('relation')}
                     </Label>
                     <div className="col-span-3">
                         <Controller
@@ -228,7 +228,7 @@ export default function PeoplePage() {
                             render={({ field }) => (
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select a relation" />
+                                    <SelectValue placeholder={t('relation')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {relations.map(r => (
@@ -245,7 +245,7 @@ export default function PeoplePage() {
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="submit">Save person</Button>
+                    <Button type="submit">{t('savePerson')}</Button>
                 </DialogFooter>
                 </form>
             </DialogContent>
@@ -254,7 +254,7 @@ export default function PeoplePage() {
       </div>
 
       {loading ? (
-        <p>Loading your contacts...</p>
+        <p>{t('loadingContacts')}</p>
       ) : people.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPeople.map(person => (
@@ -265,7 +265,7 @@ export default function PeoplePage() {
                         <CardTitle>{person.name}</CardTitle>
                         {person.relation && <CardDescription>{getRelationDisplay(person.relation)}</CardDescription>}
                     </div>
-                    <CardDescription>Balance</CardDescription>
+                    <CardDescription>{t('balance')}</CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
@@ -279,7 +279,7 @@ export default function PeoplePage() {
               <CardFooter>
                  <Link href={`/people/${person.id}`} className="w-full">
                     <Button variant="outline" className="w-full">
-                      View History
+                      {t('viewHistory')}
                       <ArrowRight className="ml-2 h-4 w-4"/>
                     </Button>
                 </Link>
@@ -289,27 +289,27 @@ export default function PeoplePage() {
         </div>
       ) : (
         <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
-          <h3 className="text-xl font-semibold text-foreground">No People Added Yet</h3>
-          <p className="mt-2 mb-4">Click "Add Person" to start building your Niondra network.</p>
+          <h3 className="text-xl font-semibold text-foreground">{t('noPeopleAdded')}</h3>
+          <p className="mt-2 mb-4">{t('clickAddPerson')}</p>
            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 <Button>
                 <UserPlus className="mr-2 h-4 w-4" />
-                Add Person
+                {t('addPerson')}
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                <DialogTitle>Add a New Person</DialogTitle>
+                <DialogTitle>{t('addNewPersonTitle')}</DialogTitle>
                 <DialogDescription>
-                    Add a new friend or relative to your ledger.
+                    {t('addNewPersonDescription')}
                 </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(handleAddPerson)}>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="name" className="text-right">
-                            Name
+                            {t('name')}
                         </Label>
                         <div className="col-span-3">
                             <Input id="name" {...register('name')} className="w-full" />
@@ -318,7 +318,7 @@ export default function PeoplePage() {
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="relation" className="text-right">
-                            Relation
+                            {t('relation')}
                         </Label>
                         <div className="col-span-3">
                             <Controller
@@ -327,7 +327,7 @@ export default function PeoplePage() {
                                 render={({ field }) => (
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select a relation" />
+                                        <SelectValue placeholder={t('relation')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {relations.map(r => (
@@ -344,7 +344,7 @@ export default function PeoplePage() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit">Save person</Button>
+                        <Button type="submit">{t('savePerson')}</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

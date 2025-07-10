@@ -26,7 +26,7 @@ import { useLanguage } from './language-provider';
 
 export function AppLayout({ children, onExport }: { children: React.ReactNode, onExport: () => void }) {
   const { user } = useAuth();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -50,23 +50,24 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
   };
   
   const navItems = [
-      { href: '/', label: 'Ledger', icon: HomeIcon },
-      { href: '/people', label: 'People', icon: Users },
+      { href: '/', label: t('navLedger'), icon: HomeIcon },
+      { href: '/people', label: t('navPeople'), icon: Users },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={cn("min-h-screen bg-background", language === 'ur' ? 'font-urdu' : 'font-body')}>
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-6">
-                <h1 className="text-3xl font-headline text-foreground">Niondra Ledger</h1>
+                <h1 className="text-3xl font-headline text-foreground">{t('appTitle')}</h1>
                 <nav className="hidden md:flex items-center gap-4">
                     {navItems.map(item => (
                          <Link key={item.href} href={item.href} passHref>
                             <Button variant="ghost" className={cn(
                                 "text-sm font-medium",
-                                pathname === item.href ? "text-primary" : "text-muted-foreground"
+                                pathname === item.href ? "text-primary" : "text-muted-foreground",
+                                language === 'ur' && 'text-lg'
                             )}>
                                 <item.icon className="mr-2 h-4 w-4" />
                                 {item.label}
@@ -89,7 +90,7 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                    <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.displayName || 'My Account'}</p>
+                      <p className="text-sm font-medium leading-none">{user?.displayName || t('myAccount')}</p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {user?.email}
                       </p>
@@ -98,18 +99,18 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onExport}>
                     <UserIcon className="mr-2 h-4 w-4" />
-                    <span>Export Data</span>
+                    <span>{t('exportData')}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger>
                       <Languages className="mr-2 h-4 w-4" />
-                      <span>Language</span>
+                      <span>{t('language')}</span>
                     </DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
                         <DropdownMenuSubContent>
                             <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as 'en' | 'ur')}>
-                                <DropdownMenuRadioItem value="en">English</DropdownMenuRadioItem>
-                                <DropdownMenuRadioItem value="ur">Urdu</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="en">{t('english')}</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="ur">{t('urdu')}</DropdownMenuRadioItem>
                             </DropdownMenuRadioGroup>
                         </DropdownMenuSubContent>
                     </DropdownMenuPortal>
@@ -117,7 +118,7 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <span>{t('logout')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

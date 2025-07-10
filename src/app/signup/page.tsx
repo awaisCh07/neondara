@@ -1,4 +1,4 @@
-// src/app/signup/page.tsx
+
 "use client";
 
 import { useState } from 'react';
@@ -10,8 +10,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from 'next/link';
+import { useLanguage } from '@/components/language-provider';
+import { cn } from '@/lib/utils';
 
 export default function SignupPage() {
+  const { language, t } = useLanguage();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,30 +38,30 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className={cn("flex items-center justify-center min-h-screen bg-background", language === 'ur' ? 'font-urdu' : 'font-body')}>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Sign Up</CardTitle>
+          <CardTitle className="text-2xl">{t('signupTitle')}</CardTitle>
           <CardDescription>
-            Create an account to start using the Niondra Ledger.
+            {t('signupDescription')}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSignup}>
           <CardContent className="grid gap-4">
             {error && <p className="text-sm font-medium text-destructive">{error}</p>}
             <div className="grid gap-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{t('fullName')}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Your Name"
+                placeholder={t('fullName')}
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -69,7 +72,7 @@ export default function SignupPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -82,12 +85,12 @@ export default function SignupPage() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? t('creatingAccount') : t('createAccount')}
             </Button>
             <div className="mt-4 text-center text-sm">
-              Already have an account?{' '}
+              {t('haveAccount')}{' '}
               <Link href="/login" className="underline">
-                Log in
+                {t('logIn')}
               </Link>
             </div>
           </CardFooter>

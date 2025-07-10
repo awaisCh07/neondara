@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { NiondraEntrySheet } from '@/components/niondra-entry-sheet';
 import { useToast } from '@/hooks/use-toast';
 import { deleteDoc, addDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import { useLanguage } from '@/components/language-provider';
 
 
 type PersonDetailProps = {
@@ -32,6 +33,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<NiondraEntry | undefined>(undefined);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const fetchPersonAndEntries = async (currentPersonId: string) => {
     if (!user) return;
@@ -83,7 +85,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
     } catch (error) {
       console.error("Error fetching person details: ", error);
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to fetch person details.",
         variant: "destructive",
       });
@@ -108,14 +110,14 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
     try {
       await deleteDoc(doc(db, "niondra_entries", entryId));
       toast({
-        title: "Success",
-        description: "Entry has been deleted.",
+        title: t('success'),
+        description: t('entryDeletedSuccess'),
       });
       fetchPersonAndEntries(personId); // Refetch to update list and balance
     } catch (error) {
       console.error("Error deleting entry: ", error);
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to delete entry.",
         variant: "destructive",
       });
@@ -131,14 +133,14 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
         date: Timestamp.fromDate(newEntry.date),
       });
       toast({
-        title: "Success",
-        description: "New entry added to the ledger.",
+        title: t('success'),
+        description: t('entryAddedSuccess'),
       });
       fetchPersonAndEntries(personId);
     } catch (error) {
       console.error("Error adding entry: ", error);
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to add new entry.",
         variant: "destructive",
       });
@@ -154,14 +156,14 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
         date: Timestamp.fromDate(dataToUpdate.date),
       });
       toast({
-        title: "Success",
-        description: "Entry has been updated.",
+        title: t('success'),
+        description: t('entryUpdatedSuccess'),
       });
       fetchPersonAndEntries(personId);
     } catch (error) {
       console.error("Error updating entry: ", error);
       toast({
-        title: "Error",
+        title: t('error'),
         description: "Failed to update entry.",
         variant: "destructive",
       });
@@ -172,7 +174,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
   if (loading) {
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p>Loading details...</p>
+        <p>{t('loadingDetails')}</p>
       </div>
     );
   }
@@ -180,11 +182,11 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
   if (!person) {
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 className="text-2xl font-bold">Person not found</h2>
+        <h2 className="text-2xl font-bold">{t('personNotFound')}</h2>
         <Link href="/people">
             <Button variant="outline" className="mt-4">
                 <ArrowLeft className="mr-2 h-4 w-4"/>
-                Back to People
+                {t('backToPeople')}
             </Button>
         </Link>
       </div>
@@ -192,7 +194,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
   }
 
   const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-green-600' : 'text-red-600';
-  const balanceText = balance.net === 0 ? "You are all square" : balance.net > 0 ? `You will receive ${new Intl.NumberFormat().format(balance.net)}` : `You will give ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
+  const balanceText = balance.net === 0 ? t('allSquare') : balance.net > 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(balance.net)}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
 
 
   return (
@@ -200,7 +202,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
         <div className="mb-8">
             <Link href="/people" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
                  <ArrowLeft className="mr-2 h-4 w-4"/>
-                Back to People List
+                {t('backToPeople')}
             </Link>
              <h1 className="text-4xl font-headline">{person.name}</h1>
              {person.relation && <p className="text-lg text-muted-foreground">{person.relation}</p>}
@@ -208,28 +210,28 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
 
         <Card className="mb-8">
             <CardHeader>
-                <CardTitle>Balance Summary</CardTitle>
-                <CardDescription>Based on monetary gifts exchanged.</CardDescription>
+                <CardTitle>{t('balanceSummary')}</CardTitle>
+                <CardDescription>{t('balanceSummaryDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                     <div>
-                        <p className="text-sm text-muted-foreground">Total Given</p>
+                        <p className="text-sm text-muted-foreground">{t('totalGiven')}</p>
                         <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.given)}</p>
                     </div>
                      <div>
-                        <p className="text-sm text-muted-foreground">Total Received</p>
+                        <p className="text-sm text-muted-foreground">{t('totalReceived')}</p>
                         <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.received)}</p>
                     </div>
                      <div>
-                        <p className="text-sm text-muted-foreground">Net Balance</p>
+                        <p className="text-sm text-muted-foreground">{t('netBalance')}</p>
                         <p className={`text-2xl font-bold ${balanceColor}`}>{balanceText}</p>
                     </div>
                 </div>
             </CardContent>
         </Card>
 
-        <h2 className="text-2xl font-bold mb-4">Transaction History</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('transactionHistory')}</h2>
          {entries.length > 0 ? (
             <div className="grid gap-6">
                 {entries.map(entry => {
@@ -239,8 +241,8 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
             </div>
         ) : (
             <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
-                <h3 className="text-xl font-semibold text-foreground">No History Yet</h3>
-                <p className="mt-2">Add a new entry to start tracking your exchanges with {person.name}.</p>
+                <h3 className="text-xl font-semibold text-foreground">{t('noHistoryYet')}</h3>
+                <p className="mt-2">{t('startTracking')} {person.name}.</p>
             </div>
         )}
         <NiondraEntrySheet

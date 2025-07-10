@@ -14,6 +14,7 @@ export default {
         headline: ['Belleza', 'sans-serif'],
         serif: ['Alegreya', 'serif'],
         code: ['monospace'],
+        urdu: ['Noto Nastaliq Urdu', 'serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -83,10 +84,10 @@ export default {
         },
         'accordion-up': {
           from: {
-            height: 'var(--radix-accordion-content-height)',
+            height: '0',
           },
           to: {
-            height: '0',
+            height: 'var(--radix-accordion-content-height)',
           },
         },
       },

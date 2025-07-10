@@ -27,7 +27,28 @@ import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const relations: RelationType[] = ["Chachu", "Chachi", "Mamu", "Mami", "Dadi Amma", "Dada Abu", "Nani Amma", "Nana Abu", "Khala", "Khalu", "Bhai", "Behan", "Bhateeja", "Bhateeji", "Bhaanja", "Bhaanji", "Friend", "Other"];
+const relations: RelationType[] = [
+    "Aunt (Chachi, Khala, Mami, Phuppi)",
+    "Brother (Bhai)",
+    "Brother-in-law (Saala, Behan ka Shohar)",
+    "Cousin (Cousin)",
+    "Daughter (Beti)",
+    "Father (Abu)",
+    "Father-in-law (Sasur)",
+    "Friend (Dost)",
+    "Grandfather (Dada, Nana)",
+    "Grandmother (Dadi, Nani)",
+    "Mother (Ammi)",
+    "Mother-in-law (Saas)",
+    "Nephew (Bhatija, Bhanja)",
+    "Niece (Bhatiji, Bhanji)",
+    "Other",
+    "Sister (Behan)",
+    "Sister-in-law (Saali, Bhabi)",
+    "Son (Beta)",
+    "Uncle (Chacha, Khalu, Mamu, Phuppa)",
+];
+
 
 const personSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -51,7 +72,7 @@ export default function PeoplePage() {
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm<PersonFormData>({
     resolver: zodResolver(personSchema),
     defaultValues: {
-      relation: "Friend"
+      relation: "Friend (Dost)"
     }
   });
 
@@ -119,15 +140,15 @@ export default function PeoplePage() {
   };
   
   const getBalanceColor = (balance: number) => {
-    if (balance > 0) return 'text-green-600';
-    if (balance < 0) return 'text-red-600';
+    if (balance > 0) return 'text-red-600';
+    if (balance < 0) return 'text-green-600';
     return 'text-muted-foreground';
   }
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return "All square";
-    if (balance > 0) return "You will receive";
-    return "You will give";
+    if (balance > 0) return "You will give";
+    return "You will receive";
   }
 
 

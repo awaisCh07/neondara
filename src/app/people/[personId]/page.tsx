@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -32,13 +33,13 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
   const [editingEntry, setEditingEntry] = useState<NiondraEntry | undefined>(undefined);
   const { toast } = useToast();
 
-  const fetchPersonAndEntries = async () => {
-    if (!user || !personId) return;
+  const fetchPersonAndEntries = async (currentPersonId: string) => {
+    if (!user) return;
 
     setLoading(true);
     try {
       // Fetch person details
-      const personRef = doc(db, 'people', personId);
+      const personRef = doc(db, 'people', currentPersonId);
       const personSnap = await getDoc(personRef);
 
       if (personSnap.exists() && personSnap.data().userId === user.uid) {
@@ -51,7 +52,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
       const entriesQuery = query(
         collection(db, 'niondra_entries'),
         where('userId', '==', user.uid),
-        where('personId', '==', personId),
+        where('personId', '==', currentPersonId),
         orderBy('date', 'desc')
       );
       const querySnapshot = await getDocs(entriesQuery);
@@ -92,7 +93,9 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
   };
 
   useEffect(() => {
-    fetchPersonAndEntries();
+    if (user && personId) {
+        fetchPersonAndEntries(personId);
+    }
   }, [user, personId]);
 
 
@@ -108,7 +111,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
         title: "Success",
         description: "Entry has been deleted.",
       });
-      fetchPersonAndEntries(); // Refetch to update list and balance
+      fetchPersonAndEntries(personId); // Refetch to update list and balance
     } catch (error) {
       console.error("Error deleting entry: ", error);
       toast({
@@ -131,7 +134,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
         title: "Success",
         description: "New entry added to the ledger.",
       });
-      fetchPersonAndEntries();
+      fetchPersonAndEntries(personId);
     } catch (error) {
       console.error("Error adding entry: ", error);
       toast({
@@ -154,7 +157,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
         title: "Success",
         description: "Entry has been updated.",
       });
-      fetchPersonAndEntries();
+      fetchPersonAndEntries(personId);
     } catch (error) {
       console.error("Error updating entry: ", error);
       toast({

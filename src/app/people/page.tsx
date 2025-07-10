@@ -8,7 +8,7 @@ import { useAuth } from '@/components/auth-provider';
 import type { Person, NiondraEntry, NiondraEntryDTO, RelationType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, UserPlus, Users, ArrowRight } from 'lucide-react';
+import { PlusCircle, UserPlus, Users, ArrowRight, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -93,7 +93,9 @@ export default function PeoplePage() {
   };
 
   useEffect(() => {
-    fetchPeopleAndBalances();
+    if (user) {
+      fetchPeopleAndBalances();
+    }
   }, [user, toast]);
   
   const handleAddPerson = async (data: PersonFormData) => {
@@ -122,6 +124,10 @@ export default function PeoplePage() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Link href="/" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4"/>
+          Back to Ledger
+      </Link>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-headline flex items-center gap-2">
             <Users/>

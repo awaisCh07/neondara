@@ -1,0 +1,38 @@
+# The name of the backend resource in firebase.json
+# The name of the backend resource in firebase.json
+run:
+  # The command to run to start the server
+  command: npm run start
+# The version of the Node.js runtime to use
+runtime: nodejs20
+# System-provided environment variables
+env:
+  - variable: PORT
+    # The port to listen on
+    value: '8080'
+# The number of instances to run
+# The minimum number of instances to run
+minInstances: 0
+# The maximum number of instances to run
+maxInstances: 10
+# The number of concurrent requests to send to a single instance
+concurrency: 80
+# The amount of memory to allocate to the instance
+memory: 256Mi
+# The amount of CPU to allocate to the instance
+cpu: 0.5
+# The region to run the instance in
+region:
+  - us-central1
+# Ingress settings for the backend
+ingress: all
+# Service account to run the instance with
+serviceAccount: app-hosting-executor
+# VPC connector settings
+vpc:
+  # The name of the VPC connector
+  connector: ''
+  # The egress settings for the VPC connector
+  egress: private-ranges-only
+# Secrets to mount in the instance
+secrets: []

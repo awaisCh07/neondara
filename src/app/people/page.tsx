@@ -119,15 +119,15 @@ export default function PeoplePage() {
   };
   
   const getBalanceColor = (balance: number) => {
-    if (balance > 0) return 'text-red-600';
-    if (balance < 0) return 'text-green-600';
+    if (balance > 0) return 'text-green-600';
+    if (balance < 0) return 'text-red-600';
     return 'text-muted-foreground';
   }
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return "All square";
-    if (balance > 0) return "You owe them";
-    return "They owe you";
+    if (balance > 0) return "You will receive";
+    return "You will give";
   }
 
 

@@ -2,7 +2,7 @@
 
 import { useAuth } from './auth-provider';
 import { useRouter, usePathname } from 'next/navigation';
-import { LogOut, User as UserIcon, Users, Home as HomeIcon } from 'lucide-react';
+import { LogOut, User as UserIcon, Users, Home as HomeIcon, Languages } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,15 +10,23 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { auth } from '@/lib/firebase';
+import { useLanguage } from './language-provider';
 
 export function AppLayout({ children, onExport }: { children: React.ReactNode, onExport: () => void }) {
   const { user } = useAuth();
+  const { language, setLanguage } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -92,6 +100,20 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
                     <UserIcon className="mr-2 h-4 w-4" />
                     <span>Export Data</span>
                   </DropdownMenuItem>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <Languages className="mr-2 h-4 w-4" />
+                      <span>Language</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                            <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as 'en' | 'ur')}>
+                                <DropdownMenuRadioItem value="en">English</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="ur">Urdu</DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />

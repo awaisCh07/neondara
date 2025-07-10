@@ -4,25 +4,30 @@ export type Occasion = "Wedding" | "Birth" | "Housewarming" | "Other";
 export type GiftType = "Money" | "Sweets" | "Item";
 
 export type RelationType = 
-  | "Aunt (Chachi, Khala, Mami, Phuppi)"
-  | "Brother (Bhai)"
-  | "Brother-in-law (Saala, Behan ka Shohar)"
-  | "Cousin (Cousin)"
-  | "Daughter (Beti)"
-  | "Father (Abu)"
-  | "Father-in-law (Sasur)"
-  | "Friend (Dost)"
-  | "Grandfather (Dada, Nana)"
-  | "Grandmother (Dadi, Nani)"
-  | "Mother (Ammi)"
-  | "Mother-in-law (Saas)"
-  | "Nephew (Bhatija, Bhanja)"
-  | "Niece (Bhatiji, Bhanji)"
+  | "Aunt"
+  | "Brother"
+  | "Brother-in-law"
+  | "Cousin"
+  | "Daughter"
+  | "Father"
+  | "Father-in-law"
+  | "Friend"
+  | "Grandfather"
+  | "Grandmother"
+  | "Mother"
+  | "Mother-in-law"
+  | "Nephew"
+  | "Niece"
   | "Other"
-  | "Sister (Behan)"
-  | "Sister-in-law (Saali, Bhabi)"
-  | "Son (Beta)"
-  | "Uncle (Chacha, Khalu, Mamu, Phuppa)";
+  | "Sister"
+  | "Sister-in-law"
+  | "Son"
+  | "Uncle";
+
+export type Relation = {
+  en: RelationType;
+  ur: string;
+}
 
 export type Person = {
     id: string;

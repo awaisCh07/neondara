@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/auth-provider';
-import type { Person, NiondraEntry, NiondraEntryDTO, RelationType } from '@/lib/types';
+import type { Person, NiondraEntry, NiondraEntryDTO, RelationType, Relation } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircle, UserPlus, Users, ArrowRight, ArrowLeft, Search } from 'lucide-react';
@@ -26,28 +26,29 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useLanguage } from '@/components/language-provider';
 
-const relations: RelationType[] = [
-    "Aunt (Chachi, Khala, Mami, Phuppi)",
-    "Brother (Bhai)",
-    "Brother-in-law (Saala, Behan ka Shohar)",
-    "Cousin (Cousin)",
-    "Daughter (Beti)",
-    "Father (Abu)",
-    "Father-in-law (Sasur)",
-    "Friend (Dost)",
-    "Grandfather (Dada, Nana)",
-    "Grandmother (Dadi, Nani)",
-    "Mother (Ammi)",
-    "Mother-in-law (Saas)",
-    "Nephew (Bhatija, Bhanja)",
-    "Niece (Bhatiji, Bhanji)",
-    "Other",
-    "Sister (Behan)",
-    "Sister-in-law (Saali, Bhabi)",
-    "Son (Beta)",
-    "Uncle (Chacha, Khalu, Mamu, Phuppa)",
-];
+const relations: Relation[] = [
+    { en: "Aunt", ur: "Chachi, Khala, Mami, Phuppi" },
+    { en: "Brother", ur: "Bhai" },
+    { en: "Brother-in-law", ur: "Saala, Behan ka Shohar" },
+    { en: "Cousin", ur: "Cousin" },
+    { en: "Daughter", ur: "Beti" },
+    { en: "Father", ur: "Abu, Baba" },
+    { en: "Father-in-law", ur: "Sasur" },
+    { en: "Friend", ur: "Dost" },
+    { en: "Grandfather", ur: "Dada, Nana" },
+    { en: "Grandmother", ur: "Dadi, Nani" },
+    { en: "Mother", ur: "Ammi, Maa" },
+    { en: "Mother-in-law", ur: "Saas" },
+    { en: "Nephew", ur: "Bhatija, Bhanja" },
+    { en: "Niece", ur: "Bhatiji, Bhanji" },
+    { en: "Other", ur: "Other" },
+    { en: "Sister", ur: "Behan" },
+    { en: "Sister-in-law", ur: "Saali, Bhabi" },
+    { en: "Son", ur: "Beta" },
+    { en: "Uncle", ur: "Chacha, Khalu, Mamu, Phuppa" },
+].sort((a, b) => a.en.localeCompare(b.en));
 
 
 const personSchema = z.object({
@@ -63,6 +64,7 @@ type PersonWithBalance = Person & {
 
 export default function PeoplePage() {
   const { user } = useAuth();
+  const { language } = useLanguage();
   const [people, setPeople] = useState<PersonWithBalance[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -72,7 +74,7 @@ export default function PeoplePage() {
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm<PersonFormData>({
     resolver: zodResolver(personSchema),
     defaultValues: {
-      relation: "Friend (Dost)"
+      relation: "Friend"
     }
   });
 
@@ -140,15 +142,25 @@ export default function PeoplePage() {
   };
   
   const getBalanceColor = (balance: number) => {
-    if (balance > 0) return 'text-red-600';
-    if (balance < 0) return 'text-green-600';
+    if (balance > 0) return 'text-green-600'; // User will receive
+    if (balance < 0) return 'text-red-600'; // User will give
     return 'text-muted-foreground';
   }
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return "All square";
-    if (balance > 0) return "You will give";
-    return "You will receive";
+    if (balance > 0) return "You will receive"; // You gave more
+    return "You will give"; // You received more
+  }
+
+  const getRelationDisplay = (relationKey: string) => {
+      const relation = relations.find(r => r.en === relationKey);
+      if (!relation) return relationKey;
+
+      if (language === 'ur') {
+          return `${relation.ur} (${relation.en})`;
+      }
+      return `${relation.en} (${relation.ur})`;
   }
 
 
@@ -220,7 +232,9 @@ export default function PeoplePage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     {relations.map(r => (
-                                        <SelectItem key={r} value={r}>{r}</SelectItem>
+                                        <SelectItem key={r.en} value={r.en}>
+                                            {language === 'ur' ? `${r.ur} (${r.en})` : `${r.en} (${r.ur})`}
+                                        </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -249,7 +263,7 @@ export default function PeoplePage() {
                 <div className="flex justify-between items-start">
                     <div>
                         <CardTitle>{person.name}</CardTitle>
-                        {person.relation && <CardDescription>{person.relation}</CardDescription>}
+                        {person.relation && <CardDescription>{getRelationDisplay(person.relation)}</CardDescription>}
                     </div>
                     <CardDescription>Balance</CardDescription>
                 </div>
@@ -317,7 +331,9 @@ export default function PeoplePage() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {relations.map(r => (
-                                            <SelectItem key={r} value={r}>{r}</SelectItem>
+                                            <SelectItem key={r.en} value={r.en}>
+                                                {language === 'ur' ? `${r.ur} (${r.en})` : `${r.en} (${r.ur})`}
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

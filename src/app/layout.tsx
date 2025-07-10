@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/components/auth-provider';
+import { LanguageProvider } from '@/components/language-provider';
 
 export const metadata: Metadata = {
   title: 'Niondra Ledger',
@@ -22,7 +23,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
         <AuthProvider>
+          <LanguageProvider>
             {children}
+          </LanguageProvider>
         </AuthProvider>
         <Toaster />
       </body>

@@ -91,7 +91,7 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
           }
         }
       });
-      setBalance({ given, received, net: given - received });
+      setBalance({ given, received, net: received - given });
 
     } catch (error) {
       console.error("Error fetching person details: ", error);
@@ -211,8 +211,8 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
     );
   }
 
-  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-red-600' : 'text-green-600';
-  const balanceText = balance.net === 0 ? t('allSquare') : balance.net > 0 ? `${t('youWillGive')} ${new Intl.NumberFormat().format(balance.net)}` : `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
+  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net < 0 ? 'text-red-600' : 'text-green-600';
+  const balanceText = balance.net === 0 ? t('allSquare') : balance.net < 0 ? `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}` : `${t('youWillReceive')} ${new Intl.NumberFormat().format(balance.net)}`;
 
   return (
     <AppLayout>
@@ -275,5 +275,3 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
     </AppLayout>
   );
 }
-
-    

@@ -14,6 +14,7 @@ import { useAuth } from './auth-provider';
 import { useLanguage } from './language-provider';
 import { AppLayout } from './layout';
 import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
 
 export function LedgerView() {
   const [entries, setEntries] = useState<NiondraEntry[]>([]);
@@ -62,7 +63,7 @@ export function LedgerView() {
         return {
           id: docSnapshot.id,
           ...data,
-          person: personName, // Legacy field for display
+          person: personName, // This is now correctly resolved
           date: data.date.toDate(),
         } as NiondraEntry;
       }));
@@ -163,6 +164,67 @@ export function LedgerView() {
     setIsSheetOpen(true);
   }
 
+  const handleExportData = () => {
+    if (entries.length === 0) {
+        toast({
+            title: "No Data to Export",
+            description: "There are no ledger entries to export.",
+            variant: "destructive"
+        })
+        return;
+    }
+
+    const headers = [
+        'ID', 'Direction', 'Person', 'Date', 'Occasion', 'Gift Type', 'Amount', 'Description', 'Notes'
+    ];
+    
+    // Using a function to safely handle quotes and commas in data
+    const escapeCsvCell = (cellData: any) => {
+        if (cellData === null || cellData === undefined) {
+            return '';
+        }
+        const stringData = String(cellData);
+        // If the data contains a comma, double quote, or newline, wrap it in double quotes
+        if (stringData.includes('"') || stringData.includes(',') || stringData.includes('\n')) {
+            // Escape existing double quotes by doubling them
+            return `"${stringData.replace(/"/g, '""')}"`;
+        }
+        return stringData;
+    };
+
+    const csvContent = [
+        headers.join(','),
+        ...entries.map(entry => [
+            escapeCsvCell(entry.id),
+            escapeCsvCell(entry.direction),
+            escapeCsvCell(entry.person),
+            escapeCsvCell(format(entry.date, 'yyyy-MM-dd')),
+            escapeCsvCell(entry.occasion),
+            escapeCsvCell(entry.giftType),
+            escapeCsvCell(entry.amount),
+            escapeCsvCell(entry.description),
+            escapeCsvCell(entry.notes),
+        ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `niondra_ledger_export_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    toast({
+        title: "Export Successful",
+        description: "Your data has been downloaded as a CSV file.",
+    })
+  };
+
+
   if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -172,7 +234,7 @@ export function LedgerView() {
   }
   
   return (
-    <AppLayout>
+    <AppLayout onExport={handleExportData}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-4xl font-headline">{t('ledgerHistory')}</h1>

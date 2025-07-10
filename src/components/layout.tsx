@@ -3,7 +3,7 @@
 
 import { useAuth } from './auth-provider';
 import { useRouter, usePathname } from 'next/navigation';
-import { LogOut, User as UserIcon, Users, Home as HomeIcon, Languages } from 'lucide-react';
+import { LogOut, User as UserIcon, Users, Home as HomeIcon, Languages, Download } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -108,7 +108,7 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={onExport}>
-                        <UserIcon className="mr-2 h-4 w-4" />
+                        <Download className="mr-2 h-4 w-4" />
                         <span>{t('exportData')}</span>
                       </DropdownMenuItem>
                     </>

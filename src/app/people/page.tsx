@@ -125,7 +125,7 @@ export default function PeoplePage() {
             received += entry.amount || 0;
           }
         });
-        return { ...person, balance: given - received };
+        return { ...person, balance: received - given };
       });
 
       setPeople(peopleWithBalances.sort((a,b) => a.name.localeCompare(b.name)));
@@ -206,15 +206,15 @@ export default function PeoplePage() {
   };
   
   const getBalanceColor = (balance: number) => {
-    if (balance > 0) return 'text-red-600'; // User will give
-    if (balance < 0) return 'text-green-600'; // User will receive
+    if (balance < 0) return 'text-red-600'; // User will give
+    if (balance > 0) return 'text-green-600'; // User will receive
     return 'text-muted-foreground';
   }
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return t('allSquare');
-    if (balance > 0) return `${t('youWillGive')} ${new Intl.NumberFormat().format(balance)}`;
-    return `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
+    if (balance < 0) return `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
+    return `${t('youWillReceive')} ${new Intl.NumberFormat().format(balance)}`;
   }
 
   const getRelationDisplay = (relationKey: string) => {
@@ -404,5 +404,3 @@ export default function PeoplePage() {
     </AppLayout>
   );
 }
-
-    

@@ -9,9 +9,11 @@ import { Search } from 'lucide-react';
 
 interface NiondraTimelineProps {
   entries: NiondraEntry[];
+  onEdit: (entry: NiondraEntry) => void;
+  onDelete: (id: string) => void;
 }
 
-export function NiondraTimeline({ entries }: NiondraTimelineProps) {
+export function NiondraTimeline({ entries, onEdit, onDelete }: NiondraTimelineProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [occasionFilter, setOccasionFilter] = useState<Occasion | 'all'>('all');
   const [directionFilter, setDirectionFilter] = useState<'given' | 'received' | 'all'>('all');
@@ -73,7 +75,7 @@ export function NiondraTimeline({ entries }: NiondraTimelineProps) {
       {filteredEntries.length > 0 ? (
         <div className="grid gap-6">
           {filteredEntries.map(entry => (
-            <NiondraCard key={entry.id} entry={entry} />
+            <NiondraCard key={entry.id} entry={entry} onEdit={onEdit} onDelete={onDelete} />
           ))}
         </div>
       ) : (

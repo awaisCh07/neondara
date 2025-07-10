@@ -1,5 +1,7 @@
 import type { NiondraEntry } from './types';
 
+// This file is no longer the primary source of data and will be removed in a future step.
+// For now, it can be kept for reference or quick testing if needed.
 export const initialEntries: NiondraEntry[] = [
   {
     id: '1',

@@ -1,24 +1,111 @@
 'use client';
 
-import { useState } from 'react';
-import type { NiondraEntry } from '@/lib/types';
-import { initialEntries } from '@/lib/data';
+import { useState, useEffect } from 'react';
+import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc, Timestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import type { NiondraEntry, NiondraEntryDTO } from '@/lib/types';
 import { NiondraEntrySheet } from '@/components/niondra-entry-sheet';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Download } from 'lucide-react';
 import { NiondraTimeline } from './niondra-timeline';
+import { useToast } from '@/hooks/use-toast';
 
 export function LedgerView() {
-  const [entries, setEntries] = useState<NiondraEntry[]>(initialEntries);
+  const [entries, setEntries] = useState<NiondraEntry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<NiondraEntry | undefined>(undefined);
+  const { toast } = useToast();
 
-  const handleAddEntry = (newEntry: Omit<NiondraEntry, 'id'>) => {
-    setEntries(prev => [...prev, { ...newEntry, id: new Date().toISOString() }]);
+  const fetchEntries = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, "niondra_entries"));
+      const entriesData = querySnapshot.docs.map(doc => {
+        const data = doc.data() as NiondraEntryDTO;
+        return {
+          id: doc.id,
+          ...data,
+          date: data.date.toDate(),
+        }
+      });
+      setEntries(entriesData);
+    } catch (error) {
+      console.error("Error fetching entries: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch ledger entries.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleUpdateEntry = (updatedEntry: NiondraEntry) => {
-    setEntries(prev => prev.map(entry => entry.id === updatedEntry.id ? updatedEntry : entry));
+  useEffect(() => {
+    fetchEntries();
+  }, []);
+
+  const handleAddEntry = async (newEntry: Omit<NiondraEntry, 'id'>) => {
+    try {
+      await addDoc(collection(db, "niondra_entries"), {
+        ...newEntry,
+        date: Timestamp.fromDate(newEntry.date),
+      });
+      toast({
+        title: "Success",
+        description: "New entry added to the ledger.",
+      });
+      fetchEntries(); // Refetch to get the new entry with its ID
+    } catch (error) {
+      console.error("Error adding entry: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to add new entry.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateEntry = async (updatedEntry: NiondraEntry) => {
+    try {
+      const entryRef = doc(db, "niondra_entries", updatedEntry.id);
+      const { id, ...dataToUpdate } = updatedEntry;
+      await updateDoc(entryRef, {
+        ...dataToUpdate,
+        date: Timestamp.fromDate(dataToUpdate.date),
+      });
+      toast({
+        title: "Success",
+        description: "Entry has been updated.",
+      });
+      fetchEntries(); // Refetch to update the UI
+    } catch (error) {
+      console.error("Error updating entry: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to update entry.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handleDeleteEntry = async (entryId: string) => {
+    try {
+      await deleteDoc(doc(db, "niondra_entries", entryId));
+      toast({
+        title: "Success",
+        description: "Entry has been deleted.",
+      });
+      setEntries(prev => prev.filter(entry => entry.id !== entryId));
+    } catch (error) {
+      console.error("Error deleting entry: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete entry.",
+        variant: "destructive",
+      });
+    }
   };
   
   const handleOpenSheet = (entry?: NiondraEntry) => {
@@ -74,7 +161,17 @@ export function LedgerView() {
       </header>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <NiondraTimeline entries={entries} />
+        {loading ? (
+          <div className="text-center py-16 text-muted-foreground">
+            <p>Loading ledger...</p>
+          </div>
+        ) : (
+          <NiondraTimeline 
+            entries={entries} 
+            onEdit={handleOpenSheet} 
+            onDelete={handleDeleteEntry} 
+          />
+        )}
       </main>
 
       <NiondraEntrySheet

@@ -8,7 +8,7 @@ import { useAuth } from '@/components/auth-provider';
 import type { Person, NiondraEntry, NiondraEntryDTO, RelationType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, UserPlus, Users, ArrowRight, ArrowLeft } from 'lucide-react';
+import { PlusCircle, UserPlus, Users, ArrowRight, ArrowLeft, Search } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -45,6 +45,7 @@ export default function PeoplePage() {
   const [people, setPeople] = useState<PersonWithBalance[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
   
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm<PersonFormData>({
@@ -96,7 +97,7 @@ export default function PeoplePage() {
     if (user) {
       fetchPeopleAndBalances();
     }
-  }, [user, toast]);
+  }, [user]);
   
   const handleAddPerson = async (data: PersonFormData) => {
     if (!user) return;
@@ -122,80 +123,98 @@ export default function PeoplePage() {
     return 'text-muted-foreground';
   }
 
+  const filteredPeople = useMemo(() => {
+    return people.filter(person => 
+      person.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [people, searchTerm]);
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Link href="/" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
           <ArrowLeft className="mr-2 h-4 w-4"/>
           Back to Ledger
       </Link>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
         <h1 className="text-4xl font-headline flex items-center gap-2">
             <Users/>
             People & Balances
         </h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Add Person
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add a New Person</DialogTitle>
-              <DialogDescription>
-                Add a new friend or relative to your ledger.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit(handleAddPerson)}>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <div className="col-span-3">
-                    <Input id="name" {...register('name')} className="w-full" />
-                    {errors.name && <p className="text-sm font-medium text-destructive mt-1">{errors.name.message}</p>}
-                  </div>
+        <div className="flex items-center gap-4">
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                placeholder="Search by name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-full sm:w-64"
+                aria-label="Search people"
+                />
+            </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+                <Button>
+                <UserPlus className="mr-2 h-4 w-4" />
+                Add Person
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                <DialogTitle>Add a New Person</DialogTitle>
+                <DialogDescription>
+                    Add a new friend or relative to your ledger.
+                </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit(handleAddPerson)}>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                        Name
+                    </Label>
+                    <div className="col-span-3">
+                        <Input id="name" {...register('name')} className="w-full" />
+                        {errors.name && <p className="text-sm font-medium text-destructive mt-1">{errors.name.message}</p>}
+                    </div>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="relation" className="text-right">
+                        Relation
+                    </Label>
+                    <div className="col-span-3">
+                        <Controller
+                            control={control}
+                            name="relation"
+                            render={({ field }) => (
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a relation" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {relations.map(r => (
+                                        <SelectItem key={r} value={r}>{r}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            )}
+                        />
+                        {errors.relation && <p className="text-sm font-medium text-destructive mt-1">{errors.relation.message}</p>}
+                    </div>
+                    </div>
                 </div>
-                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="relation" className="text-right">
-                    Relation
-                  </Label>
-                  <div className="col-span-3">
-                     <Controller
-                        control={control}
-                        name="relation"
-                        render={({ field }) => (
-                           <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a relation" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {relations.map(r => (
-                                    <SelectItem key={r} value={r}>{r}</SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      />
-                    {errors.relation && <p className="text-sm font-medium text-destructive mt-1">{errors.relation.message}</p>}
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit">Save person</Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <DialogFooter>
+                    <Button type="submit">Save person</Button>
+                </DialogFooter>
+                </form>
+            </DialogContent>
+            </Dialog>
+        </div>
       </div>
 
       {loading ? (
         <p>Loading your contacts...</p>
       ) : people.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {people.map(person => (
+          {filteredPeople.map(person => (
             <Card key={person.id} className="flex flex-col">
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -211,7 +230,7 @@ export default function PeoplePage() {
                   {new Intl.NumberFormat().format(person.balance)}
                 </p>
                  <p className={`text-sm mt-1 ${getBalanceColor(person.balance)}`}>
-                  {person.balance === 0 ? "All square" : person.balance > 0 ? "They owe you" : "You owe them"}
+                  {person.balance === 0 ? "All square" : person.balance > 0 ? "You are owed" : "You owe them"}
                 </p>
               </CardContent>
               <CardFooter>

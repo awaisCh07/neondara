@@ -8,7 +8,7 @@ import { useAuth } from '@/components/auth-provider';
 import type { Person, NiondraEntry, Relation } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserPlus, Users, ArrowRight, ArrowLeft, Search, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { UserPlus, Users, ArrowRight, Search, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -44,7 +44,7 @@ import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/components/language-provider';
-import { AppLayout } from '@/components/layout';
+import { AppLayoutWrapper } from '@/components/layout';
 
 const relations: Relation[] = [
     { en: "Aunt", ur: "Chachi, Khala, Mami, Phuppi" },
@@ -392,8 +392,8 @@ function PeopleContent() {
 
 export default function PeoplePage() {
     return (
-        <AppLayout>
+        <AppLayoutWrapper>
             <PeopleContent />
-        </AppLayout>
+        </AppLayoutWrapper>
     )
 }

@@ -11,7 +11,6 @@ import { PlusCircle } from 'lucide-react';
 import { NiondraTimeline } from './niondra-timeline';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './auth-provider';
-import { AppLayout } from './layout';
 import { useLanguage } from './language-provider';
 
 export function LedgerView() {
@@ -159,7 +158,6 @@ export function LedgerView() {
   }
   
   return (
-      <AppLayout>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-4xl font-headline">{t('ledgerHistory')}</h1>
@@ -190,6 +188,5 @@ export function LedgerView() {
             people={people}
             />
         </div>
-      </AppLayout>
   );
 }

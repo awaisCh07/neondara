@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAuth } from './auth-provider';
@@ -23,8 +24,9 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { auth } from '@/lib/firebase';
 import { useLanguage } from './language-provider';
+import React, { useEffect } from 'react';
 
-export function AppLayout({ children, onExport }: { children: React.ReactNode, onExport?: () => void }) {
+function AppLayout({ children, onExport }: { children: React.ReactNode, onExport?: () => void }) {
   const { user } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const router = useRouter();
@@ -135,4 +137,25 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
        </main>
     </div>
   );
+}
+
+export function AppLayoutWrapper({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  return <AppLayout>{children}</AppLayout>;
 }

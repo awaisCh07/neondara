@@ -15,7 +15,7 @@ import { NiondraEntrySheet } from '@/components/niondra-entry-sheet';
 import { useToast } from '@/hooks/use-toast';
 import { deleteDoc, addDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { useLanguage } from '@/components/language-provider';
-import { AppLayout } from '@/components/layout';
+import { AppLayoutWrapper } from '@/components/layout';
 
 
 type PersonDetailProps = {
@@ -268,8 +268,8 @@ function PersonDetailContent({ params }: PersonDetailProps) {
 
 export default function PersonDetailPage({ params }: PersonDetailProps) {
     return (
-        <AppLayout>
+        <AppLayoutWrapper>
             <PersonDetailContent params={params} />
-        </AppLayout>
+        </AppLayoutWrapper>
     )
 }

@@ -44,7 +44,8 @@ import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/components/language-provider';
-import { AppLayoutWrapper } from '@/components/layout';
+import { AppLayout } from '@/components/layout';
+import { useRouter } from 'next/navigation';
 
 const relations: Relation[] = [
     { en: "Aunt", ur: "Chachi, Khala, Mami, Phuppi" },
@@ -81,7 +82,8 @@ type PersonWithBalance = Person & {
 };
 
 function PeopleContent() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const { language, t } = useLanguage();
   const [people, setPeople] = useState<PersonWithBalance[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,10 +139,13 @@ function PeopleContent() {
   };
 
   useEffect(() => {
-    if (user) {
-      fetchPeopleAndBalances();
+    if (authLoading) return;
+    if (!user) {
+      router.push('/login');
+      return;
     }
-  }, [user]);
+    fetchPeopleAndBalances();
+  }, [user, authLoading, router]);
   
   const handleOpenDialog = (person: Person | null = null) => {
     setEditingPerson(person);
@@ -228,172 +233,178 @@ function PeopleContent() {
     );
   }, [people, searchTerm]);
 
-  return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-        <h1 className="text-4xl font-headline flex items-center gap-2">
-            <Users/>
-            {t('peopleAndBalances')}
-        </h1>
-        <div className="flex items-center gap-4">
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                placeholder={t('searchByName')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full sm:w-64"
-                aria-label={t('searchByName')}
-                />
-            </div>
-            <Dialog open={isDialogOpen} onOpenChange={(isOpen) => { setIsDialogOpen(isOpen); if (!isOpen) setEditingPerson(null); }}>
-              <DialogTrigger asChild>
-                  <Button onClick={() => handleOpenDialog()}>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  {t('addPerson')}
-                  </Button>
-              </DialogTrigger>
-              <DialogContent>
-                  <DialogHeader>
-                  <DialogTitle>{editingPerson ? t('edit') : t('addNewPersonTitle')}</DialogTitle>
-                  <DialogDescription>
-                      {editingPerson ? "Edit this person's details." : t('addNewPersonDescription')}
-                  </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit(handleFormSubmit)}>
-                  <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">
-                          {t('name')}
-                      </Label>
-                      <div className="col-span-3">
-                          <Input id="name" {...register('name')} className="w-full" />
-                          {errors.name && <p className="text-sm font-medium text-destructive mt-1">{errors.name.message}</p>}
-                      </div>
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="relation" className="text-right">
-                          {t('relation')}
-                      </Label>
-                      <div className="col-span-3">
-                          <Controller
-                              control={control}
-                              name="relation"
-                              render={({ field }) => (
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                  <SelectTrigger>
-                                      <SelectValue placeholder={t('relation')} />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                      {relations.map(r => (
-                                          <SelectItem key={r.en} value={r.en}>
-                                              {language === 'ur' ? `${r.ur} (${r.en})` : `${r.en} (${r.ur})`}
-                                          </SelectItem>
-                                      ))}
-                                  </SelectContent>
-                              </Select>
-                              )}
-                          />
-                          {errors.relation && <p className="text-sm font-medium text-destructive mt-1">{errors.relation.message}</p>}
-                      </div>
-                      </div>
-                  </div>
-                  <DialogFooter>
-                      <Button type="submit">{editingPerson ? t('saveChanges') : t('savePerson')}</Button>
-                  </DialogFooter>
-                  </form>
-              </DialogContent>
-            </Dialog>
-        </div>
-      </div>
 
-      {loading ? (
-        <p>{t('loadingContacts')}</p>
-      ) : people.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPeople.map(person => (
-            <Card key={person.id} className="flex flex-col">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                    <div>
-                        <CardTitle>{person.name}</CardTitle>
-                        {person.relation && <CardDescription>{getRelationDisplay(person.relation)}</CardDescription>}
-                    </div>
-                    <AlertDialog>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 -mt-2 -mr-2">
-                            <MoreVertical className="h-4 w-4" />
-                            <span className="sr-only">More options</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleOpenDialog(person)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            {t('edit')}
-                          </DropdownMenuItem>
-                          <AlertDialogTrigger asChild>
-                            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              {t('delete')}
-                            </DropdownMenuItem>
-                          </AlertDialogTrigger>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                       <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>{t('deleteConfirmTitle')}</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete {person.name}? This will not delete their transaction history, but it will remove them from your contacts. This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeletePerson(person.id)} className="bg-destructive hover:bg-destructive/90">
-                            {t('delete')}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+  if (authLoading || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+
+  return (
+    <AppLayout>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+            <h1 className="text-4xl font-headline flex items-center gap-2">
+                <Users/>
+                {t('peopleAndBalances')}
+            </h1>
+            <div className="flex items-center gap-4">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                    placeholder={t('searchByName')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 w-full sm:w-64"
+                    aria-label={t('searchByName')}
+                    />
                 </div>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <p className={`text-3xl font-bold ${getBalanceColor(person.balance)}`}>
-                  {new Intl.NumberFormat().format(Math.abs(person.balance))}
-                </p>
-                 <p className={`text-sm mt-1 ${getBalanceColor(person.balance)}`}>
-                  {getBalanceText(person.balance)}
-                </p>
-              </CardContent>
-              <CardFooter>
-                 <Link href={`/people/${person.id}`} className="w-full">
-                    <Button variant="outline" className="w-full">
-                      {t('viewHistory')}
-                      <ArrowRight className="ml-2 h-4 w-4"/>
+                <Dialog open={isDialogOpen} onOpenChange={(isOpen) => { setIsDialogOpen(isOpen); if (!isOpen) setEditingPerson(null); }}>
+                <DialogTrigger asChild>
+                    <Button onClick={() => handleOpenDialog()}>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    {t('addPerson')}
                     </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          ))}
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                    <DialogTitle>{editingPerson ? t('edit') : t('addNewPersonTitle')}</DialogTitle>
+                    <DialogDescription>
+                        {editingPerson ? "Edit this person's details." : t('addNewPersonDescription')}
+                    </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit(handleFormSubmit)}>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">
+                            {t('name')}
+                        </Label>
+                        <div className="col-span-3">
+                            <Input id="name" {...register('name')} className="w-full" />
+                            {errors.name && <p className="text-sm font-medium text-destructive mt-1">{errors.name.message}</p>}
+                        </div>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="relation" className="text-right">
+                            {t('relation')}
+                        </Label>
+                        <div className="col-span-3">
+                            <Controller
+                                control={control}
+                                name="relation"
+                                render={({ field }) => (
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder={t('relation')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {relations.map(r => (
+                                            <SelectItem key={r.en} value={r.en}>
+                                                {language === 'ur' ? `${r.ur} (${r.en})` : `${r.en} (${r.ur})`}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                )}
+                            />
+                            {errors.relation && <p className="text-sm font-medium text-destructive mt-1">{errors.relation.message}</p>}
+                        </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="submit">{editingPerson ? t('saveChanges') : t('savePerson')}</Button>
+                    </DialogFooter>
+                    </form>
+                </DialogContent>
+                </Dialog>
+            </div>
         </div>
-      ) : (
-        <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
-          <h3 className="text-xl font-semibold text-foreground">{t('noPeopleAdded')}</h3>
-          <p className="mt-2 mb-4">{t('clickAddPerson')}</p>
-           <Button onClick={() => handleOpenDialog()}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            {t('addPerson')}
-            </Button>
+
+        {people.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPeople.map(person => (
+                <Card key={person.id} className="flex flex-col">
+                <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <CardTitle>{person.name}</CardTitle>
+                            {person.relation && <CardDescription>{getRelationDisplay(person.relation)}</CardDescription>}
+                        </div>
+                        <AlertDialog>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 -mt-2 -mr-2">
+                                <MoreVertical className="h-4 w-4" />
+                                <span className="sr-only">More options</span>
+                            </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleOpenDialog(person)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                {t('edit')}
+                            </DropdownMenuItem>
+                            <AlertDialogTrigger asChild>
+                                <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                {t('delete')}
+                                </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>{t('deleteConfirmTitle')}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to delete {person.name}? This will not delete their transaction history, but it will remove them from your contacts. This action cannot be undone.
+                            </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeletePerson(person.id)} className="bg-destructive hover:bg-destructive/90">
+                                {t('delete')}
+                            </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                    <p className={`text-3xl font-bold ${getBalanceColor(person.balance)}`}>
+                    {new Intl.NumberFormat().format(Math.abs(person.balance))}
+                    </p>
+                    <p className={`text-sm mt-1 ${getBalanceColor(person.balance)}`}>
+                    {getBalanceText(person.balance)}
+                    </p>
+                </CardContent>
+                <CardFooter>
+                    <Link href={`/people/${person.id}`} className="w-full">
+                        <Button variant="outline" className="w-full">
+                        {t('viewHistory')}
+                        <ArrowRight className="ml-2 h-4 w-4"/>
+                        </Button>
+                    </Link>
+                </CardFooter>
+                </Card>
+            ))}
+            </div>
+        ) : (
+            <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
+            <h3 className="text-xl font-semibold text-foreground">{t('noPeopleAdded')}</h3>
+            <p className="mt-2 mb-4">{t('clickAddPerson')}</p>
+            <Button onClick={() => handleOpenDialog()}>
+                <UserPlus className="mr-2 h-4 w-4" />
+                {t('addPerson')}
+                </Button>
+            </div>
+        )}
         </div>
-      )}
-    </div>
+    </AppLayout>
   );
 }
 
 export default function PeoplePage() {
-    return (
-        <AppLayoutWrapper>
-            <PeopleContent />
-        </AppLayoutWrapper>
-    )
+    return <PeopleContent />;
 }

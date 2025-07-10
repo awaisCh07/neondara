@@ -12,6 +12,8 @@ import { NiondraTimeline } from './niondra-timeline';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './auth-provider';
 import { useLanguage } from './language-provider';
+import { AppLayout } from './layout';
+import { useRouter } from 'next/navigation';
 
 export function LedgerView() {
   const [entries, setEntries] = useState<NiondraEntry[]>([]);
@@ -20,7 +22,8 @@ export function LedgerView() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<NiondraEntry | undefined>(undefined);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const { t } = useLanguage();
   
   const fetchData = async () => {
@@ -79,10 +82,13 @@ export function LedgerView() {
   };
 
   useEffect(() => {
-    if (user) {
-      fetchData();
+    if (authLoading) return;
+    if (!user) {
+      router.push('/login');
+      return;
     }
-  }, [user]);
+    fetchData();
+  }, [user, authLoading, router]);
 
 
   const handleAddEntry = async (newEntry: Omit<NiondraEntry, 'id' | 'userId' | 'person'>) => {
@@ -156,8 +162,17 @@ export function LedgerView() {
     setEditingEntry(entry as NiondraEntry | undefined);
     setIsSheetOpen(true);
   }
+
+  if (authLoading || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p>Loading...</p>
+      </div>
+    );
+  }
   
   return (
+    <AppLayout>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-4xl font-headline">{t('ledgerHistory')}</h1>
@@ -166,18 +181,13 @@ export function LedgerView() {
                     {t('addEntry')}
                 </Button>
             </div>
-            {loading ? (
-            <div className="text-center py-16 text-muted-foreground">
-                <p>{t('loadingLedger')}</p>
-            </div>
-            ) : (
+            
             <NiondraTimeline 
                 entries={entries} 
                 people={people} 
                 onEdit={handleOpenSheet} 
                 onDelete={handleDeleteEntry}
             />
-            )}
         
             <NiondraEntrySheet
             isOpen={isSheetOpen}
@@ -188,5 +198,6 @@ export function LedgerView() {
             people={people}
             />
         </div>
+    </AppLayout>
   );
 }

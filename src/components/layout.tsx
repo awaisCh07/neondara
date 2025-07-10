@@ -24,10 +24,10 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { auth } from '@/lib/firebase';
 import { useLanguage } from './language-provider';
-import React, { useEffect } from 'react';
+import React from 'react';
 
-function AppLayout({ children, onExport }: { children: React.ReactNode, onExport?: () => void }) {
-  const { user } = useAuth();
+export function AppLayout({ children, onExport }: { children: React.ReactNode, onExport?: () => void }) {
+  const { user } = useAuth(); // No longer need loading state here
   const { language, setLanguage, t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
@@ -55,6 +55,12 @@ function AppLayout({ children, onExport }: { children: React.ReactNode, onExport
       { href: '/', label: t('navLedger'), icon: HomeIcon },
       { href: '/people', label: t('navPeople'), icon: Users },
   ];
+
+  // We rely on the page components to handle the loading/redirect state.
+  // AppLayout assumes a user is present.
+  if (!user) {
+    return null; // Or a minimal loading state, but pages should handle redirects.
+  }
 
   return (
     <div className={cn("min-h-screen bg-background", language === 'ur' ? 'font-urdu' : 'font-body')}>
@@ -137,25 +143,4 @@ function AppLayout({ children, onExport }: { children: React.ReactNode, onExport
        </main>
     </div>
   );
-}
-
-export function AppLayoutWrapper({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
-
-  if (loading || !user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  return <AppLayout>{children}</AppLayout>;
 }

@@ -15,7 +15,8 @@ import { NiondraEntrySheet } from '@/components/niondra-entry-sheet';
 import { useToast } from '@/hooks/use-toast';
 import { deleteDoc, addDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { useLanguage } from '@/components/language-provider';
-import { AppLayoutWrapper } from '@/components/layout';
+import { AppLayout } from '@/components/layout';
+import { useRouter } from 'next/navigation';
 
 
 type PersonDetailProps = {
@@ -25,7 +26,8 @@ type PersonDetailProps = {
 };
 
 function PersonDetailContent({ params }: PersonDetailProps) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const { personId } = params;
   const [person, setPerson] = useState<Person | null>(null);
   const [entries, setEntries] = useState<NiondraEntry[]>([]);
@@ -104,10 +106,15 @@ function PersonDetailContent({ params }: PersonDetailProps) {
   };
 
   useEffect(() => {
-    if (user && personId) {
-        fetchPersonAndEntries(personId);
+    if (authLoading) return;
+    if (!user) {
+      router.push('/login');
+      return;
     }
-  }, [user, personId]);
+    if (personId) {
+        fetchPersonAndEntries(personId as string);
+    }
+  }, [user, authLoading, personId, router]);
 
 
   const handleOpenSheet = (entry?: Omit<NiondraEntry, 'userId'>) => {
@@ -122,7 +129,7 @@ function PersonDetailContent({ params }: PersonDetailProps) {
         title: t('success'),
         description: t('entryDeletedSuccess'),
       });
-      fetchPersonAndEntries(personId); // Refetch to update list and balance
+      fetchPersonAndEntries(personId as string); // Refetch to update list and balance
     } catch (error) {
       console.error("Error deleting entry: ", error);
       toast({
@@ -145,7 +152,7 @@ function PersonDetailContent({ params }: PersonDetailProps) {
         title: t('success'),
         description: t('entryAddedSuccess'),
       });
-      fetchPersonAndEntries(personId);
+      fetchPersonAndEntries(personId as string);
     } catch (error) {
       console.error("Error adding entry: ", error);
       toast({
@@ -168,7 +175,7 @@ function PersonDetailContent({ params }: PersonDetailProps) {
         title: t('success'),
         description: t('entryUpdatedSuccess'),
       });
-      fetchPersonAndEntries(personId);
+      fetchPersonAndEntries(personId as string);
     } catch (error) {
       console.error("Error updating entry: ", error);
       toast({
@@ -180,96 +187,95 @@ function PersonDetailContent({ params }: PersonDetailProps) {
   };
 
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p>{t('loadingDetails')}</p>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p>Loading...</p>
       </div>
     );
   }
 
   if (!person) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 className="text-2xl font-bold">{t('personNotFound')}</h2>
-        <Link href="/people">
-            <Button variant="outline" className="mt-4">
-                <ArrowLeft className="mr-2 h-4 w-4"/>
-                {t('backToPeople')}
-            </Button>
-        </Link>
-      </div>
+      <AppLayout>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h2 className="text-2xl font-bold">{t('personNotFound')}</h2>
+          <Link href="/people">
+              <Button variant="outline" className="mt-4">
+                  <ArrowLeft className="mr-2 h-4 w-4"/>
+                  {t('backToPeople')}
+              </Button>
+          </Link>
+        </div>
+      </AppLayout>
     );
   }
 
   const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-red-600' : 'text-green-600';
   const balanceText = balance.net === 0 ? t('allSquare') : balance.net > 0 ? `${t('youWillGive')} ${new Intl.NumberFormat().format(balance.net)}` : `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
 
-
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-            <Link href="/people" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
-                 <ArrowLeft className="mr-2 h-4 w-4"/>
-                {t('backToPeople')}
-            </Link>
-             <h1 className="text-4xl font-headline">{person.name}</h1>
-             {person.relation && <p className="text-lg text-muted-foreground">{person.relation}</p>}
-        </div>
+    <AppLayout>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+              <Link href="/people" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
+                   <ArrowLeft className="mr-2 h-4 w-4"/>
+                  {t('backToPeople')}
+              </Link>
+               <h1 className="text-4xl font-headline">{person.name}</h1>
+               {person.relation && <p className="text-lg text-muted-foreground">{person.relation}</p>}
+          </div>
 
-        <Card className="mb-8">
-            <CardHeader>
-                <CardTitle>{t('balanceSummary')}</CardTitle>
-                <CardDescription>{t('balanceSummaryDescription')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                    <div>
-                        <p className="text-sm text-muted-foreground">{t('totalGiven')}</p>
-                        <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.given)}</p>
-                    </div>
-                     <div>
-                        <p className="text-sm text-muted-foreground">{t('totalReceived')}</p>
-                        <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.received)}</p>
-                    </div>
-                     <div>
-                        <p className="text-sm text-muted-foreground">{t('netBalance')}</p>
-                        <p className={`text-2xl font-bold ${balanceColor}`}>{balanceText}</p>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
+          <Card className="mb-8">
+              <CardHeader>
+                  <CardTitle>{t('balanceSummary')}</CardTitle>
+                  <CardDescription>{t('balanceSummaryDescription')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                      <div>
+                          <p className="text-sm text-muted-foreground">{t('totalGiven')}</p>
+                          <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.given)}</p>
+                      </div>
+                       <div>
+                          <p className="text-sm text-muted-foreground">{t('totalReceived')}</p>
+                          <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.received)}</p>
+                      </div>
+                       <div>
+                          <p className="text-sm text-muted-foreground">{t('netBalance')}</p>
+                          <p className={`text-2xl font-bold ${balanceColor}`}>{balanceText}</p>
+                      </div>
+                  </div>
+              </CardContent>
+          </Card>
 
-        <h2 className="text-2xl font-bold mb-4">{t('transactionHistory')}</h2>
-         {entries.length > 0 ? (
-            <div className="grid gap-6">
-                {entries.map(entry => {
-                    const { userId, ...cardEntry } = entry;
-                    return <NiondraCard key={entry.id} entry={cardEntry} onEdit={handleOpenSheet} onDelete={handleDeleteEntry} personName={person.name}/>
-                })}
-            </div>
-        ) : (
-            <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
-                <h3 className="text-xl font-semibold text-foreground">{t('noHistoryYet')}</h3>
-                <p className="mt-2">{t('startTracking')} {person.name}.</p>
-            </div>
-        )}
-        <NiondraEntrySheet
-            isOpen={isSheetOpen}
-            onOpenChange={setIsSheetOpen}
-            onAddEntry={handleAddEntry}
-            onUpdateEntry={handleUpdateEntry}
-            entry={editingEntry}
-            people={people}
-        />
-    </div>
+          <h2 className="text-2xl font-bold mb-4">{t('transactionHistory')}</h2>
+           {entries.length > 0 ? (
+              <div className="grid gap-6">
+                  {entries.map(entry => {
+                      const { userId, ...cardEntry } = entry;
+                      return <NiondraCard key={entry.id} entry={cardEntry} onEdit={handleOpenSheet} onDelete={handleDeleteEntry} personName={person.name}/>
+                  })}
+              </div>
+          ) : (
+              <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">{t('noHistoryYet')}</h3>
+                  <p className="mt-2">{t('startTracking')} {person.name}.</p>
+              </div>
+          )}
+          <NiondraEntrySheet
+              isOpen={isSheetOpen}
+              onOpenChange={setIsSheetOpen}
+              onAddEntry={handleAddEntry}
+              onUpdateEntry={handleUpdateEntry}
+              entry={editingEntry}
+              people={people}
+          />
+      </div>
+    </AppLayout>
   );
 }
 
 export default function PersonDetailPage({ params }: PersonDetailProps) {
-    return (
-        <AppLayoutWrapper>
-            <PersonDetailContent params={params} />
-        </AppLayoutWrapper>
-    )
+    return <PersonDetailContent params={params} />
 }

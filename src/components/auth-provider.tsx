@@ -1,4 +1,4 @@
-// src/components/auth-provider.tsx
+
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -14,15 +14,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
 
-const PROTECTED_ROUTES = ['/', '/people', '/people/[personId]'];
-const PUBLIC_ROUTES = ['/login', '/signup'];
-
-// Helper function to match dynamic routes
-const isProtectedRoute = (pathname: string) => {
-    if (PROTECTED_ROUTES.includes(pathname)) return true;
-    if (pathname.startsWith('/people/')) return true;
-    return false;
-}
+const AUTH_ROUTES = ['/login', '/signup'];
+const isAuthRoute = (pathname: string) => AUTH_ROUTES.includes(pathname);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -40,46 +33,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
   
   useEffect(() => {
+    // This effect runs only on the client after the initial loading is complete.
     if (loading) return;
 
-    const isPublic = PUBLIC_ROUTES.includes(pathname);
-    const isProtected = isProtectedRoute(pathname);
-    
-    if (!user && isProtected) {
+    const onAuthRoute = isAuthRoute(pathname);
+
+    // If there's no user and we are not on an authentication page, redirect to login.
+    if (!user && !onAuthRoute) {
         router.push('/login');
     }
 
-    if(user && isPublic){
+    // If there is a user and we are on an authentication page, redirect to the home page.
+    if(user && onAuthRoute){
         router.push('/');
     }
 
   }, [user, loading, router, pathname]);
 
+  // While checking for the user, show a loading screen.
+  // This prevents rendering protected content on the server prematurely.
   if (loading) {
       return (
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-screen bg-background">
           <p>Loading...</p>
         </div>
       );
   }
-
-  if (!user && isProtectedRoute(pathname)) {
-       return (
-        <div className="flex items-center justify-center min-h-screen">
-          <p>Redirecting to login...</p>
-        </div>
-      );
-  }
-
-  if (user && PUBLIC_ROUTES.includes(pathname)) {
-    return (
-     <div className="flex items-center justify-center min-h-screen">
-       <p>Redirecting to dashboard...</p>
-     </div>
-   );
-  }
   
-  return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
+  // If we are on a public route, or if we have a user, render the children.
+  // Otherwise, the effect above will handle the redirect.
+  // We render a fallback "Redirecting..." for the brief moment before the redirect kicks in.
+  if (isAuthRoute(pathname) || user) {
+     return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+        <p>Redirecting...</p>
+    </div>
+  );
 }
 
 export const useAuth = () => {

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -269,7 +270,7 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
                         <FormItem>
                             <FormLabel>Amount *</FormLabel>
                             <FormControl>
-                                <Input type="number" placeholder="e.g., 100" {...field} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} />
+                                <Input type="number" placeholder="e.g., 100" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

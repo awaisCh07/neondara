@@ -81,7 +81,7 @@ type PersonWithBalance = Person & {
   balance: number;
 };
 
-function PeopleContent() {
+export default function PeoplePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { language, t } = useLanguage();
@@ -405,6 +405,4 @@ function PeopleContent() {
   );
 }
 
-export default function PeoplePage() {
-    return <PeopleContent />;
-}
+    

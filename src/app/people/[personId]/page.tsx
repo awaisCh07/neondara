@@ -19,13 +19,13 @@ import { AppLayout } from '@/components/layout';
 import { useRouter } from 'next/navigation';
 
 
-type PersonDetailProps = {
+type PersonDetailPageProps = {
   params: {
     personId: string;
   };
 };
 
-function PersonDetailContent({ params }: PersonDetailProps) {
+export default function PersonDetailPage({ params }: PersonDetailPageProps) {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { personId } = params;
@@ -276,6 +276,4 @@ function PersonDetailContent({ params }: PersonDetailProps) {
   );
 }
 
-export default function PersonDetailPage({ params }: PersonDetailProps) {
-    return <PersonDetailContent params={params} />
-}
+    

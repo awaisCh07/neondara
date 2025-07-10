@@ -195,9 +195,18 @@ export function LedgerView() {
     document.body.removeChild(link);
   };
   
-  const getInitials = (email: string | null | undefined) => {
-    if (!email) return '?';
-    return email.substring(0, 2).toUpperCase();
+  const getInitials = (name: string | null | undefined, email: string | null | undefined) => {
+    if (name) {
+      const names = name.split(' ');
+      if (names.length > 1) {
+        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+      }
+      return name.substring(0, 2).toUpperCase();
+    }
+    if (email) {
+      return email.substring(0, 2).toUpperCase();
+    }
+    return '?';
   };
 
 
@@ -217,14 +226,14 @@ export function LedgerView() {
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
                        <AvatarImage src={user?.photoURL || undefined} alt={user?.displayName || "User"} />
-                       <AvatarFallback>{getInitials(user?.email)}</AvatarFallback>
+                       <AvatarFallback>{getInitials(user?.displayName, user?.email)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                    <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">My Account</p>
+                      <p className="text-sm font-medium leading-none">{user?.displayName || 'My Account'}</p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {user?.email}
                       </p>

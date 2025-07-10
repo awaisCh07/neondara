@@ -23,6 +23,7 @@ type PersonDetailProps = {
 
 export default function PersonDetailPage({ params }: PersonDetailProps) {
   const { user } = useAuth();
+  const { personId } = params;
   const [person, setPerson] = useState<Person | null>(null);
   const [entries, setEntries] = useState<NiondraEntry[]>([]);
   const [balance, setBalance] = useState({ given: 0, received: 0, net: 0 });
@@ -32,12 +33,12 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
   const { toast } = useToast();
 
   const fetchPersonAndEntries = async () => {
-    if (!user || !params.personId) return;
+    if (!user || !personId) return;
 
     setLoading(true);
     try {
       // Fetch person details
-      const personRef = doc(db, 'people', params.personId);
+      const personRef = doc(db, 'people', personId);
       const personSnap = await getDoc(personRef);
 
       if (personSnap.exists() && personSnap.data().userId === user.uid) {
@@ -50,7 +51,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
       const entriesQuery = query(
         collection(db, 'niondra_entries'),
         where('userId', '==', user.uid),
-        where('personId', '==', params.personId),
+        where('personId', '==', personId),
         orderBy('date', 'desc')
       );
       const querySnapshot = await getDocs(entriesQuery);
@@ -92,7 +93,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
 
   useEffect(() => {
     fetchPersonAndEntries();
-  }, [user, params.personId]);
+  }, [user, personId]);
 
 
   const handleOpenSheet = (entry?: Omit<NiondraEntry, 'userId'>) => {

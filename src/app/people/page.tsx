@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/auth-provider';
-import type { Person, NiondraEntry, NiondraEntryDTO } from '@/lib/types';
+import type { Person, NiondraEntry, NiondraEntryDTO, RelationType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircle, UserPlus, Users, ArrowRight } from 'lucide-react';
@@ -24,9 +24,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const relations: RelationType[] = ["Chachu", "Chachi", "Mamu", "Mami", "Dadi Amma", "Dada Abu", "Nani Amma", "Nana Abu", "Khala", "Khalu", "Bhai", "Behan", "Bhateeja", "Bhateeji", "Bhaanja", "Bhaanji", "Friend", "Other"];
 
 const personSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  relation: z.string({ required_error: "Please select a relation." }),
 });
 
 type PersonFormData = z.infer<typeof personSchema>;
@@ -42,8 +46,11 @@ export default function PeoplePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<PersonFormData>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<PersonFormData>({
     resolver: zodResolver(personSchema),
+    defaultValues: {
+      relation: "Friend"
+    }
   });
 
   const fetchPeopleAndBalances = async () => {
@@ -93,6 +100,7 @@ export default function PeoplePage() {
     try {
       await addDoc(collection(db, 'people'), {
         name: data.name,
+        relation: data.relation,
         userId: user.uid,
       });
       toast({ title: "Success", description: `${data.name} has been added.` });
@@ -143,6 +151,30 @@ export default function PeoplePage() {
                     {errors.name && <p className="text-sm font-medium text-destructive mt-1">{errors.name.message}</p>}
                   </div>
                 </div>
+                 <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="relation" className="text-right">
+                    Relation
+                  </Label>
+                  <div className="col-span-3">
+                     <Controller
+                        control={control}
+                        name="relation"
+                        render={({ field }) => (
+                           <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a relation" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {relations.map(r => (
+                                    <SelectItem key={r} value={r}>{r}</SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    {errors.relation && <p className="text-sm font-medium text-destructive mt-1">{errors.relation.message}</p>}
+                  </div>
+                </div>
               </div>
               <DialogFooter>
                 <Button type="submit">Save person</Button>
@@ -159,11 +191,15 @@ export default function PeoplePage() {
           {people.map(person => (
             <Card key={person.id} className="flex flex-col">
               <CardHeader>
-                <CardTitle>{person.name}</CardTitle>
-                <CardDescription>Summary of monetary exchanges.</CardDescription>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <CardTitle>{person.name}</CardTitle>
+                        {person.relation && <CardDescription>{person.relation}</CardDescription>}
+                    </div>
+                    <CardDescription>Balance</CardDescription>
+                </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-sm text-muted-foreground">Net Balance</p>
                 <p className={`text-3xl font-bold ${getBalanceColor(person.balance)}`}>
                   {new Intl.NumberFormat().format(person.balance)}
                 </p>
@@ -201,18 +237,44 @@ export default function PeoplePage() {
                 </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(handleAddPerson)}>
-                <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                        Name
-                    </Label>
-                    <Input id="name" {...register('name')} className="col-span-3" />
-                     {errors.name && <p className="text-sm font-medium text-destructive col-span-4 text-center">{errors.name.message}</p>}
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">
+                            Name
+                        </Label>
+                        <div className="col-span-3">
+                            <Input id="name" {...register('name')} className="w-full" />
+                            {errors.name && <p className="text-sm font-medium text-destructive mt-1">{errors.name.message}</p>}
+                        </div>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="relation" className="text-right">
+                            Relation
+                        </Label>
+                        <div className="col-span-3">
+                            <Controller
+                                control={control}
+                                name="relation"
+                                render={({ field }) => (
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a relation" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {relations.map(r => (
+                                            <SelectItem key={r} value={r}>{r}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                )}
+                            />
+                            {errors.relation && <p className="text-sm font-medium text-destructive mt-1">{errors.relation.message}</p>}
+                        </div>
+                        </div>
                     </div>
-                </div>
-                <DialogFooter>
-                    <Button type="submit">Save person</Button>
-                </DialogFooter>
+                    <DialogFooter>
+                        <Button type="submit">Save person</Button>
+                    </DialogFooter>
                 </form>
             </DialogContent>
             </Dialog>

@@ -199,6 +199,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
                 Back to People List
             </Link>
              <h1 className="text-4xl font-headline">{person.name}</h1>
+             {person.relation && <p className="text-lg text-muted-foreground">{person.relation}</p>}
         </div>
 
         <Card className="mb-8">

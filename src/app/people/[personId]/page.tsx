@@ -28,6 +28,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
   const { personId } = params;
   const [person, setPerson] = useState<Person | null>(null);
   const [entries, setEntries] = useState<NiondraEntry[]>([]);
+  const [people, setPeople] = useState<Person[]>([]);
   const [balance, setBalance] = useState({ given: 0, received: 0, net: 0 });
   const [loading, setLoading] = useState(true);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -40,6 +41,13 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
 
     setLoading(true);
     try {
+      // Fetch people list for the entry sheet
+      const peopleQuery = query(collection(db, "people"), where("userId", "==", user.uid));
+      const peopleSnapshot = await getDocs(peopleQuery);
+      const peopleData = peopleSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Person));
+      setPeople(peopleData);
+
+
       // Fetch person details
       const personRef = doc(db, 'people', currentPersonId);
       const personSnap = await getDoc(personRef);
@@ -98,7 +106,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
     if (user && personId) {
         fetchPersonAndEntries(personId);
     }
-  }, [user, personId]);
+  }, [user, personId, toast]);
 
 
   const handleOpenSheet = (entry?: Omit<NiondraEntry, 'userId'>) => {
@@ -251,7 +259,10 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
             onAddEntry={handleAddEntry}
             onUpdateEntry={handleUpdateEntry}
             entry={editingEntry}
+            people={people}
         />
     </div>
   );
 }
+
+    

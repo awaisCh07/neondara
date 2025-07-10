@@ -5,10 +5,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/auth-provider';
-import type { Person, NiondraEntry, NiondraEntryDTO, RelationType, Relation } from '@/lib/types';
+import type { Person, NiondraEntry, Relation } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, UserPlus, Users, ArrowRight, ArrowLeft, Search } from 'lucide-react';
+import { UserPlus, Users, ArrowRight, ArrowLeft, Search, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -19,6 +19,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm, Controller } from 'react-hook-form';
@@ -68,10 +85,11 @@ export default function PeoplePage() {
   const [people, setPeople] = useState<PersonWithBalance[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingPerson, setEditingPerson] = useState<Person | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
   
-  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<PersonFormData>({
+  const { register, handleSubmit, reset, control, formState: { errors }, setValue } = useForm<PersonFormData>({
     resolver: zodResolver(personSchema),
     defaultValues: {
       relation: "Friend"
@@ -121,23 +139,63 @@ export default function PeoplePage() {
     if (user) {
       fetchPeopleAndBalances();
     }
-  }, [user]);
+  }, [user, toast]);
   
-  const handleAddPerson = async (data: PersonFormData) => {
+  const handleOpenDialog = (person: Person | null = null) => {
+    setEditingPerson(person);
+    if (person) {
+      setValue('name', person.name);
+      setValue('relation', person.relation || 'Friend');
+    } else {
+      reset({ name: '', relation: 'Friend' });
+    }
+    setIsDialogOpen(true);
+  };
+  
+  const handleFormSubmit = async (data: PersonFormData) => {
     if (!user) return;
+    if (editingPerson) {
+      // Update existing person
+      try {
+        const personRef = doc(db, 'people', editingPerson.id);
+        await updateDoc(personRef, {
+          name: data.name,
+          relation: data.relation,
+        });
+        toast({ title: t('success'), description: `${data.name} has been updated.` });
+      } catch (error) {
+        console.error("Error updating person: ", error);
+        toast({ title: t('error'), description: "Failed to update person.", variant: "destructive" });
+      }
+    } else {
+      // Add new person
+      try {
+        await addDoc(collection(db, 'people'), {
+          name: data.name,
+          relation: data.relation,
+          userId: user.uid,
+        });
+        toast({ title: t('success'), description: `${data.name} has been added.` });
+      } catch (error) {
+         console.error("Error adding person: ", error);
+         toast({ title: t('error'), description: "Failed to add person.", variant: "destructive" });
+      }
+    }
+    reset();
+    setIsDialogOpen(false);
+    setEditingPerson(null);
+    fetchPeopleAndBalances();
+  };
+
+  const handleDeletePerson = async (personId: string) => {
+     if (!user) return;
     try {
-      await addDoc(collection(db, 'people'), {
-        name: data.name,
-        relation: data.relation,
-        userId: user.uid,
-      });
-      toast({ title: t('success'), description: `${data.name} has been added.` });
-      reset();
-      setIsDialogOpen(false);
+      await deleteDoc(doc(db, 'people', personId));
+      toast({ title: t('success'), description: "Person has been deleted." });
       fetchPeopleAndBalances();
     } catch (error) {
-       console.error("Error adding person: ", error);
-       toast({ title: t('error'), description: "Failed to add person.", variant: "destructive" });
+       console.error("Error deleting person: ", error);
+       toast({ title: t('error'), description: "Failed to delete person.", variant: "destructive" });
     }
   };
   
@@ -149,8 +207,8 @@ export default function PeoplePage() {
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return t('allSquare');
-    if (balance > 0) return t('youWillReceive'); // You gave more
-    return t('youWillGive'); // You received more
+    if (balance > 0) return `${t('youWillReceive')} ${new Intl.NumberFormat().format(balance)}`;
+    return `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
   }
 
   const getRelationDisplay = (relationKey: string) => {
@@ -162,7 +220,6 @@ export default function PeoplePage() {
       }
       return `${relation.en} (${relation.ur})`;
   }
-
 
   const filteredPeople = useMemo(() => {
     return people.filter(person => 
@@ -192,63 +249,63 @@ export default function PeoplePage() {
                 aria-label={t('searchByName')}
                 />
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-                <Button>
-                <UserPlus className="mr-2 h-4 w-4" />
-                {t('addPerson')}
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                <DialogTitle>{t('addNewPersonTitle')}</DialogTitle>
-                <DialogDescription>
-                    {t('addNewPersonDescription')}
-                </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit(handleAddPerson)}>
-                <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                        {t('name')}
-                    </Label>
-                    <div className="col-span-3">
-                        <Input id="name" {...register('name')} className="w-full" />
-                        {errors.name && <p className="text-sm font-medium text-destructive mt-1">{errors.name.message}</p>}
-                    </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="relation" className="text-right">
-                        {t('relation')}
-                    </Label>
-                    <div className="col-span-3">
-                        <Controller
-                            control={control}
-                            name="relation"
-                            render={({ field }) => (
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder={t('relation')} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {relations.map(r => (
-                                        <SelectItem key={r.en} value={r.en}>
-                                            {language === 'ur' ? `${r.ur} (${r.en})` : `${r.en} (${r.ur})`}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            )}
-                        />
-                        {errors.relation && <p className="text-sm font-medium text-destructive mt-1">{errors.relation.message}</p>}
-                    </div>
-                    </div>
-                </div>
-                <DialogFooter>
-                    <Button type="submit">{t('savePerson')}</Button>
-                </DialogFooter>
-                </form>
-            </DialogContent>
+            <Dialog open={isDialogOpen} onOpenChange={(isOpen) => { setIsDialogOpen(isOpen); if (!isOpen) setEditingPerson(null); }}>
+              <DialogTrigger asChild>
+                  <Button onClick={() => handleOpenDialog()}>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {t('addPerson')}
+                  </Button>
+              </DialogTrigger>
+              <DialogContent>
+                  <DialogHeader>
+                  <DialogTitle>{editingPerson ? t('edit') : t('addNewPersonTitle')}</DialogTitle>
+                  <DialogDescription>
+                      {editingPerson ? "Edit this person's details." : t('addNewPersonDescription')}
+                  </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit(handleFormSubmit)}>
+                  <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                          {t('name')}
+                      </Label>
+                      <div className="col-span-3">
+                          <Input id="name" {...register('name')} className="w-full" />
+                          {errors.name && <p className="text-sm font-medium text-destructive mt-1">{errors.name.message}</p>}
+                      </div>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="relation" className="text-right">
+                          {t('relation')}
+                      </Label>
+                      <div className="col-span-3">
+                          <Controller
+                              control={control}
+                              name="relation"
+                              render={({ field }) => (
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                  <SelectTrigger>
+                                      <SelectValue placeholder={t('relation')} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                      {relations.map(r => (
+                                          <SelectItem key={r.en} value={r.en}>
+                                              {language === 'ur' ? `${r.ur} (${r.en})` : `${r.en} (${r.ur})`}
+                                          </SelectItem>
+                                      ))}
+                                  </SelectContent>
+                              </Select>
+                              )}
+                          />
+                          {errors.relation && <p className="text-sm font-medium text-destructive mt-1">{errors.relation.message}</p>}
+                      </div>
+                      </div>
+                  </div>
+                  <DialogFooter>
+                      <Button type="submit">{editingPerson ? t('saveChanges') : t('savePerson')}</Button>
+                  </DialogFooter>
+                  </form>
+              </DialogContent>
             </Dialog>
         </div>
       </div>
@@ -265,7 +322,42 @@ export default function PeoplePage() {
                         <CardTitle>{person.name}</CardTitle>
                         {person.relation && <CardDescription>{getRelationDisplay(person.relation)}</CardDescription>}
                     </div>
-                    <CardDescription>{t('balance')}</CardDescription>
+                    <AlertDialog>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 -mt-2 -mr-2">
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">More options</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleOpenDialog(person)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            {t('edit')}
+                          </DropdownMenuItem>
+                          <AlertDialogTrigger asChild>
+                            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              {t('delete')}
+                            </DropdownMenuItem>
+                          </AlertDialogTrigger>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                       <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{t('deleteConfirmTitle')}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete {person.name}? This will not delete their transaction history, but it will remove them from your contacts. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDeletePerson(person.id)} className="bg-destructive hover:bg-destructive/90">
+                            {t('delete')}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
@@ -291,66 +383,14 @@ export default function PeoplePage() {
         <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
           <h3 className="text-xl font-semibold text-foreground">{t('noPeopleAdded')}</h3>
           <p className="mt-2 mb-4">{t('clickAddPerson')}</p>
-           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-                <Button>
-                <UserPlus className="mr-2 h-4 w-4" />
-                {t('addPerson')}
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                <DialogTitle>{t('addNewPersonTitle')}</DialogTitle>
-                <DialogDescription>
-                    {t('addNewPersonDescription')}
-                </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit(handleAddPerson)}>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">
-                            {t('name')}
-                        </Label>
-                        <div className="col-span-3">
-                            <Input id="name" {...register('name')} className="w-full" />
-                            {errors.name && <p className="text-sm font-medium text-destructive mt-1">{errors.name.message}</p>}
-                        </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="relation" className="text-right">
-                            {t('relation')}
-                        </Label>
-                        <div className="col-span-3">
-                            <Controller
-                                control={control}
-                                name="relation"
-                                render={({ field }) => (
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder={t('relation')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {relations.map(r => (
-                                            <SelectItem key={r.en} value={r.en}>
-                                                {language === 'ur' ? `${r.ur} (${r.en})` : `${r.en} (${r.ur})`}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                )}
-                            />
-                            {errors.relation && <p className="text-sm font-medium text-destructive mt-1">{errors.relation.message}</p>}
-                        </div>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit">{t('savePerson')}</Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-            </Dialog>
+           <Button onClick={() => handleOpenDialog()}>
+            <UserPlus className="mr-2 h-4 w-4" />
+            {t('addPerson')}
+            </Button>
         </div>
       )}
     </div>
   );
 }
+
+    

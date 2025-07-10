@@ -54,3 +54,5 @@ export type NiondraEntry = {
 export type NiondraEntryDTO = Omit<NiondraEntry, 'id' | 'date' | 'person'> & {
   date: Timestamp;
 };
+
+    

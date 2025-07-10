@@ -22,7 +22,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
         <AuthProvider>
-          {children}
+            {children}
         </AuthProvider>
         <Toaster />
       </body>

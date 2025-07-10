@@ -1,0 +1,250 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useAuth } from '@/components/auth-provider';
+import { NiondraCard } from '@/components/niondra-card';
+import type { NiondraEntry, NiondraEntryDTO, Person } from '@/lib/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { NiondraEntrySheet } from '@/components/niondra-entry-sheet';
+import { useToast } from '@/hooks/use-toast';
+import { deleteDoc, addDoc, Timestamp, updateDoc } from 'firebase/firestore';
+
+
+type PersonDetailProps = {
+  params: {
+    personId: string;
+  };
+};
+
+export default function PersonDetailPage({ params }: PersonDetailProps) {
+  const { user } = useAuth();
+  const [person, setPerson] = useState<Person | null>(null);
+  const [entries, setEntries] = useState<NiondraEntry[]>([]);
+  const [balance, setBalance] = useState({ given: 0, received: 0, net: 0 });
+  const [loading, setLoading] = useState(true);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [editingEntry, setEditingEntry] = useState<NiondraEntry | undefined>(undefined);
+  const { toast } = useToast();
+
+  const fetchPersonAndEntries = async () => {
+    if (!user || !params.personId) return;
+
+    setLoading(true);
+    try {
+      // Fetch person details
+      const personRef = doc(db, 'people', params.personId);
+      const personSnap = await getDoc(personRef);
+
+      if (personSnap.exists() && personSnap.data().userId === user.uid) {
+        setPerson({ id: personSnap.id, ...personSnap.data() } as Person);
+      } else {
+        throw new Error("Person not found or insufficient permissions.");
+      }
+
+      // Fetch entries for this person
+      const entriesQuery = query(
+        collection(db, 'niondra_entries'),
+        where('userId', '==', user.uid),
+        where('personId', '==', params.personId),
+        orderBy('date', 'desc')
+      );
+      const querySnapshot = await getDocs(entriesQuery);
+      const entriesData = querySnapshot.docs.map(doc => {
+        const data = doc.data() as NiondraEntryDTO;
+        return {
+          id: doc.id,
+          ...data,
+          date: data.date.toDate(),
+        } as NiondraEntry;
+      });
+      setEntries(entriesData);
+
+      // Calculate balance
+      let given = 0;
+      let received = 0;
+      entriesData.forEach(entry => {
+        if (entry.giftType === 'Money') {
+          if (entry.direction === 'given') {
+            given += entry.amount || 0;
+          } else {
+            received += entry.amount || 0;
+          }
+        }
+      });
+      setBalance({ given, received, net: received - given });
+
+    } catch (error) {
+      console.error("Error fetching person details: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch person details.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPersonAndEntries();
+  }, [user, params.personId]);
+
+
+  const handleOpenSheet = (entry?: Omit<NiondraEntry, 'userId'>) => {
+    setEditingEntry(entry as NiondraEntry | undefined);
+    setIsSheetOpen(true);
+  }
+
+  const handleDeleteEntry = async (entryId: string) => {
+    try {
+      await deleteDoc(doc(db, "niondra_entries", entryId));
+      toast({
+        title: "Success",
+        description: "Entry has been deleted.",
+      });
+      fetchPersonAndEntries(); // Refetch to update list and balance
+    } catch (error) {
+      console.error("Error deleting entry: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete entry.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddEntry = async (newEntry: Omit<NiondraEntry, 'id' | 'userId'>) => {
+    if (!user) return;
+    try {
+      await addDoc(collection(db, "niondra_entries"), {
+        ...newEntry,
+        userId: user.uid,
+        date: Timestamp.fromDate(newEntry.date),
+      });
+      toast({
+        title: "Success",
+        description: "New entry added to the ledger.",
+      });
+      fetchPersonAndEntries();
+    } catch (error) {
+      console.error("Error adding entry: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to add new entry.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handleUpdateEntry = async (updatedEntry: Omit<NiondraEntry, 'userId'>) => {
+    try {
+      const entryRef = doc(db, "niondra_entries", updatedEntry.id);
+      const { id, ...dataToUpdate } = updatedEntry;
+      await updateDoc(entryRef, {
+        ...dataToUpdate,
+        date: Timestamp.fromDate(dataToUpdate.date),
+      });
+      toast({
+        title: "Success",
+        description: "Entry has been updated.",
+      });
+      fetchPersonAndEntries();
+    } catch (error) {
+      console.error("Error updating entry: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to update entry.",
+        variant: "destructive",
+      });
+    }
+  };
+
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <p>Loading details...</p>
+      </div>
+    );
+  }
+
+  if (!person) {
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h2 className="text-2xl font-bold">Person not found</h2>
+        <Link href="/people">
+            <Button variant="outline" className="mt-4">
+                <ArrowLeft className="mr-2 h-4 w-4"/>
+                Back to People
+            </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-green-600' : 'text-red-600';
+  const balanceText = balance.net === 0 ? "You are all square" : balance.net > 0 ? `You are owed ${new Intl.NumberFormat().format(balance.net)}` : `You owe ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
+
+
+  return (
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+            <Link href="/people" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
+                 <ArrowLeft className="mr-2 h-4 w-4"/>
+                Back to People List
+            </Link>
+             <h1 className="text-4xl font-headline">{person.name}</h1>
+        </div>
+
+        <Card className="mb-8">
+            <CardHeader>
+                <CardTitle>Balance Summary</CardTitle>
+                <CardDescription>Based on monetary gifts exchanged.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                    <div>
+                        <p className="text-sm text-muted-foreground">Total Given</p>
+                        <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.given)}</p>
+                    </div>
+                     <div>
+                        <p className="text-sm text-muted-foreground">Total Received</p>
+                        <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.received)}</p>
+                    </div>
+                     <div>
+                        <p className="text-sm text-muted-foreground">Net Balance</p>
+                        <p className={`text-2xl font-bold ${balanceColor}`}>{balanceText}</p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <h2 className="text-2xl font-bold mb-4">Transaction History</h2>
+         {entries.length > 0 ? (
+            <div className="grid gap-6">
+                {entries.map(entry => {
+                    const { userId, ...cardEntry } = entry;
+                    return <NiondraCard key={entry.id} entry={cardEntry} onEdit={handleOpenSheet} onDelete={handleDeleteEntry} personName={person.name}/>
+                })}
+            </div>
+        ) : (
+            <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
+                <h3 className="text-xl font-semibold text-foreground">No History Yet</h3>
+                <p className="mt-2">Add a new entry to start tracking your exchanges with {person.name}.</p>
+            </div>
+        )}
+        <NiondraEntrySheet
+            isOpen={isSheetOpen}
+            onOpenChange={setIsSheetOpen}
+            onAddEntry={handleAddEntry}
+            onUpdateEntry={handleUpdateEntry}
+            entry={editingEntry}
+        />
+    </div>
+  );
+}

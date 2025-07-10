@@ -3,11 +3,19 @@ import type { Timestamp } from "firebase/firestore";
 export type Occasion = "Wedding" | "Birth" | "Housewarming" | "Other";
 export type GiftType = "Money" | "Sweets" | "Item";
 
+export type Person = {
+    id: string;
+    userId: string;
+    name: string;
+    notes?: string;
+}
+
 export type NiondraEntry = {
   id: string;
   userId: string;
+  personId: string;
+  person: string; // This is for display purposes, resolved from personId
   direction: 'given' | 'received';
-  person: string;
   date: Date;
   occasion: Occasion;
   giftType: GiftType;
@@ -16,6 +24,6 @@ export type NiondraEntry = {
   notes?: string;
 };
 
-export type NiondraEntryDTO = Omit<NiondraEntry, 'id' | 'date'> & {
+export type NiondraEntryDTO = Omit<NiondraEntry, 'id' | 'date' | 'person'> & {
   date: Timestamp;
 };

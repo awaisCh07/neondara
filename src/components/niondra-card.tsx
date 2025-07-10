@@ -26,6 +26,7 @@ interface NiondraCardProps {
   entry: Omit<NiondraEntry, 'userId'>;
   onEdit: (entry: Omit<NiondraEntry, 'userId'>) => void;
   onDelete: (id: string) => void;
+  personName?: string;
 }
 
 const occasionIcons: Record<NiondraEntry['occasion'], React.ReactNode> = {
@@ -35,9 +36,10 @@ const occasionIcons: Record<NiondraEntry['occasion'], React.ReactNode> = {
   Other: <PartyPopper className="h-4 w-4" aria-label="Other occasion" />,
 };
 
-export function NiondraCard({ entry, onEdit, onDelete }: NiondraCardProps) {
+export function NiondraCard({ entry, onEdit, onDelete, personName }: NiondraCardProps) {
   const isGiven = entry.direction === 'given';
-  const title = isGiven ? `To: ${entry.person}` : `From: ${entry.person}`;
+  const nameToDisplay = personName || entry.person;
+  const title = isGiven ? `To: ${nameToDisplay}` : `From: ${nameToDisplay}`;
   
   const giftDisplay = entry.giftType === 'Money' && entry.amount 
     ? `${new Intl.NumberFormat().format(entry.amount)} ${entry.description}` 

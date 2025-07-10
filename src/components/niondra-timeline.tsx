@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import type { NiondraEntry, Occasion } from '@/lib/types';
+import type { NiondraEntry, Occasion, Person } from '@/lib/types';
 import { NiondraCard } from './niondra-card';
 import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -9,15 +9,17 @@ import { Search } from 'lucide-react';
 
 interface NiondraTimelineProps {
   entries: NiondraEntry[];
+  people: Person[];
   onEdit: (entry: Omit<NiondraEntry, 'userId'>) => void;
   onDelete: (id: string) => void;
 }
 
-export function NiondraTimeline({ entries, onEdit, onDelete }: NiondraTimelineProps) {
+export function NiondraTimeline({ entries, people, onEdit, onDelete }: NiondraTimelineProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [occasionFilter, setOccasionFilter] = useState<Occasion | 'all'>('all');
   const [directionFilter, setDirectionFilter] = useState<'given' | 'received' | 'all'>('all');
-
+  const [personFilter, setPersonFilter] = useState<string>('all');
+  
   const filteredEntries = useMemo(() => {
     return entries
       .filter(entry => {
@@ -28,25 +30,37 @@ export function NiondraTimeline({ entries, onEdit, onDelete }: NiondraTimelinePr
           : true;
         const occasionMatch = occasionFilter === 'all' || entry.occasion === occasionFilter;
         const directionMatch = directionFilter === 'all' || entry.direction === directionFilter;
-        return searchMatch && occasionMatch && directionMatch;
+        const personMatch = personFilter === 'all' || entry.personId === personFilter;
+        return searchMatch && occasionMatch && directionMatch && personMatch;
       })
       .sort((a, b) => b.date.getTime() - a.date.getTime());
-  }, [entries, searchTerm, occasionFilter, directionFilter]);
+  }, [entries, searchTerm, occasionFilter, directionFilter, personFilter]);
 
   return (
     <div>
       <div className="mb-8 p-4 rounded-lg bg-card border">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="relative md:col-span-2 lg:col-span-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by name, gift..."
+              placeholder="Search by gift..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
               aria-label="Search entries"
             />
           </div>
+          <Select value={personFilter} onValueChange={(value) => setPersonFilter(value)}>
+            <SelectTrigger aria-label="Filter by person">
+              <SelectValue placeholder="Filter by person" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All People</SelectItem>
+              {people.map(p => (
+                <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={occasionFilter} onValueChange={(value) => setOccasionFilter(value as Occasion | 'all')}>
             <SelectTrigger aria-label="Filter by occasion">
               <SelectValue placeholder="Filter by occasion" />

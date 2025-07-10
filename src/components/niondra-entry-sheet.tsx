@@ -21,13 +21,13 @@ import { CalendarIcon } from "lucide-react"
 import { Calendar } from "./ui/calendar"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
-import type { NiondraEntry, Occasion, GiftType } from "@/lib/types"
+import type { NiondraEntry, Person } from "@/lib/types"
 import { Textarea } from "./ui/textarea"
 import { useEffect } from "react"
 
 const formSchema = z.object({
   direction: z.enum(['given', 'received'], { required_error: "Please select a direction." }),
-  person: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  personId: z.string({ required_error: "Please select a person." }),
   date: z.date({ required_error: "A date is required." }),
   occasion: z.enum(['Wedding', 'Birth', 'Housewarming', 'Other']),
   giftType: z.enum(['Money', 'Sweets', 'Item']),
@@ -62,8 +62,8 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>
-type EntryInput = Omit<NiondraEntry, 'id' | 'userId'>;
-type EntryUpdate = Omit<NiondraEntry, 'userId'>
+type EntryInput = Omit<NiondraEntry, 'id' | 'userId' | 'person'>;
+type EntryUpdate = Omit<NiondraEntry, 'userId' | 'person'>
 
 interface NiondraEntrySheetProps {
     isOpen: boolean;
@@ -71,21 +71,12 @@ interface NiondraEntrySheetProps {
     onAddEntry: (entry: EntryInput) => void;
     onUpdateEntry: (entry: EntryUpdate) => void;
     entry?: Omit<NiondraEntry, 'userId'>;
+    people: Person[];
 }
 
-export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEntry, entry }: NiondraEntrySheetProps) {
+export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEntry, entry, people }: NiondraEntrySheetProps) {
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            direction: entry?.direction || 'given',
-            person: entry?.person || '',
-            date: entry?.date || new Date(),
-            occasion: entry?.occasion || 'Wedding',
-            giftType: entry?.giftType || 'Money',
-            amount: entry?.amount || undefined,
-            description: entry?.description || '',
-            notes: entry?.notes || '',
-        }
     });
 
     useEffect(() => {
@@ -94,7 +85,7 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
             amount: entry.amount ?? undefined
         } : {
             direction: 'given',
-            person: '',
+            personId: undefined,
             date: new Date(),
             occasion: 'Wedding',
             giftType: 'Money',
@@ -162,13 +153,22 @@ export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEn
             />
              <FormField
               control={form.control}
-              name="person"
+              name="personId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Person's Name *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Aunt Fatima" {...field} />
-                  </FormControl>
+                  <FormLabel>Person *</FormLabel>
+                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a person" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {people.map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

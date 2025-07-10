@@ -6,7 +6,6 @@ import type { User } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { usePathname, useRouter } from 'next/navigation';
-import { AppLayout } from './layout';
 
 interface AuthContextType {
   user: User | null;
@@ -70,12 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         </div>
       );
   }
-
-  // Render children within layout for protected routes, otherwise just children
-  if (user && isProtectedRoute(pathname)) {
-       return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
-  }
-
+  
   return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
 }
 

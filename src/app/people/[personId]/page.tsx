@@ -15,6 +15,7 @@ import { NiondraEntrySheet } from '@/components/niondra-entry-sheet';
 import { useToast } from '@/hooks/use-toast';
 import { deleteDoc, addDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { useLanguage } from '@/components/language-provider';
+import { AppLayout } from '@/components/layout';
 
 
 type PersonDetailProps = {
@@ -23,7 +24,7 @@ type PersonDetailProps = {
   };
 };
 
-export default function PersonDetailPage({ params }: PersonDetailProps) {
+function PersonDetailContent({ params }: PersonDetailProps) {
   const { user } = useAuth();
   const { personId } = params;
   const [person, setPerson] = useState<Person | null>(null);
@@ -106,7 +107,7 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
     if (user && personId) {
         fetchPersonAndEntries(personId);
     }
-  }, [user, personId, toast]);
+  }, [user, personId]);
 
 
   const handleOpenSheet = (entry?: Omit<NiondraEntry, 'userId'>) => {
@@ -201,8 +202,8 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
     );
   }
 
-  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-green-600' : 'text-red-600';
-  const balanceText = balance.net === 0 ? t('allSquare') : balance.net > 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(balance.net)}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
+  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-red-600' : 'text-green-600';
+  const balanceText = balance.net === 0 ? t('allSquare') : balance.net > 0 ? `${t('youWillGive')} ${new Intl.NumberFormat().format(balance.net)}` : `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
 
 
   return (
@@ -265,4 +266,10 @@ export default function PersonDetailPage({ params }: PersonDetailProps) {
   );
 }
 
-    
+export default function PersonDetailPage({ params }: PersonDetailProps) {
+    return (
+        <AppLayout>
+            <PersonDetailContent params={params} />
+        </AppLayout>
+    )
+}

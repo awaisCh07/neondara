@@ -79,8 +79,10 @@ export function LedgerView() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [user, toast]);
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
 
   const handleAddEntry = async (newEntry: Omit<NiondraEntry, 'id' | 'userId' | 'person'>) => {
@@ -154,36 +156,8 @@ export function LedgerView() {
     setEditingEntry(entry as NiondraEntry | undefined);
     setIsSheetOpen(true);
   }
-
-  const handleExport = () => {
-    const headers = "id,direction,person,date,occasion,giftType,amount,description,notes\n";
-    const csvContent = entries.map(e => 
-      [
-        e.id,
-        e.direction,
-        e.person, // Use the resolved person name
-        e.date.toISOString().split('T')[0],
-        e.occasion,
-        e.giftType,
-        e.amount ?? '',
-        `"${e.description.replace(/"/g, '""')}"`,
-        `"${e.notes?.replace(/"/g, '""') || ''}"`
-      ].join(',')
-    ).join('\n');
-
-    const csv = headers + csvContent;
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "niondra-ledger.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
   
   return (
-    <AppLayout onExport={handleExport}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
             <h1 className="text-4xl font-headline">{t('ledgerHistory')}</h1>
@@ -204,16 +178,15 @@ export function LedgerView() {
             onDelete={handleDeleteEntry}
           />
         )}
+      
+        <NiondraEntrySheet
+          isOpen={isSheetOpen}
+          onOpenChange={setIsSheetOpen}
+          onAddEntry={handleAddEntry}
+          onUpdateEntry={handleUpdateEntry}
+          entry={editingEntry}
+          people={people}
+        />
       </div>
-
-      <NiondraEntrySheet
-        isOpen={isSheetOpen}
-        onOpenChange={setIsSheetOpen}
-        onAddEntry={handleAddEntry}
-        onUpdateEntry={handleUpdateEntry}
-        entry={editingEntry}
-        people={people}
-      />
-    </AppLayout>
   );
 }

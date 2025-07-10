@@ -44,6 +44,7 @@ import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/components/language-provider';
+import { AppLayout } from '@/components/layout';
 
 const relations: Relation[] = [
     { en: "Aunt", ur: "Chachi, Khala, Mami, Phuppi" },
@@ -79,7 +80,7 @@ type PersonWithBalance = Person & {
   balance: number;
 };
 
-export default function PeoplePage() {
+function PeopleContent() {
   const { user } = useAuth();
   const { language, t } = useLanguage();
   const [people, setPeople] = useState<PersonWithBalance[]>([]);
@@ -139,7 +140,7 @@ export default function PeoplePage() {
     if (user) {
       fetchPeopleAndBalances();
     }
-  }, [user, toast]);
+  }, [user]);
   
   const handleOpenDialog = (person: Person | null = null) => {
     setEditingPerson(person);
@@ -200,15 +201,15 @@ export default function PeoplePage() {
   };
   
   const getBalanceColor = (balance: number) => {
-    if (balance > 0) return 'text-green-600'; // User will receive
-    if (balance < 0) return 'text-red-600'; // User will give
+    if (balance > 0) return 'text-red-600'; // User will give
+    if (balance < 0) return 'text-green-600'; // User will receive
     return 'text-muted-foreground';
   }
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return t('allSquare');
-    if (balance > 0) return `${t('youWillReceive')} ${new Intl.NumberFormat().format(balance)}`;
-    return `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
+    if (balance > 0) return `${t('youWillGive')} ${new Intl.NumberFormat().format(balance)}`;
+    return `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
   }
 
   const getRelationDisplay = (relationKey: string) => {
@@ -229,10 +230,6 @@ export default function PeoplePage() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Link href="/" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4"/>
-          {t('backToLedger')}
-      </Link>
       <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
         <h1 className="text-4xl font-headline flex items-center gap-2">
             <Users/>
@@ -393,4 +390,10 @@ export default function PeoplePage() {
   );
 }
 
-    
+export default function PeoplePage() {
+    return (
+        <AppLayout>
+            <PeopleContent />
+        </AppLayout>
+    )
+}

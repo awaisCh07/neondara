@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -158,35 +159,37 @@ export function LedgerView() {
   }
   
   return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-headline">{t('ledgerHistory')}</h1>
-            <Button size="sm" onClick={() => handleOpenSheet()}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-                {t('addEntry')}
-            </Button>
+      <AppLayout>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-4xl font-headline">{t('ledgerHistory')}</h1>
+                <Button size="sm" onClick={() => handleOpenSheet()}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                    {t('addEntry')}
+                </Button>
+            </div>
+            {loading ? (
+            <div className="text-center py-16 text-muted-foreground">
+                <p>{t('loadingLedger')}</p>
+            </div>
+            ) : (
+            <NiondraTimeline 
+                entries={entries} 
+                people={people} 
+                onEdit={handleOpenSheet} 
+                onDelete={handleDeleteEntry}
+            />
+            )}
+        
+            <NiondraEntrySheet
+            isOpen={isSheetOpen}
+            onOpenChange={setIsSheetOpen}
+            onAddEntry={handleAddEntry}
+            onUpdateEntry={handleUpdateEntry}
+            entry={editingEntry}
+            people={people}
+            />
         </div>
-        {loading ? (
-          <div className="text-center py-16 text-muted-foreground">
-            <p>{t('loadingLedger')}</p>
-          </div>
-        ) : (
-          <NiondraTimeline 
-            entries={entries} 
-            people={people} 
-            onEdit={handleOpenSheet} 
-            onDelete={handleDeleteEntry}
-          />
-        )}
-      
-        <NiondraEntrySheet
-          isOpen={isSheetOpen}
-          onOpenChange={setIsSheetOpen}
-          onAddEntry={handleAddEntry}
-          onUpdateEntry={handleUpdateEntry}
-          entry={editingEntry}
-          people={people}
-        />
-      </div>
+      </AppLayout>
   );
 }

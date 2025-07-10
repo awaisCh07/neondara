@@ -42,13 +42,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+    const isPublic = PUBLIC_ROUTES.includes(pathname);
+    const isProtected = isProtectedRoute(pathname);
     
-    if (!user && isProtectedRoute(pathname)) {
+    if (!user && isProtected) {
         router.push('/login');
     }
 
-    if(user && isPublicRoute){
+    if(user && isPublic){
         router.push('/');
     }
 
@@ -68,6 +69,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           <p>Redirecting to login...</p>
         </div>
       );
+  }
+
+  if (user && PUBLIC_ROUTES.includes(pathname)) {
+    return (
+     <div className="flex items-center justify-center min-h-screen">
+       <p>Redirecting to dashboard...</p>
+     </div>
+   );
   }
   
   return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;

@@ -9,7 +9,7 @@ import { Search } from 'lucide-react';
 
 interface NiondraTimelineProps {
   entries: NiondraEntry[];
-  onEdit: (entry: NiondraEntry) => void;
+  onEdit: (entry: Omit<NiondraEntry, 'userId'>) => void;
   onDelete: (id: string) => void;
 }
 
@@ -74,9 +74,10 @@ export function NiondraTimeline({ entries, onEdit, onDelete }: NiondraTimelinePr
       
       {filteredEntries.length > 0 ? (
         <div className="grid gap-6">
-          {filteredEntries.map(entry => (
-            <NiondraCard key={entry.id} entry={entry} onEdit={onEdit} onDelete={onDelete} />
-          ))}
+          {filteredEntries.map(entry => {
+            const { userId, ...cardEntry } = entry;
+            return <NiondraCard key={entry.id} entry={cardEntry} onEdit={onEdit} onDelete={onDelete} />
+          })}
         </div>
       ) : (
         <div className="text-center py-16 text-muted-foreground">

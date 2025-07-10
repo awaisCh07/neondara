@@ -5,6 +5,7 @@ export type GiftType = "Money" | "Sweets" | "Item";
 
 export type NiondraEntry = {
   id: string;
+  userId: string;
   direction: 'given' | 'received';
   person: string;
   date: Date;

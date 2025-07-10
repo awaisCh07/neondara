@@ -62,13 +62,15 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>
+type EntryInput = Omit<NiondraEntry, 'id' | 'userId'>;
+type EntryUpdate = Omit<NiondraEntry, 'userId'>
 
 interface NiondraEntrySheetProps {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
-    onAddEntry: (entry: Omit<NiondraEntry, 'id'>) => void;
-    onUpdateEntry: (entry: NiondraEntry) => void;
-    entry?: NiondraEntry;
+    onAddEntry: (entry: EntryInput) => void;
+    onUpdateEntry: (entry: EntryUpdate) => void;
+    entry?: Omit<NiondraEntry, 'userId'>;
 }
 
 export function NiondraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEntry, entry }: NiondraEntrySheetProps) {

@@ -23,8 +23,8 @@ import {
 } from "@/components/ui/alert-dialog"
 
 interface NiondraCardProps {
-  entry: NiondraEntry;
-  onEdit: (entry: NiondraEntry) => void;
+  entry: Omit<NiondraEntry, 'userId'>;
+  onEdit: (entry: Omit<NiondraEntry, 'userId'>) => void;
   onDelete: (id: string) => void;
 }
 

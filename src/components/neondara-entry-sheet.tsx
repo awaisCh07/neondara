@@ -27,6 +27,9 @@ import { Textarea } from "./ui/textarea"
 import { useEffect, useState, useRef } from "react"
 import { useLanguage } from "./language-provider"
 import Image from "next/image"
+import { useToast } from "@/hooks/use-toast"
+
+const MAX_FILE_SIZE = 500 * 1024; // 500KB
 
 const formSchema = z.object({
   direction: z.enum(['given', 'received'], { required_error: "Please select a direction." }),
@@ -35,25 +38,25 @@ const formSchema = z.object({
   occasion: z.enum(['Wedding', 'Birth', 'Housewarming', 'Other']),
   giftType: z.enum(['Money', 'Sweets', 'Gift']),
   amount: z.coerce.number().positive("Amount must be positive.").optional(),
-  description: z.string(),
+  description: z.string().min(1, "A description or image is required."), // Now only checks for non-emptiness
   notes: z.string().optional(),
 }).superRefine((data, ctx) => {
     if (data.giftType === 'Money') {
         if (!data.amount) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'An amount is required for money gifts.', path: ['amount'] });
         }
-        if (data.description.length === 0) {
+        if (!data.description || data.description.length === 0) {
              ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Currency (e.g., USD, CAD) is required.', path: ['description'] });
         }
     } else if (data.giftType === 'Sweets') {
         if (!data.amount) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'An amount in kg is required.', path: ['amount'] });
         }
-        if (data.description.length < 2) {
+        if (!data.description || data.description.length < 2) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description of the sweet is required.', path: ['description'] });
         }
     } else if (data.giftType === 'Gift') {
-        if (data.description.length < 2) { // description will hold the Data URL or the name of the gift
+        if (!data.description || data.description.trim().length < 2) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description or image of the gift is required.', path: ['description'] });
         }
     }
@@ -74,44 +77,70 @@ interface NeondaraEntrySheetProps {
 
 export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEntry, entry, people }: NeondaraEntrySheetProps) {
     const { t } = useLanguage();
+    const { toast } = useToast();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
+        defaultValues: {
+            description: "",
+        }
     });
 
     useEffect(() => {
-        if (entry && entry.giftType === 'Gift' && entry.description.startsWith('data:image')) {
-            setImagePreview(entry.description);
-        } else {
-            setImagePreview(null);
+        if (isOpen) {
+            form.reset(entry ? {
+                ...entry,
+                amount: entry.amount ?? undefined
+            } : {
+                direction: 'given',
+                personId: undefined,
+                date: new Date(),
+                occasion: 'Wedding',
+                giftType: 'Money',
+                amount: undefined,
+                description: '',
+                notes: '',
+            });
+
+            if (entry && entry.giftType === 'Gift' && entry.description.startsWith('data:image')) {
+                setImagePreview(entry.description);
+            } else {
+                setImagePreview(null);
+            }
         }
-        form.reset(entry ? {
-            ...entry,
-            amount: entry.amount ?? undefined
-        } : {
-            direction: 'given',
-            personId: undefined,
-            date: new Date(),
-            occasion: 'Wedding',
-            giftType: 'Money',
-            amount: undefined,
-            description: '',
-            notes: '',
-        });
     }, [entry, isOpen, form]);
 
     const giftType = form.watch("giftType");
+    
+    // Clear description when gift type changes away from 'Gift' with an image
+    useEffect(() => {
+        if (giftType !== 'Gift') {
+            setImagePreview(null);
+            if (form.getValues('description').startsWith('data:image')) {
+                form.setValue('description', '');
+            }
+        }
+    }, [giftType, form]);
+
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
+            if (file.size > MAX_FILE_SIZE) {
+                toast({
+                    title: "Image Too Large",
+                    description: `Please select an image smaller than ${MAX_FILE_SIZE / 1024}KB.`,
+                    variant: "destructive"
+                });
+                return;
+            }
             const reader = new FileReader();
             reader.onloadend = () => {
                 const dataUrl = reader.result as string;
                 setImagePreview(dataUrl);
-                form.setValue('description', dataUrl); 
+                form.setValue('description', dataUrl, { shouldValidate: true }); 
             };
             reader.readAsDataURL(file);
         }
@@ -124,10 +153,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             submissionValues.amount = values.amount!;
         } else {
             submissionValues.amount = null;
-        }
-
-        if (values.giftType === 'Gift' && imagePreview) {
-            submissionValues.description = imagePreview; // Ensure the data URL is saved
         }
         
         const newEntryData = {
@@ -142,17 +167,9 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
         }
         onOpenChange(false);
     }
-    
-    useEffect(() => {
-        if(giftType !== 'Gift') {
-            setImagePreview(null);
-        }
-        if (giftType === 'Gift' && entry?.description.startsWith('data:image')) {
-            setImagePreview(entry.description);
-            form.setValue('description', entry.description);
-        }
-    }, [giftType, entry, form]);
 
+    const descriptionValue = form.watch('description');
+    const isDescriptionImageData = descriptionValue && descriptionValue.startsWith('data:image');
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -369,7 +386,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                     <FormItem className="mt-2">
                       <FormLabel>{t('giftDescription')} *</FormLabel>
                       <FormControl>
-                          <Input placeholder={t('giftDescriptionPlaceholder')} {...field} value={field.value.startsWith('data:image') ? '' : field.value} onChange={(e) => field.onChange(e.target.value)}/>
+                          <Input placeholder={t('giftDescriptionPlaceholder')} {...field} value={isDescriptionImageData ? '' : field.value} onChange={(e) => field.onChange(e.target.value)}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -401,3 +418,5 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     </Sheet>
   )
 }
+
+    

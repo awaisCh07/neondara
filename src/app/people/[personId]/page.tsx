@@ -87,7 +87,7 @@ export default function PersonDetailPage() {
           }
         }
       });
-      setBalance({ given, received, net: received - given });
+      setBalance({ given, received, net: given - received });
 
     } catch (error) {
       console.error("Error fetching person details: ", error);

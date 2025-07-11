@@ -125,7 +125,7 @@ export default function PeoplePage() {
             received += entry.amount || 0;
           }
         });
-        return { ...person, balance: received - given };
+        return { ...person, balance: given - received };
       });
 
       setPeople(peopleWithBalances.sort((a,b) => a.name.localeCompare(b.name)));

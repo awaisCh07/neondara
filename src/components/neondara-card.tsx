@@ -2,7 +2,7 @@
 import type { NeondaraEntry } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Badge } from './ui/badge';
-import { ArrowUpRight, ArrowDownLeft, Gift, Home, PartyPopper, Heart, Edit, Trash2, MoreVertical, Cake, Image as ImageIcon } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, Gift, Home, PartyPopper, Heart, Edit, Trash2, MoreVertical, Image as ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from './ui/button';
 import Image from 'next/image';
@@ -59,8 +59,17 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
         return `${entry.amount}kg ${entry.description}`;
       case 'Gift':
          if (entry.description && entry.description.startsWith('data:image')) {
-            // This case is handled by the JSX below, returning null here
-            return null;
+            return (
+              <a href={entry.description} download={`gift_from_${nameToDisplay}.png`}>
+                <Image
+                  src={entry.description}
+                  alt="Gift"
+                  width={400}
+                  height={300}
+                  className="rounded-lg object-cover w-full aspect-video transition-transform duration-300 hover:scale-105"
+                />
+              </a>
+            );
          }
          return (
             <div className="flex items-center gap-4">
@@ -99,19 +108,10 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
         </div>
       </CardHeader>
       <CardContent className="flex-grow">
-        {entry.giftType === 'Gift' && entry.description && entry.description.startsWith('data:image') ? (
-            <div className="mt-2">
-              <Image
-                src={entry.description}
-                alt="Gift"
-                width={400}
-                height={300}
-                className="rounded-lg object-cover w-full aspect-video"
-              />
-            </div>
-          ) : (
-            giftDisplayContent && <p className="text-2xl font-headline text-foreground/90">{giftDisplayContent}</p>
-          )
+        {
+          typeof giftDisplayContent === 'string' ?
+            <p className="text-2xl font-headline text-foreground/90">{giftDisplayContent}</p>
+          : giftDisplayContent
         }
         {entry.notes && (
           <blockquote className="mt-4 border-l-2 pl-4 italic text-muted-foreground font-serif">

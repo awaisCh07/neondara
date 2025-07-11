@@ -30,6 +30,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -108,6 +109,12 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
                       className="object-contain"
                     />
                   </div>
+                  <DialogFooter>
+                    <Button onClick={handleDownload}>
+                      <Download className="mr-2 h-4 w-4" />
+                      {t('exportData')}
+                    </Button>
+                  </DialogFooter>
                 </DialogContent>
               </Dialog>
               
@@ -195,12 +202,6 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
                 <Edit className="mr-2 h-4 w-4" />
                 {t('edit')}
               </DropdownMenuItem>
-              {isImageDataUrl && (
-                <DropdownMenuItem onClick={handleDownload}>
-                  <Download className="mr-2 h-4 w-4" />
-                  {t('exportData')}
-                </DropdownMenuItem>
-              )}
               <DropdownMenuSeparator />
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">

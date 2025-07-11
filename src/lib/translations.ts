@@ -130,8 +130,8 @@ export const translations: Translations = {
     balance: { en: 'Balance', ur: 'بیلنس' },
     viewHistory: { en: 'View History', ur: 'ہسٹری دیکھیں' },
     allSquare: { en: 'All square', ur: 'حساب برابر' },
-    youAreOwed: { en: 'You are owed {{amount}}', ur: 'آپ کو {{amount}} ملیں گے' },
-    youHaveGivenMore: { en: 'You have given {{amount}} more', ur: 'آپ نے {{amount}} زیادہ دیے ہیں' },
+    youAreOwed: { en: 'They will pay you {{amount}}', ur: 'وہ آپ کو {{amount}} ادا کریں گے۔' },
+    youHaveGivenMore: { en: 'You will give {{amount}}', ur: 'آپ {{amount}} دیں گے' },
 
     // Person Detail Page
     backToPeople: { en: 'Back to People', ur: 'لوگوں کی فہرست پر واپس' },
@@ -158,5 +158,3 @@ export const useTranslation = (language: Language) => {
         return translation;
     }
 }
-
-    

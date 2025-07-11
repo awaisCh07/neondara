@@ -1,7 +1,8 @@
+
 import type { Timestamp } from "firebase/firestore";
 
 export type Occasion = "Wedding" | "Birth" | "Housewarming" | "Other";
-export type GiftType = "Money" | "Sweets" | "Item";
+export type GiftType = "Money" | "Sweets" | "Gift";
 
 export type RelationType = 
   | "Aunt"
@@ -37,7 +38,7 @@ export type Person = {
     notes?: string;
 }
 
-export type NiondraEntry = {
+export type NeondaraEntry = {
   id: string;
   userId: string;
   personId: string;
@@ -47,12 +48,10 @@ export type NiondraEntry = {
   occasion: Occasion;
   giftType: GiftType;
   amount: number | null;
-  description: string;
+  description: string; // Used for currency, item description, or gift image URL
   notes?: string;
 };
 
-export type NiondraEntryDTO = Omit<NiondraEntry, 'id' | 'date' | 'person'> & {
+export type NeondaraEntryDTO = Omit<NeondaraEntry, 'id' | 'date' | 'person'> & {
   date: Timestamp;
 };
-
-    

@@ -5,18 +5,19 @@ import { useEffect, useState } from 'react';
 import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/auth-provider';
-import { NiondraCard } from '@/components/niondra-card';
-import type { NiondraEntry, NiondraEntryDTO, Person } from '@/lib/types';
+import { NeondaraCard } from '@/components/neondara-card';
+import type { NeondaraEntry, NeondaraEntryDTO, Person } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { NiondraEntrySheet } from '@/components/niondra-entry-sheet';
+import { NeondaraEntrySheet } from '@/components/neondara-entry-sheet';
 import { useToast } from '@/hooks/use-toast';
 import { deleteDoc, addDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { useLanguage } from '@/components/language-provider';
 import { AppLayout } from '@/components/layout';
 import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
 
 
 type PersonDetailPageProps = {
@@ -30,12 +31,12 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
   const router = useRouter();
   const { personId } = params;
   const [person, setPerson] = useState<Person | null>(null);
-  const [entries, setEntries] = useState<NiondraEntry[]>([]);
+  const [entries, setEntries] = useState<NeondaraEntry[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
   const [balance, setBalance] = useState({ given: 0, received: 0, net: 0 });
   const [loading, setLoading] = useState(true);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<NiondraEntry | undefined>(undefined);
+  const [editingEntry, setEditingEntry] = useState<NeondaraEntry | undefined>(undefined);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -63,19 +64,19 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
 
       // Fetch entries for this person
       const entriesQuery = query(
-        collection(db, 'niondra_entries'),
+        collection(db, 'neondara_entries'),
         where('userId', '==', user.uid),
         where('personId', '==', currentPersonId),
         orderBy('date', 'desc')
       );
       const querySnapshot = await getDocs(entriesQuery);
       const entriesData = querySnapshot.docs.map(doc => {
-        const data = doc.data() as NiondraEntryDTO;
+        const data = doc.data() as NeondaraEntryDTO;
         return {
           id: doc.id,
           ...data,
           date: data.date.toDate(),
-        } as NiondraEntry;
+        } as NeondaraEntry;
       });
       setEntries(entriesData);
 
@@ -91,7 +92,7 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
           }
         }
       });
-      setBalance({ given, received, net: given - received });
+      setBalance({ given, received, net: received - given });
 
     } catch (error) {
       console.error("Error fetching person details: ", error);
@@ -117,14 +118,14 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
   }, [user, authLoading, personId, router]);
 
 
-  const handleOpenSheet = (entry?: Omit<NiondraEntry, 'userId'>) => {
-    setEditingEntry(entry as NiondraEntry | undefined);
+  const handleOpenSheet = (entry?: Omit<NeondaraEntry, 'userId'>) => {
+    setEditingEntry(entry as NeondaraEntry | undefined);
     setIsSheetOpen(true);
   }
 
   const handleDeleteEntry = async (entryId: string) => {
     try {
-      await deleteDoc(doc(db, "niondra_entries", entryId));
+      await deleteDoc(doc(db, "neondara_entries", entryId));
       toast({
         title: t('success'),
         description: t('entryDeletedSuccess'),
@@ -140,10 +141,10 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
     }
   };
 
-  const handleAddEntry = async (newEntry: Omit<NiondraEntry, 'id' | 'userId'>) => {
+  const handleAddEntry = async (newEntry: Omit<NeondaraEntry, 'id' | 'userId'>) => {
     if (!user) return;
     try {
-      await addDoc(collection(db, "niondra_entries"), {
+      await addDoc(collection(db, "neondara_entries"), {
         ...newEntry,
         userId: user.uid,
         date: Timestamp.fromDate(newEntry.date),
@@ -163,9 +164,9 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
     }
   };
   
-  const handleUpdateEntry = async (updatedEntry: Omit<NiondraEntry, 'userId'>) => {
+  const handleUpdateEntry = async (updatedEntry: Omit<NeondaraEntry, 'userId'>) => {
     try {
-      const entryRef = doc(db, "niondra_entries", updatedEntry.id);
+      const entryRef = doc(db, "neondara_entries", updatedEntry.id);
       const { id, ...dataToUpdate } = updatedEntry;
       await updateDoc(entryRef, {
         ...dataToUpdate,
@@ -184,6 +185,64 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
         variant: "destructive",
       });
     }
+  };
+
+  const handleExportData = () => {
+    if (entries.length === 0) {
+        toast({
+            title: "No Data to Export",
+            description: "There are no ledger entries to export.",
+            variant: "destructive"
+        })
+        return;
+    }
+
+    const headers = [
+        'ID', 'Direction', 'Person', 'Date', 'Occasion', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'
+    ];
+    
+    // Using a function to safely handle quotes and commas in data
+    const escapeCsvCell = (cellData: any) => {
+        if (cellData === null || cellData === undefined) {
+            return '';
+        }
+        const stringData = String(cellData);
+        if (stringData.includes('"') || stringData.includes(',') || stringData.includes('\n')) {
+            return `"${stringData.replace(/"/g, '""')}"`;
+        }
+        return stringData;
+    };
+
+    const csvContent = [
+        headers.join(','),
+        ...entries.map(entry => [
+            escapeCsvCell(entry.id),
+            escapeCsvCell(entry.direction),
+            escapeCsvCell(person?.name),
+            escapeCsvCell(format(entry.date, 'yyyy-MM-dd')),
+            escapeCsvCell(entry.occasion),
+            escapeCsvCell(entry.giftType),
+            escapeCsvCell(entry.amount),
+            escapeCsvCell(entry.description),
+            escapeCsvCell(entry.notes),
+        ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `neondara_ledger_export_${person?.name}_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    toast({
+        title: "Export Successful",
+        description: "Your data has been downloaded as a CSV file.",
+    })
   };
 
 
@@ -215,7 +274,7 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
   const balanceText = balance.net === 0 ? t('allSquare') : balance.net > 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
 
   return (
-    <AppLayout>
+    <AppLayout onExport={handleExportData}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
               <Link href="/people" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
@@ -254,7 +313,7 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
               <div className="grid gap-6">
                   {entries.map(entry => {
                       const { userId, ...cardEntry } = entry;
-                      return <NiondraCard key={entry.id} entry={cardEntry} onEdit={handleOpenSheet} onDelete={handleDeleteEntry} personName={person.name}/>
+                      return <NeondaraCard key={entry.id} entry={cardEntry} onEdit={handleOpenSheet} onDelete={handleDeleteEntry} personName={person.name}/>
                   })}
               </div>
           ) : (
@@ -263,7 +322,7 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
                   <p className="mt-2">{t('startTracking')} {person.name}.</p>
               </div>
           )}
-          <NiondraEntrySheet
+          <NeondaraEntrySheet
               isOpen={isSheetOpen}
               onOpenChange={setIsSheetOpen}
               onAddEntry={handleAddEntry}

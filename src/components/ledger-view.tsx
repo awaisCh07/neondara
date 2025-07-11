@@ -4,11 +4,11 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc, Timestamp, query, where, orderBy, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import type { NiondraEntry, NiondraEntryDTO, Person } from '@/lib/types';
-import { NiondraEntrySheet } from '@/components/niondra-entry-sheet';
+import type { NeondaraEntry, NeondaraEntryDTO, Person } from '@/lib/types';
+import { NeondaraEntrySheet } from '@/components/neondara-entry-sheet';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
-import { NiondraTimeline } from './niondra-timeline';
+import { NeondaraTimeline } from './neondara-timeline';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './auth-provider';
 import { useLanguage } from './language-provider';
@@ -17,11 +17,11 @@ import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 
 export function LedgerView() {
-  const [entries, setEntries] = useState<NiondraEntry[]>([]);
+  const [entries, setEntries] = useState<NeondaraEntry[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<NiondraEntry | undefined>(undefined);
+  const [editingEntry, setEditingEntry] = useState<NeondaraEntry | undefined>(undefined);
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -41,11 +41,11 @@ export function LedgerView() {
       setPeople(peopleData);
 
       // Fetch entries
-      const entriesQuery = query(collection(db, "niondra_entries"), where("userId", "==", user.uid), orderBy("date", "desc"));
+      const entriesQuery = query(collection(db, "neondara_entries"), where("userId", "==", user.uid), orderBy("date", "desc"));
       const entriesSnapshot = await getDocs(entriesQuery);
       
       const entriesData = await Promise.all(entriesSnapshot.docs.map(async docSnapshot => {
-        const data = docSnapshot.data() as NiondraEntryDTO;
+        const data = docSnapshot.data() as NeondaraEntryDTO;
         let personName = 'Unknown';
         // Find personName from the already fetched people data
         const person = peopleData.find(p => p.id === data.personId);
@@ -65,7 +65,7 @@ export function LedgerView() {
           ...data,
           person: personName, // This is now correctly resolved
           date: data.date.toDate(),
-        } as NiondraEntry;
+        } as NeondaraEntry;
       }));
 
       setEntries(entriesData);
@@ -92,13 +92,13 @@ export function LedgerView() {
   }, [user, authLoading, router]);
 
 
-  const handleAddEntry = async (newEntry: Omit<NiondraEntry, 'id' | 'userId' | 'person'>) => {
+  const handleAddEntry = async (newEntry: Omit<NeondaraEntry, 'id' | 'userId' | 'person'>) => {
     if (!user) {
         toast({ title: t('error'), description: "You must be logged in to add an entry.", variant: "destructive" });
         return;
     }
     try {
-      await addDoc(collection(db, "niondra_entries"), {
+      await addDoc(collection(db, "neondara_entries"), {
         ...newEntry,
         userId: user.uid,
         date: Timestamp.fromDate(newEntry.date),
@@ -118,9 +118,9 @@ export function LedgerView() {
     }
   };
 
-  const handleUpdateEntry = async (updatedEntry: Omit<NiondraEntry, 'userId' | 'person'>) => {
+  const handleUpdateEntry = async (updatedEntry: Omit<NeondaraEntry, 'userId' | 'person'>) => {
     try {
-      const entryRef = doc(db, "niondra_entries", updatedEntry.id);
+      const entryRef = doc(db, "neondara_entries", updatedEntry.id);
       const { id, ...dataToUpdate } = updatedEntry;
       await updateDoc(entryRef, {
         ...dataToUpdate,
@@ -143,7 +143,7 @@ export function LedgerView() {
   
   const handleDeleteEntry = async (entryId: string) => {
     try {
-      await deleteDoc(doc(db, "niondra_entries", entryId));
+      await deleteDoc(doc(db, "neondara_entries", entryId));
       toast({
         title: t('success'),
         description: t('entryDeletedSuccess'),
@@ -159,8 +159,8 @@ export function LedgerView() {
     }
   };
   
-  const handleOpenSheet = (entry?: Omit<NiondraEntry, 'userId'>) => {
-    setEditingEntry(entry as NiondraEntry | undefined);
+  const handleOpenSheet = (entry?: Omit<NeondaraEntry, 'userId'>) => {
+    setEditingEntry(entry as NeondaraEntry | undefined);
     setIsSheetOpen(true);
   }
 
@@ -175,7 +175,7 @@ export function LedgerView() {
     }
 
     const headers = [
-        'ID', 'Direction', 'Person', 'Date', 'Occasion', 'Gift Type', 'Amount', 'Description', 'Notes'
+        'ID', 'Direction', 'Person', 'Date', 'Occasion', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'
     ];
     
     // Using a function to safely handle quotes and commas in data
@@ -184,9 +184,7 @@ export function LedgerView() {
             return '';
         }
         const stringData = String(cellData);
-        // If the data contains a comma, double quote, or newline, wrap it in double quotes
         if (stringData.includes('"') || stringData.includes(',') || stringData.includes('\n')) {
-            // Escape existing double quotes by doubling them
             return `"${stringData.replace(/"/g, '""')}"`;
         }
         return stringData;
@@ -212,7 +210,7 @@ export function LedgerView() {
     if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute("download", `niondra_ledger_export_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute("download", `neondara_ledger_export_${new Date().toISOString().split('T')[0]}.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
@@ -244,14 +242,14 @@ export function LedgerView() {
                 </Button>
             </div>
             
-            <NiondraTimeline 
+            <NeondaraTimeline 
                 entries={entries} 
                 people={people} 
                 onEdit={handleOpenSheet} 
                 onDelete={handleDeleteEntry}
             />
         
-            <NiondraEntrySheet
+            <NeondaraEntrySheet
             isOpen={isSheetOpen}
             onOpenChange={setIsSheetOpen}
             onAddEntry={handleAddEntry}

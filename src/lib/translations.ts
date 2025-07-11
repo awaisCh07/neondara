@@ -9,8 +9,8 @@ type Translations = {
 
 export const translations: Translations = {
     // App Metadata
-    appTitle: { en: 'Niondra Ledger', ur: 'نیوندرا لیجر' },
-    appDescription: { en: 'Manage and store records for the cultural tradition of Niondra.', ur: 'نیوندرا کی ثقافتی روایت کے لیے ریکارڈز کا نظم اور ذخیرہ کریں۔' },
+    appTitle: { en: 'Neondara Ledger', ur: 'نیوندرا لیجر' },
+    appDescription: { en: 'Manage and store records for the cultural tradition of Neondara.', ur: 'نیوندرا کی ثقافتی روایت کے لیے ریکارڈز کا نظم اور ذخیرہ کریں۔' },
 
     // General
     add: { en: 'Add', ur: 'شامل کریں' },
@@ -41,7 +41,7 @@ export const translations: Translations = {
 
     // Signup Page
     signupTitle: { en: 'Sign Up', ur: 'سائن اپ' },
-    signupDescription: { en: 'Create an account to start using the Niondra Ledger.', ur: 'نیوندرا لیجر استعمال شروع کرنے کے لیے ایک اکاؤنٹ بنائیں۔' },
+    signupDescription: { en: 'Create an account to start using the Neondara Ledger.', ur: 'نیوندرا لیجر استعمال شروع کرنے کے لیے ایک اکاؤنٹ بنائیں۔' },
     fullName: { en: 'Full Name', ur: 'پورا نام' },
     createAccount: { en: 'Create Account', ur: 'اکاؤنٹ بنائیں' },
     creatingAccount: { en: 'Creating Account...', ur: 'اکاؤنٹ بن رہا ہے۔۔۔' },
@@ -66,7 +66,7 @@ export const translations: Translations = {
     entryUpdatedSuccess: { en: 'Entry has been updated.', ur: 'اندراج کو اپ ڈیٹ کر دیا گیا ہے۔' },
     entryDeletedSuccess: { en: 'Entry has been deleted.', ur: 'اندراج کو حذف کر دیا گیا ہے۔' },
     
-    // Niondra Timeline / Filters
+    // Neondara Timeline / Filters
     searchByGift: { en: 'Search by gift...', ur: 'تحفے کے لحاظ سے تلاش کریں...' },
     allPeople: { en: 'All People', ur: 'تمام لوگ' },
     allOccasions: { en: 'All Occasions', ur: 'تمام مواقع' },
@@ -77,7 +77,7 @@ export const translations: Translations = {
     noEntriesFound: { en: 'No Entries Found', ur: 'کوئی اندراج نہیں ملا' },
     adjustFilters: { en: 'Try adjusting your search or filters, or add a new entry.', ur: 'اپنی تلاش یا فلٹرز کو ایڈجسٹ کرنے کی کوشش کریں، یا ایک نیا اندراج شامل کریں۔' },
     
-    // Niondra Card
+    // Neondara Card
     to: { en: 'To', ur: 'بنام' },
     from: { en: 'From', ur: 'منجانب' },
     occasionWedding: { en: 'Wedding', ur: 'شادی' },
@@ -89,10 +89,10 @@ export const translations: Translations = {
     deleteConfirmTitle: { en: 'Are you sure?', ur: 'کیا آپ واقعی حذف کرنا چاہتے ہیں؟' },
     deleteConfirmDescription: { en: 'This action cannot be undone. This will permanently delete this ledger entry.', ur: 'یہ عمل واپس نہیں کیا جا سکتا۔ یہ اس لیجر اندراج کو مستقل طور پر حذف کر دے گا۔' },
     
-    // Niondra Entry Sheet
+    // Neondara Entry Sheet
     addNewEntry: { en: 'Add New Entry', ur: 'نیا اندراج شامل کریں' },
     editEntry: { en: 'Edit Entry', ur: 'اندراج میں ترمیم کریں' },
-    entrySheetDescription: { en: 'Record a Niondra exchange. Fill in the details below.', ur: 'نیوندرا کے تبادلے کو ریکارڈ کریں۔ نیچے تفصیلات پر کریں۔' },
+    entrySheetDescription: { en: 'Record a Neondara exchange. Fill in the details below.', ur: 'نیوندرا کے تبادلے کو ریکارڈ کریں۔ نیچے تفصیلات پر کریں۔' },
     direction: { en: 'Direction', ur: 'سمت' },
     person: { en: 'Person', ur: 'شخص' },
     dateOfOccasion: { en: 'Date of Occasion', ur: 'موقع کی تاریخ' },
@@ -100,12 +100,16 @@ export const translations: Translations = {
     giftType: { en: 'Gift Type', ur: 'تحفے کی قسم' },
     giftTypeMoney: { en: 'Money', ur: 'پیسے' },
     giftTypeSweets: { en: 'Sweets', ur: 'مٹھائی' },
-    giftTypeItem: { en: 'Item', ur: 'چیز' },
+    giftTypeGift: { en: 'Gift', ur: 'تحفہ' },
     currency: { en: 'Currency', ur: 'کرنسی' },
     currencyPlaceholder: { en: 'e.g., USD, CAD', ur: 'مثلاً، USD, CAD' },
-    descriptionPlaceholder: { en: 'e.g., Box of mithai', ur: 'مثلاً، مٹھائی کا ڈبہ' },
+    sweetDescriptionPlaceholder: { en: 'e.g., Box of mixed sweets', ur: 'مثلاً، مٹھائی کا ڈبہ' },
     notesPlaceholder: { en: 'Any additional remarks...', ur: 'کوئی اضافی ریمارکس...' },
     saveChanges: { en: 'Save Changes', ur: 'تبدیلیاں محفوظ کریں' },
+    uploadImage: { en: 'Upload an Image', ur: ' تصویر اپلوڈ کریں' },
+    giftImage: { en: 'Gift Image', ur: 'تحفہ کی تصویر'},
+    giftDescription: { en: 'Gift Description', ur: 'تحفے کی تفصیل' },
+    giftDescriptionPlaceholder: { en: 'e.g., Dinner Set', ur: 'مثلاً، ڈنر سیٹ' },
     
     // People Page
     backToLedger: { en: 'Back to Ledger', ur: 'لیجر پر واپس' },
@@ -117,7 +121,7 @@ export const translations: Translations = {
     savePerson: { en: 'Save person', ur: 'شخص کو محفوظ کریں' },
     loadingContacts: { en: 'Loading your contacts...', ur: 'آپ کے رابطے لوڈ ہو رہے ہیں...' },
     noPeopleAdded: { en: 'No People Added Yet', ur: 'ابھی تک کوئی شخص شامل نہیں کیا گیا' },
-    clickAddPerson: { en: 'Click "Add Person" to start building your Niondra network.', ur: 'اپنا نیوندرا نیٹ ورک بنانا شروع کرنے کے لیے "شخص شامل کریں" پر کلک کریں۔' },
+    clickAddPerson: { en: 'Click "Add Person" to start building your Neondara network.', ur: 'اپنا نیوندرا نیٹ ورک بنانا شروع کرنے کے لیے "شخص شامل کریں" پر کلک کریں۔' },
     balance: { en: 'Balance', ur: 'بیلنس' },
     viewHistory: { en: 'View History', ur: 'ہسٹری دیکھیں' },
     allSquare: { en: 'All square', ur: 'حساب برابر' },

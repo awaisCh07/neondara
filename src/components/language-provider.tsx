@@ -18,14 +18,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en');
 
   useEffect(() => {
-    const storedLang = localStorage.getItem('niondra-lang') as Language | null;
+    const storedLang = localStorage.getItem('neondara-lang') as Language | null;
     if (storedLang) {
       setLanguageState(storedLang);
     }
   }, []);
 
   const setLanguage = (lang: Language) => {
-    localStorage.setItem('niondra-lang', lang);
+    localStorage.setItem('neondara-lang', lang);
     setLanguageState(lang);
     document.documentElement.lang = lang;
     document.body.className = cn(document.body.className.replace(/font-urdu|font-english/g, ''), lang === 'ur' ? 'font-urdu' : 'font-english');

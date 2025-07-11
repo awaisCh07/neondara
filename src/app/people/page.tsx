@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/auth-provider';
-import type { Person, NiondraEntry, Relation } from '@/lib/types';
+import type { Person, NeondaraEntry, Relation } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserPlus, Users, ArrowRight, Search, MoreVertical, Edit, Trash2 } from 'lucide-react';
@@ -109,9 +109,9 @@ export default function PeoplePage() {
       const peopleData = peopleSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Person));
 
       // Fetch all entries for the user
-      const entriesQuery = query(collection(db, 'niondra_entries'), where('userId', '==', user.uid));
+      const entriesQuery = query(collection(db, 'neondara_entries'), where('userId', '==', user.uid));
       const entriesSnap = await getDocs(entriesQuery);
-      const entriesData = entriesSnap.docs.map(doc => doc.data() as NiondraEntry);
+      const entriesData = entriesSnap.docs.map(doc => doc.data() as NeondaraEntry);
 
       // Calculate balances
       const peopleWithBalances = peopleData.map(person => {
@@ -125,7 +125,7 @@ export default function PeoplePage() {
             received += entry.amount || 0;
           }
         });
-        return { ...person, balance: given - received };
+        return { ...person, balance: received - given };
       });
 
       setPeople(peopleWithBalances.sort((a,b) => a.name.localeCompare(b.name)));

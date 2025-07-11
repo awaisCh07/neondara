@@ -1,15 +1,17 @@
-# Niondra Ledger
+# Neondara Ledger
 
-Niondra Ledger is a modern web application designed to help users track and manage the cultural tradition of Niondra, the exchange of gifts at significant life events like weddings, births, and housewarmings. It provides a secure, private, and easy-to-use platform to ensure you never lose track of gifts given and received.
+Neondara Ledger is a modern web application designed to help users track and manage the cultural tradition of Neondara, the exchange of gifts at significant life events like weddings, births, and housewarmings. It provides a secure, private, and easy-to-use platform to ensure you never lose track of gifts given and received.
 
 ## Core Features
 
 - **Secure User Authentication**: Private accounts to keep your ledger data safe and accessible only to you.
-- **Comprehensive Ledger History**: A central timeline view of all your Niondra transactions, chronologically ordered.
+- **Comprehensive Ledger History**: A central timeline view of all your Neondara transactions, chronologically ordered.
 - **Detailed People & Balance Tracking**: Manage a list of your contacts and automatically see the net monetary balance for each person.
 - **Full CRUD Functionality**: Easily **C**reate, **R**ead, **U**pdate, and **D**elete entries and contacts.
 - **Advanced Filtering & Search**: Quickly find specific entries by filtering by person, occasion, direction (given/received), or by searching for keywords.
 - **Bilingual Interface**: Full support for both **English** and **Urdu**, allowing you to switch languages seamlessly.
+- **Data Export**: Download your entire transaction history, or just the history for a specific person, as a CSV file.
+- **Rich Gift Tracking**: Record gifts as money, sweets (with quantity in kg), or upload an image for physical gifts.
 
 ---
 
@@ -22,13 +24,16 @@ Niondra Ledger is a modern web application designed to help users track and mana
 
 ### 2. Main Ledger View (`/`)
 This is the homepage for authenticated users.
-- **Timeline View**: Displays all Niondra entries in a reverse chronological list.
+- **Timeline View**: Displays all Neondara entries in a reverse chronological list.
 - **Add New Entry**: A prominent "Add Entry" button opens a side sheet to record a new transaction.
 - **Entry Details Card**: Each card in the timeline clearly shows:
     - Direction (Given/Received)
     - Person's Name
     - Date and Occasion (with a representative icon)
-    - Gift Description (e.g., amount of money, or item description)
+    - Gift Details:
+        - **Money**: Amount and currency.
+        - **Sweets**: Quantity in kg and a description.
+        - **Gift**: An uploaded image of the gift item.
     - Optional notes.
 - **Edit/Delete Entries**: Each entry card has options to edit or delete the transaction.
 - **Filtering and Search**: A powerful set of controls allows you to:
@@ -36,14 +41,15 @@ This is the homepage for authenticated users.
     - **Filter** by a specific person from your contacts list.
     - **Filter** by occasion type (Wedding, Birth, etc.).
     - **Filter** by direction (Given, Received, or both).
+- **Export All Data**: The user menu contains an "Export Data" option to download a CSV of all entries.
 
 ### 3. People & Balances (`/people`)
-This page serves as your contact book for Niondra.
+This page serves as your contact book for Neondara.
 - **Contact List**: Displays a card for every person you've added.
 - **Add/Edit/Delete People**: You can add new people (with their name and relation) and edit or delete existing ones.
 - **Net Balance Calculation**: For each person, the application automatically calculates the net balance of all monetary gifts exchanged.
+    - If you have given less money than you've received, it shows "You will receive".
     - If you have given more money than you've received, it shows "You will give".
-    - If you have received more than you've given, it shows "You will receive".
     - If the balance is zero, it shows "All square".
 - **View History**: A button on each person's card navigates to a detailed page showing only the transactions with that individual.
 
@@ -51,7 +57,8 @@ This page serves as your contact book for Niondra.
 This page provides a focused view of your history with a single person.
 - **Person Information**: Displays the person's name and relation.
 - **Balance Summary**: Shows a clear summary of total money given, total money received, and the final net balance.
-- **Transaction History**: A complete timeline of every Niondra entry associated with that person.
+- **Transaction History**: A complete timeline of every Neondara entry associated with that person.
+- **Export Person History**: The user menu's "Export Data" option will download a CSV containing only the transactions for this specific person.
 
 ### 5. Language Support
 - The application is fully internationalized with support for English and Urdu.

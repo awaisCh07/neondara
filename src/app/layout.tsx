@@ -5,8 +5,8 @@ import { AuthProvider } from '@/components/auth-provider';
 import { LanguageProvider } from '@/components/language-provider';
 
 export const metadata: Metadata = {
-  title: 'Niondra Ledger',
-  description: 'Manage and store records for the cultural tradition of Niondra.',
+  title: 'Neondara Ledger',
+  description: 'Manage and store records for the cultural tradition of Neondara.',
 };
 
 export default function RootLayout({

@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -208,7 +207,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
 
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange} modal>
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{entry ? t('editEntry') : t('addNewEntry')}</SheetTitle>
@@ -286,6 +285,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                         const adjustedDate = new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000);
                         field.onChange(adjustedDate);
                       }}
+                      className="block w-full"
                     />
                   </FormControl>
                 ) : (
@@ -420,7 +420,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                   >
                       {imagePreview ? (
                         <>
-                            <Image src={imagePreview} alt="Preview" fill className="object-contain rounded-md" />
+                            <Image src={imagePreview} alt="Preview" fill className="object-contain rounded-md p-2" />
                             <Button variant="ghost" size="icon" className="absolute top-1 right-1 bg-background/50 hover:bg-background/80 rounded-full h-7 w-7" onClick={(e) => { e.stopPropagation(); removeImage();}}>
                                 <X className="h-4 w-4" />
                             </Button>
@@ -429,7 +429,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                           <div className="text-center">
                               <Upload className="mx-auto h-8 w-8" />
                               <p>{t('uploadImage')}</p>
-                              <p className="text-xs text-muted-foreground">{t('or')}</p>
                           </div>
                       )}
                   </div>

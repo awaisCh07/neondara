@@ -56,7 +56,7 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
       case 'Money':
         return <p className="text-2xl font-headline text-foreground/90">{new Intl.NumberFormat().format(entry.amount || 0)}</p>;
       case 'Sweets':
-        return <p className="text-2xl font-headline text-foreground/90">{`${entry.amount}kg ${entry.description}`}</p>;
+        return <p className="text-2xl font-headline text-foreground/90">{`${entry.amount || 0}kg ${entry.description || ''}`.trim()}</p>;
       case 'Gift':
          if (entry.description && entry.description.startsWith('data:image')) {
             return (
@@ -71,10 +71,11 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
               </a>
             );
          }
+         // Fallback for gift with only text description
          return (
             <div className="flex items-center gap-4">
                 <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                <p className="text-2xl font-headline text-foreground/90">{entry.description || "Gift"}</p>
+                <p className="text-lg font-semibold text-foreground/90">{entry.description || "Gift"}</p>
             </div>
          );
       case 'Other':

@@ -87,7 +87,7 @@ export default function PersonDetailPage() {
           }
         }
       });
-      setBalance({ given, received, net: given - received });
+      setBalance({ given, received, net: received - given });
 
     } catch (error) {
       console.error("Error fetching person details: ", error);
@@ -265,8 +265,8 @@ export default function PersonDetailPage() {
     );
   }
 
-  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-green-600' : 'text-red-600';
-  const balanceText = balance.net === 0 ? t('allSquare') : balance.net > 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
+  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net < 0 ? 'text-green-600' : 'text-red-600';
+  const balanceText = balance.net === 0 ? t('allSquare') : balance.net < 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
 
   return (
     <AppLayout onExport={handleExportData}>

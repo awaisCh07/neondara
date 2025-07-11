@@ -1,4 +1,7 @@
 
+"use client"
+
+import { useState } from 'react';
 import type { NeondaraEntry } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Badge } from './ui/badge';
@@ -24,6 +27,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { useLanguage } from './language-provider';
 
 interface NeondaraCardProps {
@@ -35,6 +45,7 @@ interface NeondaraCardProps {
 
 export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCardProps) {
   const { t } = useLanguage();
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
   
   const occasionIcons: Record<NeondaraEntry['occasion'], React.ReactNode> = {
     Wedding: <Heart className="h-4 w-4" aria-label="Wedding" />,
@@ -71,32 +82,79 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
       case 'Sweets':
         return <p className="text-2xl font-headline text-foreground/90">{`${entry.amount || 0}kg ${entry.description || ''}`.trim()}</p>;
       case 'Gift':
-         if (isImageDataUrl) {
-            return (
-              <a href={entry.description} target="_blank" rel="noopener noreferrer" title="Click to view image in new tab">
-                <Image
-                  src={entry.description}
-                  alt={`Gift from ${nameToDisplay}`}
-                  width={400}
-                  height={300}
-                  className="rounded-lg object-cover w-full h-48 transition-transform duration-300 hover:scale-105"
-                />
-              </a>
-            );
-         }
-         // Fallback for gift with only text description or if description is missing
-         return (
-            <div className="flex items-center gap-4">
-                <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                <p className="text-lg font-semibold text-foreground/90">{entry.description || "Gift"}</p>
+        if (isImageDataUrl) {
+          return (
+            <div className="flex gap-4 items-start">
+              <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
+                <DialogTrigger asChild>
+                  <div className="w-24 h-24 relative flex-shrink-0 cursor-pointer">
+                    <Image
+                      src={entry.description}
+                      alt={`Gift from ${nameToDisplay}`}
+                      fill
+                      className="rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                  </div>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl">
+                  <DialogHeader>
+                    <DialogTitle>{t('giftImage')}</DialogTitle>
+                  </DialogHeader>
+                  <div className="relative mt-4" style={{paddingBottom: '75%'}}>
+                    <Image
+                      src={entry.description}
+                      alt={`Gift from ${nameToDisplay}`}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <div className="flex-grow">
+                <p className="text-lg font-semibold text-foreground/90">{t('giftTypeGift')}</p>
+                {entry.notes && (
+                  <blockquote className="mt-2 border-l-2 pl-4 italic text-muted-foreground font-serif">
+                    {entry.notes}
+                  </blockquote>
+                )}
+              </div>
             </div>
-         );
+          );
+        }
+        // Fallback for gift with only text description
+        return (
+          <div className="flex items-center gap-4">
+            <ImageIcon className="h-8 w-8 text-muted-foreground flex-shrink-0" />
+            <div>
+                <p className="text-lg font-semibold text-foreground/90">{entry.description || "Gift"}</p>
+                 {entry.notes && (
+                    <blockquote className="mt-2 border-l-2 pl-4 italic text-muted-foreground font-serif">
+                        {entry.notes}
+                    </blockquote>
+                )}
+            </div>
+          </div>
+        );
       case 'Other':
         return <p className="text-2xl font-headline text-foreground/90">{entry.description}</p>;
       default:
         return <p className="text-2xl font-headline text-foreground/90">{entry.description}</p>;
     }
   };
+  
+  const notesDisplay = () => {
+    // Notes are now displayed within the giftDisplay logic for 'Gift' type, so we avoid duplicating them here.
+    if (entry.giftType !== 'Gift' && entry.notes) {
+        return (
+            <blockquote className="mt-4 border-l-2 pl-4 italic text-muted-foreground font-serif">
+                {entry.notes}
+            </blockquote>
+        );
+    }
+    return null;
+  }
+
 
   return (
     <Card className="w-full transition-all duration-300 ease-in-out hover:shadow-xl flex flex-col">
@@ -121,11 +179,7 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
       </CardHeader>
       <CardContent className="flex-grow">
         {giftDisplay()}
-        {entry.notes && (
-          <blockquote className="mt-4 border-l-2 pl-4 italic text-muted-foreground font-serif">
-            {entry.notes}
-          </blockquote>
-        )}
+        {notesDisplay()}
       </CardContent>
        <CardFooter className="flex justify-end">
         <AlertDialog>

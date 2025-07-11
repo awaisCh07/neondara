@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -50,7 +51,7 @@ const getFormSchema = (t: (key: string) => string) => z.object({
   date: z.date({ required_error: t('errorSelectDate') }),
   occasion: z.enum(['Wedding', 'Birth', 'Housewarming', 'Other']),
   giftType: z.enum(['Money', 'Sweets', 'Gift', 'Other']),
-  amount: z.coerce.number().positive(t('errorPositiveAmount')).optional(),
+  amount: z.coerce.number().positive({ message: t('errorPositiveAmount') }).optional(),
   description: z.string().optional(),
   notes: z.string().optional(),
 }).superRefine((data, ctx) => {
@@ -116,6 +117,8 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     const giftType = form.watch("giftType");
     
     useEffect(() => {
+        // Clear errors when gift type changes
+        form.clearErrors(["amount", "description"]);
         if (giftType !== 'Gift') {
             setImagePreview(null);
         }
@@ -205,7 +208,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
 
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{entry ? t('editEntry') : t('addNewEntry')}</SheetTitle>
@@ -364,7 +367,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                     name="amount"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{giftType === 'Sweets' ? `${t('amount')} (kg) *` : `${t('amount')} *`}</FormLabel>
+                            <FormLabel>{giftType === 'Sweets' ? `${t('quantityInKg')} *` : `${t('amount')} *`}</FormLabel>
                             <FormControl>
                                 <Input type="number" placeholder={giftType === 'Sweets' ? "e.g., 2.5" : "e.g., 100"} {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} />
                             </FormControl>

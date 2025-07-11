@@ -1,4 +1,5 @@
 
+
 export type Language = 'en' | 'ur';
 
 type Translations = {
@@ -28,6 +29,7 @@ export const translations: Translations = {
     notes: { en: 'Notes', ur: 'نوٹس' },
     description: { en: 'Description', ur: 'تفصیل' },
     amount: { en: 'Amount', ur: 'رقم' },
+    quantityInKg: { en: 'Quantity (kg)', ur: 'مقدار (کلوگرام)'},
     date: { en: 'Date', ur: 'تاریخ' },
     relation: { en: 'Relation', ur: 'رشتہ' },
     search: { en: 'Search', ur: 'تلاش کریں' },
@@ -122,8 +124,7 @@ export const translations: Translations = {
     errorSelectDate: { en: "A date is required.", ur: "تاریخ درکار ہے۔" },
     errorPositiveAmount: { en: "Amount must be positive.", ur: "رقم مثبت ہونی چاہیے۔" },
     errorAmountRequired: { en: "An amount is required for money gifts.", ur: "پیسے کے تحائف کے لیے رقم درکار ہے۔" },
-    errorAmountKgRequired: { en: "An amount in kg is required.", ur: "کلوگرام میں مقدار درکار ہے۔" },
-    errorSweetDescRequired: { en: "A description of the sweet is required.", ur: "مٹھائی کی تفصیل درکار ہے۔" },
+    errorAmountKgRequired: { en: "A quantity in kg is required.", ur: "کلوگرام میں مقدار درکار ہے۔" },
     errorDescriptionRequired: { en: "A description for the gift is required.", ur: "تحفے کے لیے تفصیل درکار ہے۔" },
     errorMin2Chars: { en: "Must be at least 2 characters.", ur: "کم از کم 2 حروف کا ہونا ضروری ہے۔" },
     errorSelectRelation: { en: "Please select a relation.", ur: "براہ کرم ایک رشتہ منتخب کریں۔" },

@@ -25,13 +25,20 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { auth } from '@/lib/firebase';
 import { useLanguage } from './language-provider';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 export function AppLayout({ children, onExport }: { children: React.ReactNode, onExport?: () => void }) {
-  const { user } = useAuth(); // No longer need loading state here
+  const { user, loading } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
 
   const handleLogout = async () => {
     await auth.signOut();
@@ -57,10 +64,12 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
       { href: '/people', label: t('navPeople'), icon: Users },
   ];
 
-  // We rely on the page components to handle the loading/redirect state.
-  // AppLayout assumes a user is present.
-  if (!user) {
-    return null; // Or a minimal loading state, but pages should handle redirects.
+  if (loading || !user) {
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-background">
+          <p>Loading...</p>
+        </div>
+      );
   }
 
   return (

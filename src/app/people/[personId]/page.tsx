@@ -1,250 +1,76 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useAuth } from '@/components/auth-provider';
-import { NeondaraCard } from '@/components/neondara-card';
-import type { NeondaraEntry, NeondaraEntryDTO, Person } from '@/lib/types';
+import { useEffect, useState, useMemo } from 'react';
+import type { NeondaraEntry, Person } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { NeondaraEntrySheet } from '@/components/neondara-entry-sheet';
-import { useToast } from '@/hooks/use-toast';
-import { deleteDoc, addDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { useLanguage } from '@/components/language-provider';
 import { AppLayout } from '@/components/layout';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
+import { useData } from '@/components/data-provider';
+import { NeondaraCard } from '@/components/neondara-card';
 
 
 export default function PersonDetailPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const params = useParams();
   const personId = params.personId as string;
-  const [person, setPerson] = useState<Person | null>(null);
-  const [entries, setEntries] = useState<NeondaraEntry[]>([]);
-  const [people, setPeople] = useState<Person[]>([]);
-  const [balance, setBalance] = useState({ given: 0, received: 0, net: 0 });
-  const [loading, setLoading] = useState(true);
+  
+  const { 
+    people, 
+    entries, 
+    loading, 
+    addEntry, 
+    updateEntry, 
+    deleteEntry, 
+    getPersonById,
+    exportData 
+  } = useData();
+  
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<NeondaraEntry | undefined>(undefined);
-  const { toast } = useToast();
   const { t } = useLanguage();
 
-  const fetchPersonAndEntries = async (currentPersonId: string) => {
-    if (!user) return;
+  const person = useMemo(() => getPersonById(personId), [personId, getPersonById]);
 
-    setLoading(true);
-    try {
-      // Fetch people list for the entry sheet
-      const peopleQuery = query(collection(db, "people"), where("userId", "==", user.uid));
-      const peopleSnapshot = await getDocs(peopleQuery);
-      const peopleData = peopleSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Person));
-      setPeople(peopleData);
+  const personEntries = useMemo(() => {
+    return entries
+      .filter(entry => entry.personId === personId)
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+  }, [entries, personId]);
 
-
-      // Fetch person details
-      const personRef = doc(db, 'people', currentPersonId);
-      const personSnap = await getDoc(personRef);
-
-      if (personSnap.exists() && personSnap.data().userId === user.uid) {
-        setPerson({ id: personSnap.id, ...personSnap.data() } as Person);
-      } else {
-        throw new Error("Person not found or insufficient permissions.");
-      }
-
-      // Fetch entries for this person
-      const entriesQuery = query(
-        collection(db, 'neondara_entries'),
-        where('userId', '==', user.uid),
-        where('personId', '==', currentPersonId),
-        orderBy('date', 'desc')
-      );
-      const querySnapshot = await getDocs(entriesQuery);
-      const entriesData = querySnapshot.docs.map(doc => {
-        const data = doc.data() as NeondaraEntryDTO;
-        return {
-          id: doc.id,
-          ...data,
-          date: data.date.toDate(),
-        } as NeondaraEntry;
-      });
-      setEntries(entriesData);
-
-      // Calculate balance
-      let given = 0;
-      let received = 0;
-      entriesData.forEach(entry => {
-        if (entry.giftType === 'Money' && entry.amount) {
-          if (entry.direction === 'given') {
-            given += entry.amount;
-          } else {
-            received += entry.amount;
-          }
+  const balance = useMemo(() => {
+    let given = 0;
+    let received = 0;
+    personEntries.forEach(entry => {
+      if (entry.giftType === 'Money' && entry.amount) {
+        if (entry.direction === 'given') {
+          given += entry.amount;
+        } else {
+          received += entry.amount;
         }
-      });
-      setBalance({ given, received, net: received - given });
-
-    } catch (error) {
-      console.error("Error fetching person details: ", error);
-      toast({
-        title: t('error'),
-        description: "Failed to fetch person details.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-    if (personId) {
-        fetchPersonAndEntries(personId);
-    }
-  }, [user, authLoading, personId, router]);
-
+      }
+    });
+    return { given, received, net: given - received };
+  }, [personEntries]);
 
   const handleOpenSheet = (entry?: Omit<NeondaraEntry, 'userId'>) => {
     setEditingEntry(entry as NeondaraEntry | undefined);
     setIsSheetOpen(true);
   }
 
-  const handleDeleteEntry = async (entryId: string) => {
-    try {
-      await deleteDoc(doc(db, "neondara_entries", entryId));
-      toast({
-        title: t('success'),
-        description: t('entryDeletedSuccess'),
-      });
-      fetchPersonAndEntries(personId); // Refetch to update list and balance
-    } catch (error) {
-      console.error("Error deleting entry: ", error);
-      toast({
-        title: t('error'),
-        description: "Failed to delete entry.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleAddEntry = async (newEntry: Omit<NeondaraEntry, 'id' | 'userId'>) => {
-    if (!user) return;
-    try {
-      await addDoc(collection(db, "neondara_entries"), {
-        ...newEntry,
-        userId: user.uid,
-        date: Timestamp.fromDate(newEntry.date),
-      });
-      toast({
-        title: t('success'),
-        description: t('entryAddedSuccess'),
-      });
-      fetchPersonAndEntries(personId);
-    } catch (error) {
-      console.error("Error adding entry: ", error);
-      toast({
-        title: t('error'),
-        description: "Failed to add new entry.",
-        variant: "destructive",
-      });
-    }
+  const handleExport = () => {
+    exportData({ personId });
   };
   
-  const handleUpdateEntry = async (updatedEntry: Omit<NeondaraEntry, 'userId'>) => {
-    try {
-      const entryRef = doc(db, "neondara_entries", updatedEntry.id);
-      const { id, ...dataToUpdate } = updatedEntry;
-      await updateDoc(entryRef, {
-        ...dataToUpdate,
-        date: Timestamp.fromDate(dataToUpdate.date),
-      });
-      toast({
-        title: t('success'),
-        description: t('entryUpdatedSuccess'),
-      });
-      fetchPersonAndEntries(personId);
-    } catch (error) {
-      console.error("Error updating entry: ", error);
-      toast({
-        title: t('error'),
-        description: "Failed to update entry.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleExportData = () => {
-    if (entries.length === 0) {
-        toast({
-            title: "No Data to Export",
-            description: "There are no ledger entries to export.",
-            variant: "destructive"
-        })
-        return;
-    }
-
-    const headers = [
-        'ID', 'Direction', 'Person', 'Date', 'Occasion', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'
-    ];
-    
-    // Using a function to safely handle quotes and commas in data
-    const escapeCsvCell = (cellData: any) => {
-        if (cellData === null || cellData === undefined) {
-            return '';
-        }
-        const stringData = String(cellData);
-        if (stringData.includes('"') || stringData.includes(',') || stringData.includes('\n')) {
-            return `"${stringData.replace(/"/g, '""')}"`;
-        }
-        return stringData;
-    };
-
-    const csvContent = [
-        headers.join(','),
-        ...entries.map(entry => [
-            escapeCsvCell(entry.id),
-            escapeCsvCell(entry.direction),
-            escapeCsvCell(person?.name),
-            escapeCsvCell(format(entry.date, 'yyyy-MM-dd')),
-            escapeCsvCell(entry.occasion),
-            escapeCsvCell(entry.giftType),
-            escapeCsvCell(entry.amount),
-            escapeCsvCell(entry.description),
-            escapeCsvCell(entry.notes),
-        ].join(','))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `neondara_ledger_export_${person?.name}_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-    toast({
-        title: "Export Successful",
-        description: "Your data has been downloaded as a CSV file.",
-    })
-  };
-
-
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <p>Loading...</p>
+        <p>{t('loadingDetails')}</p>
       </div>
     );
   }
@@ -265,11 +91,11 @@ export default function PersonDetailPage() {
     );
   }
 
-  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net < 0 ? 'text-green-600' : 'text-red-600';
-  const balanceText = balance.net === 0 ? t('allSquare') : balance.net < 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
+  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-green-600' : 'text-red-600';
+  const balanceText = balance.net === 0 ? t('allSquare') : balance.net > 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
 
   return (
-    <AppLayout onExport={handleExportData}>
+    <AppLayout onExport={handleExport}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
               <Link href="/people" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
@@ -304,11 +130,11 @@ export default function PersonDetailPage() {
           </Card>
 
           <h2 className="text-2xl font-bold mb-4">{t('transactionHistory')}</h2>
-           {entries.length > 0 ? (
+           {personEntries.length > 0 ? (
               <div className="grid gap-6">
-                  {entries.map(entry => {
+                  {personEntries.map(entry => {
                       const { userId, ...cardEntry } = entry;
-                      return <NeondaraCard key={entry.id} entry={cardEntry} onEdit={handleOpenSheet} onDelete={handleDeleteEntry} personName={person.name}/>
+                      return <NeondaraCard key={entry.id} entry={cardEntry} onEdit={handleOpenSheet} onDelete={deleteEntry} personName={person.name}/>
                   })}
               </div>
           ) : (
@@ -320,8 +146,8 @@ export default function PersonDetailPage() {
           <NeondaraEntrySheet
               isOpen={isSheetOpen}
               onOpenChange={setIsSheetOpen}
-              onAddEntry={handleAddEntry}
-              onUpdateEntry={handleUpdateEntry}
+              onAddEntry={addEntry}
+              onUpdateEntry={updateEntry}
               entry={editingEntry}
               people={people}
           />

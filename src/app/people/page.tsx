@@ -1,10 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useAuth } from '@/components/auth-provider';
+import { useState, useMemo } from 'react';
 import type { Person, NeondaraEntry, Relation } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,18 +31,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/components/language-provider';
 import { AppLayout } from '@/components/layout';
-import { useRouter } from 'next/navigation';
+import { useData } from '@/components/data-provider';
 
 const relations: Relation[] = [
     { en: "Aunt", ur: "Chachi, Khala, Mami, Phuppi" },
@@ -82,15 +77,11 @@ type PersonWithBalance = Person & {
 };
 
 export default function PeoplePage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { people, entries, loading, addPerson, updatePerson, deletePerson } = useData();
   const { language, t } = useLanguage();
-  const [people, setPeople] = useState<PersonWithBalance[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPerson, setEditingPerson] = useState<Person | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const { toast } = useToast();
   
   const { register, handleSubmit, reset, control, formState: { errors }, setValue } = useForm<PersonFormData>({
     resolver: zodResolver(personSchema),
@@ -99,53 +90,26 @@ export default function PeoplePage() {
     }
   });
 
-  const fetchPeopleAndBalances = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      // Fetch people
-      const peopleQuery = query(collection(db, 'people'), where('userId', '==', user.uid));
-      const peopleSnap = await getDocs(peopleQuery);
-      const peopleData = peopleSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Person));
+  const peopleWithBalances = useMemo<PersonWithBalance[]>(() => {
+    const balances = new Map<string, number>();
+    entries.forEach(entry => {
+      if (entry.giftType === 'Money' && entry.amount) {
+        const currentBalance = balances.get(entry.personId) || 0;
+        if (entry.direction === 'given') {
+          balances.set(entry.personId, currentBalance + entry.amount);
+        } else {
+          balances.set(entry.personId, currentBalance - entry.amount);
+        }
+      }
+    });
 
-      // Fetch all entries for the user
-      const entriesQuery = query(collection(db, 'neondara_entries'), where('userId', '==', user.uid));
-      const entriesSnap = await getDocs(entriesQuery);
-      const entriesData = entriesSnap.docs.map(doc => doc.data() as NeondaraEntry);
-
-      // Calculate balances
-      const peopleWithBalances = peopleData.map(person => {
-        const personEntries = entriesData.filter(entry => entry.personId === person.id && entry.giftType === 'Money');
-        let given = 0;
-        let received = 0;
-        personEntries.forEach(entry => {
-          if (entry.direction === 'given') {
-            given += entry.amount || 0;
-          } else {
-            received += entry.amount || 0;
-          }
-        });
-        return { ...person, balance: received - given };
-      });
-
-      setPeople(peopleWithBalances.sort((a,b) => a.name.localeCompare(b.name)));
-
-    } catch (error) {
-      console.error("Error fetching people and balances: ", error);
-      toast({ title: t('error'), description: "Could not fetch your contacts.", variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-    fetchPeopleAndBalances();
-  }, [user, authLoading, router]);
+    return people
+      .map(person => ({
+        ...person,
+        balance: balances.get(person.id) || 0,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [people, entries]);
   
   const handleOpenDialog = (person: Person | null = null) => {
     setEditingPerson(person);
@@ -159,61 +123,25 @@ export default function PeoplePage() {
   };
   
   const handleFormSubmit = async (data: PersonFormData) => {
-    if (!user) return;
     if (editingPerson) {
-      // Update existing person
-      try {
-        const personRef = doc(db, 'people', editingPerson.id);
-        await updateDoc(personRef, {
-          name: data.name,
-          relation: data.relation,
-        });
-        toast({ title: t('success'), description: `${data.name} has been updated.` });
-      } catch (error) {
-        console.error("Error updating person: ", error);
-        toast({ title: t('error'), description: "Failed to update person.", variant: "destructive" });
-      }
+      await updatePerson({ ...editingPerson, ...data });
     } else {
-      // Add new person
-      try {
-        await addDoc(collection(db, 'people'), {
-          name: data.name,
-          relation: data.relation,
-          userId: user.uid,
-        });
-        toast({ title: t('success'), description: `${data.name} has been added.` });
-      } catch (error) {
-         console.error("Error adding person: ", error);
-         toast({ title: t('error'), description: "Failed to add person.", variant: "destructive" });
-      }
+      await addPerson(data);
     }
     reset();
     setIsDialogOpen(false);
     setEditingPerson(null);
-    fetchPeopleAndBalances();
   };
 
-  const handleDeletePerson = async (personId: string) => {
-     if (!user) return;
-    try {
-      await deleteDoc(doc(db, 'people', personId));
-      toast({ title: t('success'), description: "Person has been deleted." });
-      fetchPeopleAndBalances();
-    } catch (error) {
-       console.error("Error deleting person: ", error);
-       toast({ title: t('error'), description: "Failed to delete person.", variant: "destructive" });
-    }
-  };
-  
   const getBalanceColor = (balance: number) => {
-    if (balance < 0) return 'text-green-600'; // User will receive
-    if (balance > 0) return 'text-red-600'; // User will give
+    if (balance > 0) return 'text-green-600'; // User will receive
+    if (balance < 0) return 'text-red-600'; // User will give
     return 'text-muted-foreground';
   }
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return t('allSquare');
-    if (balance < 0) return `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
+    if (balance > 0) return `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
     return `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
   }
 
@@ -228,20 +156,19 @@ export default function PeoplePage() {
   }
 
   const filteredPeople = useMemo(() => {
-    return people.filter(person => 
+    return peopleWithBalances.filter(person => 
       person.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [people, searchTerm]);
+  }, [peopleWithBalances, searchTerm]);
 
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <p>Loading...</p>
+        <p>{t('loadingContacts')}</p>
       </div>
     );
   }
-
 
   return (
     <AppLayout>
@@ -334,40 +261,40 @@ export default function PeoplePage() {
                             {person.relation && <CardDescription>{getRelationDisplay(person.relation)}</CardDescription>}
                         </div>
                         <AlertDialog>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 -mt-2 -mr-2">
-                                <MoreVertical className="h-4 w-4" />
-                                <span className="sr-only">More options</span>
-                            </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleOpenDialog(person)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                {t('edit')}
-                            </DropdownMenuItem>
-                            <AlertDialogTrigger asChild>
-                                <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                {t('delete')}
-                                </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                            <AlertDialogTitle>{t('deleteConfirmTitle')}</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Are you sure you want to delete {person.name}? This will not delete their transaction history, but it will remove them from your contacts. This action cannot be undone.
-                            </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeletePerson(person.id)} className="bg-destructive hover:bg-destructive/90">
-                                {t('delete')}
-                            </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
+                          <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 -mt-2 -mr-2">
+                                  <MoreVertical className="h-4 w-4" />
+                                  <span className="sr-only">More options</span>
+                              </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleOpenDialog(person)}>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  {t('edit')}
+                              </DropdownMenuItem>
+                              <AlertDialogTrigger asChild>
+                                  <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  {t('delete')}
+                                  </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              </DropdownMenuContent>
+                          </DropdownMenu>
+                          <AlertDialogContent>
+                              <AlertDialogHeader>
+                              <AlertDialogTitle>{t('deleteConfirmTitle')}</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                  Are you sure you want to delete {person.name}? This will not delete their transaction history, but it will remove them from your contacts. This action cannot be undone.
+                              </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                              <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deletePerson(person.id)} className="bg-destructive hover:bg-destructive/90">
+                                  {t('delete')}
+                              </AlertDialogAction>
+                              </AlertDialogFooter>
+                          </AlertDialogContent>
                         </AlertDialog>
                     </div>
                 </CardHeader>

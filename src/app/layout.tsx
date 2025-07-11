@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/components/auth-provider';
 import { LanguageProvider } from '@/components/language-provider';
+import { DataProvider } from '@/components/data-provider';
 
 export const metadata: Metadata = {
   title: 'Neondara Ledger',
@@ -24,7 +25,9 @@ export default function RootLayout({
       <body className="font-body antialiased" suppressHydrationWarning>
         <AuthProvider>
           <LanguageProvider>
-            {children}
+            <DataProvider>
+              {children}
+            </DataProvider>
           </LanguageProvider>
         </AuthProvider>
         <Toaster />

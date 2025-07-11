@@ -83,6 +83,7 @@ export default function PeoplePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPerson, setEditingPerson] = useState<Person | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   
   const { register, handleSubmit, reset, control, formState: { errors }, setValue } = useForm<PersonFormData>({
     resolver: zodResolver(personSchema),
@@ -124,14 +125,19 @@ export default function PeoplePage() {
   };
   
   const handleFormSubmit = async (data: PersonFormData) => {
-    if (editingPerson) {
-      await updatePerson({ ...editingPerson, ...data });
-    } else {
-      await addPerson(data);
+    setIsSaving(true);
+    try {
+      if (editingPerson) {
+        await updatePerson({ ...editingPerson, ...data });
+      } else {
+        await addPerson(data);
+      }
+      reset();
+      setIsDialogOpen(false);
+      setEditingPerson(null);
+    } finally {
+        setIsSaving(false);
     }
-    reset();
-    setIsDialogOpen(false);
-    setEditingPerson(null);
   };
 
   const getBalanceColor = (balance: number) => {
@@ -243,7 +249,9 @@ export default function PeoplePage() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit">{editingPerson ? t('saveChanges') : t('savePerson')}</Button>
+                        <Button type="submit" disabled={isSaving}>
+                          {isSaving ? t('saving') : (editingPerson ? t('saveChanges') : t('savePerson'))}
+                        </Button>
                     </DialogFooter>
                     </form>
                 </DialogContent>

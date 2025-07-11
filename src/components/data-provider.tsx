@@ -146,6 +146,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const addPerson = async (personData: PersonInput) => {
     if (!user) return;
+    
+    const existingPerson = people.find(p => p.name.trim().toLowerCase() === personData.name.trim().toLowerCase());
+    if (existingPerson) {
+        toast({ title: t('error'), description: `A person named "${personData.name}" already exists.`, variant: "destructive" });
+        return;
+    }
+
     try {
       const docRef = await addDoc(collection(db, "people"), {
         ...personData,
@@ -162,6 +169,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   
   const updatePerson = async (personData: PersonUpdate) => {
     if (!user) return;
+    
+    const existingPerson = people.find(p => p.id !== personData.id && p.name.trim().toLowerCase() === personData.name.trim().toLowerCase());
+    if (existingPerson) {
+        toast({ title: t('error'), description: `Another person named "${personData.name}" already exists.`, variant: "destructive" });
+        return;
+    }
+
     const { id, userId, ...dataToUpdate } = personData;
     try {
       const personRef = doc(db, 'people', id);

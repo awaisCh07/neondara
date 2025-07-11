@@ -26,10 +26,9 @@ type PersonDetailPageProps = {
   };
 };
 
-export default function PersonDetailPage({ params }: PersonDetailPageProps) {
+export default function PersonDetailPage({ params: { personId } }: PersonDetailPageProps) {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const { personId } = params;
   const [person, setPerson] = useState<Person | null>(null);
   const [entries, setEntries] = useState<NeondaraEntry[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
@@ -92,7 +91,7 @@ export default function PersonDetailPage({ params }: PersonDetailPageProps) {
           }
         }
       });
-      setBalance({ given, received, net: received - given });
+      setBalance({ given, received, net: given - received });
 
     } catch (error) {
       console.error("Error fetching person details: ", error);

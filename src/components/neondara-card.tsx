@@ -2,7 +2,7 @@
 import type { NeondaraEntry } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Badge } from './ui/badge';
-import { ArrowUpRight, ArrowDownLeft, Gift, Home, PartyPopper, Heart, Edit, Trash2, MoreVertical, Image as ImageIcon } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, Gift, Home, PartyPopper, Heart, Edit, Trash2, MoreVertical, Image as ImageIcon, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from './ui/button';
 import Image from 'next/image';
@@ -11,6 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
@@ -50,6 +51,18 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
   const isGiven = entry.direction === 'given';
   const nameToDisplay = personName || entry.person;
   const title = isGiven ? `${t('to')}: ${nameToDisplay}` : `${t('from')}: ${nameToDisplay}`;
+
+  const isImageDataUrl = entry.giftType === 'Gift' && entry.description && entry.description.startsWith('data:image');
+
+  const handleDownload = () => {
+    if (!isImageDataUrl) return;
+    const link = document.createElement('a');
+    link.href = entry.description;
+    link.download = `gift_from_${nameToDisplay}_${entry.id}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   
   const giftDisplay = () => {
     switch (entry.giftType) {
@@ -58,15 +71,15 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
       case 'Sweets':
         return <p className="text-2xl font-headline text-foreground/90">{`${entry.amount || 0}kg ${entry.description || ''}`.trim()}</p>;
       case 'Gift':
-         if (entry.description && entry.description.startsWith('data:image')) {
+         if (isImageDataUrl) {
             return (
-              <a href={entry.description} download={`gift_from_${nameToDisplay}.png`} title="Click to download image">
+              <a href={entry.description} target="_blank" rel="noopener noreferrer" title="Click to view image in new tab">
                 <Image
                   src={entry.description}
                   alt={`Gift from ${nameToDisplay}`}
                   width={400}
                   height={300}
-                  className="rounded-lg object-cover w-full aspect-video transition-transform duration-300 hover:scale-105"
+                  className="rounded-lg object-cover w-full h-48 transition-transform duration-300 hover:scale-105"
                 />
               </a>
             );
@@ -128,6 +141,13 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
                 <Edit className="mr-2 h-4 w-4" />
                 {t('edit')}
               </DropdownMenuItem>
+              {isImageDataUrl && (
+                <DropdownMenuItem onClick={handleDownload}>
+                  <Download className="mr-2 h-4 w-4" />
+                  {t('exportData')}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -155,5 +175,3 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
     </Card>
   );
 }
-
-    

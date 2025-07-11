@@ -97,9 +97,9 @@ export default function PeoplePage() {
       if (entry.giftType === 'Money' && entry.amount) {
         const currentBalance = balances.get(entry.personId) || 0;
         if (entry.direction === 'given') {
-          balances.set(entry.personId, currentBalance + entry.amount);
-        } else {
           balances.set(entry.personId, currentBalance - entry.amount);
+        } else {
+          balances.set(entry.personId, currentBalance + entry.amount);
         }
       }
     });
@@ -135,14 +135,14 @@ export default function PeoplePage() {
   };
 
   const getBalanceColor = (balance: number) => {
-    if (balance > 0) return 'text-green-600'; // User will receive
-    if (balance < 0) return 'text-red-600'; // User will give
+    if (balance < 0) return 'text-green-600'; // User will give
+    if (balance > 0) return 'text-red-600'; // User will receive
     return 'text-muted-foreground';
   }
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return t('allSquare');
-    if (balance > 0) return `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
+    if (balance < 0) return `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
     return `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
   }
 
@@ -332,5 +332,3 @@ export default function PeoplePage() {
     </AppLayout>
   );
 }
-
-    

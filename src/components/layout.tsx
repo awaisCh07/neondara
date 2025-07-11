@@ -60,7 +60,7 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
   };
   
   const navItems = [
-      { href: '/', label: t('navLedger'), icon: HomeIcon },
+      { href: '/', label: t('navHistory'), icon: HomeIcon },
       { href: '/people', label: t('navPeople'), icon: Users },
   ];
 

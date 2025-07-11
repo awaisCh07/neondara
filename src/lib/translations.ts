@@ -9,7 +9,7 @@ type Translations = {
 
 export const translations: Translations = {
     // App Metadata
-    appTitle: { en: 'Neondara Ledger', ur: 'نیوندرا لیجر' },
+    appTitle: { en: 'Neondara History', ur: 'نیوندرا ہسٹری' },
     appDescription: { en: 'Manage and store records for the cultural tradition of Neondara.', ur: 'نیوندرا کی ثقافتی روایت کے لیے ریکارڈز کا نظم اور ذخیرہ کریں۔' },
 
     // General
@@ -42,7 +42,7 @@ export const translations: Translations = {
 
     // Signup Page
     signupTitle: { en: 'Sign Up', ur: 'سائن اپ' },
-    signupDescription: { en: 'Create an account to start using the Neondara Ledger.', ur: 'نیوندرا لیجر استعمال شروع کرنے کے لیے ایک اکاؤنٹ بنائیں۔' },
+    signupDescription: { en: 'Create an account to start using the Neondara History.', ur: 'نیوندرا ہسٹری استعمال شروع کرنے کے لیے ایک اکاؤنٹ بنائیں۔' },
     fullName: { en: 'Full Name', ur: 'پورا نام' },
     createAccount: { en: 'Create Account', ur: 'اکاؤنٹ بنائیں' },
     creatingAccount: { en: 'Creating Account...', ur: 'اکاؤنٹ بن رہا ہے۔۔۔' },
@@ -50,7 +50,7 @@ export const translations: Translations = {
     logIn: { en: 'Log in', ur: 'لاگ ان کریں' },
 
     // Layout / Header
-    navLedger: { en: 'Ledger', ur: 'لیجر' },
+    navHistory: { en: 'History', ur: 'ہسٹری' },
     navPeople: { en: 'People', ur: 'لوگ' },
     myAccount: { en: 'My Account', ur: 'میرا اکاؤنٹ' },
     exportData: { en: 'Export Data', ur: 'ڈیٹا برآمد کریں' },
@@ -59,11 +59,10 @@ export const translations: Translations = {
     urdu: { en: 'Urdu', ur: 'اردو' },
     logout: { en: 'Log out', ur: 'لاگ آؤٹ' },
 
-    // Ledger View
-    ledgerHistory: { en: 'Ledger History', ur: 'لیجر ہسٹری' },
+    // History View
     addEntry: { en: 'Add Entry', ur: 'اندراج شامل کریں' },
-    loadingLedger: { en: 'Loading ledger...', ur: 'لیجر لوڈ ہو رہا ہے۔۔۔' },
-    entryAddedSuccess: { en: 'New entry added to the ledger.', ur: 'نیا اندراج لیجر میں شامل کر دیا گیا ہے۔' },
+    loadingHistory: { en: 'Loading history...', ur: 'ہسٹری لوڈ ہو رہی ہے۔۔۔' },
+    entryAddedSuccess: { en: 'New entry added to the history.', ur: 'نیا اندراج ہسٹری میں شامل کر دیا گیا ہے۔' },
     entryUpdatedSuccess: { en: 'Entry has been updated.', ur: 'اندراج کو اپ ڈیٹ کر دیا گیا ہے۔' },
     entryDeletedSuccess: { en: 'Entry has been deleted.', ur: 'اندراج کو حذف کر دیا گیا ہے۔' },
     
@@ -88,7 +87,7 @@ export const translations: Translations = {
     directionGiven: { en: 'Given', ur: 'دیا' },
     directionReceived: { en: 'Received', ur: 'وصول کیا' },
     deleteConfirmTitle: { en: 'Are you sure?', ur: 'کیا آپ واقعی حذف کرنا چاہتے ہیں؟' },
-    deleteConfirmDescription: { en: 'This action cannot be undone. This will permanently delete this ledger entry.', ur: 'یہ عمل واپس نہیں کیا جا سکتا۔ یہ اس لیجر اندراج کو مستقل طور پر حذف کر دے گا۔' },
+    deleteConfirmDescription: { en: 'This action cannot be undone. This will permanently delete this history entry.', ur: 'یہ عمل واپس نہیں کیا جا سکتا۔ یہ اس ہسٹری اندراج کو مستقل طور پر حذف کر دے گا۔' },
     
     // Neondara Entry Sheet
     addNewEntry: { en: 'Add New Entry', ur: 'نیا اندراج شامل کریں' },
@@ -116,12 +115,12 @@ export const translations: Translations = {
     giftDescriptionPlaceholder: { en: 'e.g., Dinner Set', ur: 'مثلاً، ڈنر سیٹ' },
     
     // People Page
-    backToLedger: { en: 'Back to Ledger', ur: 'لیجر پر واپس' },
+    backToHistory: { en: 'Back to History', ur: 'ہسٹری پر واپس' },
     peopleAndBalances: { en: 'People & Balances', ur: 'لوگ اور بیلنس' },
     searchByName: { en: 'Search by name...', ur: 'نام سے تلاش کریں...' },
     addPerson: { en: 'Add Person', ur: 'شخص شامل کریں' },
     addNewPersonTitle: { en: 'Add a New Person', ur: 'ایک نیا شخص شامل کریں' },
-    addNewPersonDescription: { en: 'Add a new friend or relative to your ledger.', ur: 'اپنے لیجر میں ایک نیا دوست یا رشتہ دار شامل کریں۔' },
+    addNewPersonDescription: { en: 'Add a new friend or relative to your contact list.', ur: 'اپنی رابطہ فہرست میں ایک نیا دوست یا رشتہ دار شامل کریں۔' },
     savePerson: { en: 'Save person', ur: 'شخص کو محفوظ کریں' },
     loadingContacts: { en: 'Loading your contacts...', ur: 'آپ کے رابطے لوڈ ہو رہے ہیں...' },
     noPeopleAdded: { en: 'No People Added Yet', ur: 'ابھی تک کوئی شخص شامل نہیں کیا گیا' },
@@ -151,5 +150,3 @@ export const useTranslation = (language: Language) => {
         return translations[key] ? translations[key][language] : key;
     }
 }
-
-    

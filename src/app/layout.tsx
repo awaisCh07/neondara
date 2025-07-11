@@ -6,7 +6,7 @@ import { LanguageProvider } from '@/components/language-provider';
 import { DataProvider } from '@/components/data-provider';
 
 export const metadata: Metadata = {
-  title: 'Neondara Ledger',
+  title: 'Neondara History',
   description: 'Manage and store records for the cultural tradition of Neondara.',
 };
 

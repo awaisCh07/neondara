@@ -2,10 +2,10 @@
 'use client';
 
 import { AppLayout } from '@/components/layout';
-import { LedgerView } from '@/components/ledger-view';
+import { HistoryView } from '@/components/history-view';
 
 export default function Home() {
   return (
-    <LedgerView />
+    <HistoryView />
   );
 }

@@ -75,7 +75,7 @@ export default function PersonDetailPage() {
     return { 
         moneyGiven, 
         moneyReceived, 
-        netMoney: moneyGiven - moneyReceived,
+        netMoney: moneyReceived - moneyGiven,
         sweetsGiven,
         sweetsReceived,
         giftsGivenCount,
@@ -138,7 +138,7 @@ export default function PersonDetailPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium mb-2">Monetary Balance</h3>
+                    <h3 className="text-lg font-medium mb-2">{t('netBalance')}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                         <div>
                             <p className="text-sm text-muted-foreground">{t('totalGiven')}</p>

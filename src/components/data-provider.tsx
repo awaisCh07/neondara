@@ -68,7 +68,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     } catch (error) {
       console.error("Error fetching data: ", error);
-      toast({ title: t('error'), description: "Failed to fetch ledger data.", variant: "destructive" });
+      toast({ title: t('error'), description: "Failed to fetch history data.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -200,7 +200,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     if (dataToExport.length === 0) {
         toast({
             title: "No Data to Export",
-            description: "There are no ledger entries to export.",
+            description: "There are no history entries to export.",
             variant: "destructive"
         })
         return;
@@ -234,8 +234,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     const filename = person 
-      ? `neondara_ledger_${person.name}_${new Date().toISOString().split('T')[0]}.csv`
-      : `neondara_ledger_export_${new Date().toISOString().split('T')[0]}.csv`;
+      ? `neondara_history_${person.name}_${new Date().toISOString().split('T')[0]}.csv`
+      : `neondara_history_export_${new Date().toISOString().split('T')[0]}.csv`;
     
     link.setAttribute("href", URL.createObjectURL(blob));
     link.setAttribute("download", filename);

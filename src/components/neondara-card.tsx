@@ -54,11 +54,10 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
   const giftDisplay = () => {
     switch (entry.giftType) {
       case 'Money':
-        return `${new Intl.NumberFormat().format(entry.amount || 0)}`;
+        return <p className="text-2xl font-headline text-foreground/90">{new Intl.NumberFormat().format(entry.amount || 0)}</p>;
       case 'Sweets':
-        return `${entry.amount}kg ${entry.description}`;
+        return <p className="text-2xl font-headline text-foreground/90">{`${entry.amount}kg ${entry.description}`}</p>;
       case 'Gift':
-         // Check if the description is a data URL for an image
          if (entry.description && entry.description.startsWith('data:image')) {
             return (
               <a href={entry.description} download={`gift_from_${nameToDisplay}.png`} title="Click to download image">
@@ -72,7 +71,6 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
               </a>
             );
          }
-         // If it's not an image URL, display the text description
          return (
             <div className="flex items-center gap-4">
                 <ImageIcon className="h-8 w-8 text-muted-foreground" />
@@ -80,13 +78,11 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
             </div>
          );
       case 'Other':
-        return entry.description;
+        return <p className="text-2xl font-headline text-foreground/90">{entry.description}</p>;
       default:
-        return entry.description;
+        return <p className="text-2xl font-headline text-foreground/90">{entry.description}</p>;
     }
   };
-
-  const giftDisplayContent = giftDisplay();
 
   return (
     <Card className="w-full transition-all duration-300 ease-in-out hover:shadow-xl flex flex-col">
@@ -110,11 +106,7 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
         </div>
       </CardHeader>
       <CardContent className="flex-grow">
-        {
-          typeof giftDisplayContent === 'string' ?
-            <p className="text-2xl font-headline text-foreground/90">{giftDisplayContent}</p>
-          : giftDisplayContent
-        }
+        {giftDisplay()}
         {entry.notes && (
           <blockquote className="mt-4 border-l-2 pl-4 italic text-muted-foreground font-serif">
             {entry.notes}

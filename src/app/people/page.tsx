@@ -44,25 +44,25 @@ import { AppLayout } from '@/components/layout';
 import { useData } from '@/components/data-provider';
 
 const relations: Relation[] = [
-    { en: "Aunt", ur: "Chachi, Khala, Mami, Phuppi" },
-    { en: "Brother", ur: "Bhai" },
-    { en: "Brother-in-law", ur: "Saala, Behan ka Shohar" },
-    { en: "Cousin", ur: "Cousin" },
-    { en: "Daughter", ur: "Beti" },
-    { en: "Father", ur: "Abu, Baba" },
-    { en: "Father-in-law", ur: "Sasur" },
-    { en: "Friend", ur: "Dost" },
-    { en: "Grandfather", ur: "Dada, Nana" },
-    { en: "Grandmother", ur: "Dadi, Nani" },
-    { en: "Mother", ur: "Ammi, Maa" },
-    { en: "Mother-in-law", ur: "Saas" },
-    { en: "Nephew", ur: "Bhatija, Bhanja" },
-    { en: "Niece", ur: "Bhatiji, Bhanji" },
-    { en: "Other", ur: "Other" },
-    { en: "Sister", ur: "Behan" },
-    { en: "Sister-in-law", ur: "Saali, Bhabi" },
-    { en: "Son", ur: "Beta" },
-    { en: "Uncle", ur: "Chacha, Khalu, Mamu, Phuppa" },
+    { en: "Aunt", ur: "چچی، خالہ، مامی، پھوپھی" },
+    { en: "Brother", ur: "بھائی" },
+    { en: "Brother-in-law", ur: "سالا، بہن کا شوہر" },
+    { en: "Cousin", ur: "کزن" },
+    { en: "Daughter", ur: "بیٹی" },
+    { en: "Father", ur: "ابو، بابا" },
+    { en: "Father-in-law", ur: "سسر" },
+    { en: "Friend", ur: "دوست" },
+    { en: "Grandfather", ur: "دادا، نانا" },
+    { en: "Grandmother", ur: "دادی، نانی" },
+    { en: "Mother", ur: "امی، ماں" },
+    { en: "Mother-in-law", ur: "ساس" },
+    { en: "Nephew", ur: "بھتیجا، بھانجا" },
+    { en: "Niece", ur: "بھتیجی، بھانجی" },
+    { en: "Other", ur: "دیگر" },
+    { en: "Sister", ur: "بہن" },
+    { en: "Sister-in-law", ur: "سالی، بھابھی" },
+    { en: "Son", ur: "بیٹا" },
+    { en: "Uncle", ur: "چچا، خالو، ماموں، پھپھا" },
 ].sort((a, b) => a.en.localeCompare(b.en));
 
 
@@ -155,11 +155,7 @@ export default function PeoplePage() {
   const getRelationDisplay = (relationKey: string) => {
       const relation = relations.find(r => r.en === relationKey);
       if (!relation) return relationKey;
-
-      if (language === 'ur') {
-          return `${relation.ur} (${relation.en})`;
-      }
-      return `${relation.en} (${relation.ur})`;
+      return language === 'ur' ? relation.ur : relation.en;
   }
 
   const filteredPeople = useMemo(() => {
@@ -237,7 +233,7 @@ export default function PeoplePage() {
                                     <SelectContent>
                                         {relations.map(r => (
                                             <SelectItem key={r.en} value={r.en}>
-                                                {language === 'ur' ? `${r.ur} (${r.en})` : `${r.en} (${r.ur})`}
+                                                {getRelationDisplay(r.en)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

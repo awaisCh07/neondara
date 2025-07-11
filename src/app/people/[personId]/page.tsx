@@ -4,7 +4,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import type { NeondaraEntry, Person } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Gift, Grape } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { NeondaraEntrySheet } from '@/components/neondara-entry-sheet';
@@ -14,6 +14,7 @@ import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { useData } from '@/components/data-provider';
 import { NeondaraCard } from '@/components/neondara-card';
+import { Separator } from '@/components/ui/separator';
 
 
 export default function PersonDetailPage() {
@@ -43,19 +44,43 @@ export default function PersonDetailPage() {
       .sort((a, b) => b.date.getTime() - a.date.getTime());
   }, [entries, personId]);
 
-  const balance = useMemo(() => {
-    let given = 0;
-    let received = 0;
+  const summaryStats = useMemo(() => {
+    let moneyGiven = 0;
+    let moneyReceived = 0;
+    let sweetsGiven = 0;
+    let sweetsReceived = 0;
+    let giftsGivenCount = 0;
+    let giftsReceivedCount = 0;
+
     personEntries.forEach(entry => {
-      if (entry.giftType === 'Money' && entry.amount) {
-        if (entry.direction === 'given') {
-          given += entry.amount;
-        } else {
-          received += entry.amount;
+      if (entry.direction === 'given') {
+        if (entry.giftType === 'Money' && entry.amount) {
+          moneyGiven += entry.amount;
+        } else if (entry.giftType === 'Sweets' && entry.amount) {
+          sweetsGiven += entry.amount;
+        } else if (entry.giftType === 'Gift') {
+          giftsGivenCount++;
+        }
+      } else { // received
+        if (entry.giftType === 'Money' && entry.amount) {
+          moneyReceived += entry.amount;
+        } else if (entry.giftType === 'Sweets' && entry.amount) {
+          sweetsReceived += entry.amount;
+        } else if (entry.giftType === 'Gift') {
+          giftsReceivedCount++;
         }
       }
     });
-    return { given, received, net: given - received };
+
+    return { 
+        moneyGiven, 
+        moneyReceived, 
+        netMoney: moneyGiven - moneyReceived,
+        sweetsGiven,
+        sweetsReceived,
+        giftsGivenCount,
+        giftsReceivedCount
+    };
   }, [personEntries]);
 
   const handleOpenSheet = (entry?: Omit<NeondaraEntry, 'userId'>) => {
@@ -91,8 +116,8 @@ export default function PersonDetailPage() {
     );
   }
 
-  const balanceColor = balance.net === 0 ? 'text-foreground' : balance.net > 0 ? 'text-green-600' : 'text-red-600';
-  const balanceText = balance.net === 0 ? t('allSquare') : balance.net > 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance.net))}`;
+  const balanceColor = summaryStats.netMoney === 0 ? 'text-foreground' : summaryStats.netMoney > 0 ? 'text-green-600' : 'text-red-600';
+  const balanceText = summaryStats.netMoney === 0 ? t('allSquare') : summaryStats.netMoney > 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney))}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney))}`;
 
   return (
     <AppLayout onExport={handleExport}>
@@ -111,21 +136,53 @@ export default function PersonDetailPage() {
                   <CardTitle>{t('balanceSummary')}</CardTitle>
                   <CardDescription>{t('balanceSummaryDescription')}</CardDescription>
               </CardHeader>
-              <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                      <div>
-                          <p className="text-sm text-muted-foreground">{t('totalGiven')}</p>
-                          <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.given)}</p>
-                      </div>
-                       <div>
-                          <p className="text-sm text-muted-foreground">{t('totalReceived')}</p>
-                          <p className="text-2xl font-bold">{new Intl.NumberFormat().format(balance.received)}</p>
-                      </div>
-                       <div>
-                          <p className="text-sm text-muted-foreground">{t('netBalance')}</p>
-                          <p className={`text-2xl font-bold ${balanceColor}`}>{balanceText}</p>
-                      </div>
+              <CardContent className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">Monetary Balance</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p className="text-sm text-muted-foreground">{t('totalGiven')}</p>
+                            <p className="text-2xl font-bold">{new Intl.NumberFormat().format(summaryStats.moneyGiven)}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">{t('totalReceived')}</p>
+                            <p className="text-2xl font-bold">{new Intl.NumberFormat().format(summaryStats.moneyReceived)}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">{t('netBalance')}</p>
+                            <p className={`text-2xl font-bold ${balanceColor}`}>{balanceText}</p>
+                        </div>
+                    </div>
                   </div>
+                  <Separator />
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium flex items-center"><Grape className="mr-2 h-5 w-5" /> Sweets Exchanged</h3>
+                         <div className="flex justify-around text-center">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Given</p>
+                              <p className="text-2xl font-bold">{summaryStats.sweetsGiven}<span className="text-base font-normal text-muted-foreground">kg</span></p>
+                            </div>
+                             <div>
+                              <p className="text-sm text-muted-foreground">Received</p>
+                              <p className="text-2xl font-bold">{summaryStats.sweetsReceived}<span className="text-base font-normal text-muted-foreground">kg</span></p>
+                            </div>
+                        </div>
+                      </div>
+                       <div className="space-y-4">
+                        <h3 className="text-lg font-medium flex items-center"><Gift className="mr-2 h-5 w-5" /> Gifts Exchanged</h3>
+                          <div className="flex justify-around text-center">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Given</p>
+                              <p className="text-2xl font-bold">{summaryStats.giftsGivenCount}</p>
+                            </div>
+                             <div>
+                              <p className="text-sm text-muted-foreground">Received</p>
+                              <p className="text-2xl font-bold">{summaryStats.giftsReceivedCount}</p>
+                            </div>
+                        </div>
+                      </div>
+                   </div>
               </CardContent>
           </Card>
 

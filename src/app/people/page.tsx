@@ -31,6 +31,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -141,8 +142,8 @@ export default function PeoplePage() {
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return t('allSquare');
-    if (balance > 0) return `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
-    return `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
+    if (balance > 0) return `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
+    return `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(balance))}`;
   }
 
   const getRelationDisplay = (relationKey: string) => {
@@ -331,3 +332,5 @@ export default function PeoplePage() {
     </AppLayout>
   );
 }
+
+    

@@ -54,11 +54,11 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
   const giftDisplay = () => {
     switch (entry.giftType) {
       case 'Money':
-        return `${new Intl.NumberFormat().format(entry.amount || 0)} ${entry.description}`;
+        return `${new Intl.NumberFormat().format(entry.amount || 0)}`;
       case 'Sweets':
         return `${entry.amount}kg ${entry.description}`;
       case 'Gift':
-         if (entry.description.startsWith('data:image')) {
+         if (entry.description && entry.description.startsWith('data:image')) {
             // This case is handled by the JSX below, returning null here
             return null;
          }
@@ -99,7 +99,7 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
         </div>
       </CardHeader>
       <CardContent className="flex-grow">
-        {entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? (
+        {entry.giftType === 'Gift' && entry.description && entry.description.startsWith('data:image') ? (
             <div className="mt-2">
               <Image
                 src={entry.description}

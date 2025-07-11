@@ -38,15 +38,12 @@ const formSchema = z.object({
   occasion: z.enum(['Wedding', 'Birth', 'Housewarming', 'Other']),
   giftType: z.enum(['Money', 'Sweets', 'Gift', 'Other']),
   amount: z.coerce.number().positive("Amount must be positive.").optional(),
-  description: z.string().min(1, "A description or image is required."), // Now only checks for non-emptiness
+  description: z.string().optional(),
   notes: z.string().optional(),
 }).superRefine((data, ctx) => {
     if (data.giftType === 'Money') {
         if (!data.amount) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'An amount is required for money gifts.', path: ['amount'] });
-        }
-        if (!data.description || data.description.length === 0) {
-             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Currency (e.g., USD, CAD) is required.', path: ['description'] });
         }
     } else if (data.giftType === 'Sweets') {
         if (!data.amount) {
@@ -96,7 +93,8 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
         if (isOpen) {
             form.reset(entry ? {
                 ...entry,
-                amount: entry.amount ?? undefined
+                amount: entry.amount ?? undefined,
+                description: entry.description ?? ""
             } : {
                 direction: 'given',
                 personId: undefined,
@@ -108,7 +106,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 notes: '',
             });
 
-            if (entry && entry.giftType === 'Gift' && entry.description.startsWith('data:image')) {
+            if (entry && entry.giftType === 'Gift' && entry.description && entry.description.startsWith('data:image')) {
                 setImagePreview(entry.description);
             } else {
                 setImagePreview(null);
@@ -118,11 +116,10 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
 
     const giftType = form.watch("giftType");
     
-    // Clear description when gift type changes away from 'Gift' with an image
     useEffect(() => {
         if (giftType !== 'Gift') {
             setImagePreview(null);
-            if (form.getValues('description').startsWith('data:image')) {
+            if (form.getValues('description')?.startsWith('data:image')) {
                 form.setValue('description', '');
             }
         }
@@ -152,8 +149,11 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     
     function onSubmit(values: FormValues) {
         let submissionValues = { ...values };
-
-        if (values.giftType === 'Money' || values.giftType === 'Sweets') {
+        
+        if (values.giftType === 'Money') {
+            submissionValues.amount = values.amount!;
+            submissionValues.description = ""; // No description for money
+        } else if (values.giftType === 'Sweets') {
             submissionValues.amount = values.amount!;
         } else {
             submissionValues.amount = null;
@@ -161,6 +161,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
         
         const newEntryData = {
             ...submissionValues,
+            description: submissionValues.description || '',
             amount: submissionValues.amount
         }
 
@@ -177,8 +178,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     
     const getDescriptionLabel = () => {
         switch(giftType) {
-            case 'Money':
-                return `${t('currency')} *`;
             case 'Sweets':
                 return `${t('description')} *`;
             case 'Other':
@@ -189,8 +188,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     }
     const getDescriptionPlaceholder = () => {
         switch(giftType) {
-            case 'Money':
-                return t('currencyPlaceholder');
             case 'Sweets':
                 return t('sweetDescriptionPlaceholder');
             case 'Other':
@@ -369,7 +366,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 />
             )}
             
-            {giftType !== 'Gift' && (
+            {giftType !== 'Gift' && giftType !== 'Money' && (
               <FormField
                 control={form.control}
                 name="description"
@@ -377,7 +374,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                   <FormItem>
                     <FormLabel>{getDescriptionLabel()}</FormLabel>
                     <FormControl>
-                      <Input placeholder={getDescriptionPlaceholder()} {...field} />
+                      <Input placeholder={getDescriptionPlaceholder()} {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -417,7 +414,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                     <FormItem className="mt-2">
                       <FormLabel>{t('giftDescription')} *</FormLabel>
                       <FormControl>
-                          <Input placeholder={t('giftDescriptionPlaceholder')} {...field} value={isDescriptionImageData ? '' : field.value} onChange={(e) => field.onChange(e.target.value)}/>
+                          <Input placeholder={t('giftDescriptionPlaceholder')} {...field} value={isDescriptionImageData ? '' : field.value || ''} onChange={(e) => field.onChange(e.target.value)}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -434,7 +431,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 <FormItem>
                   <FormLabel>{t('notes')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={t('notesPlaceholder')} {...field} />
+                    <Textarea placeholder={t('notesPlaceholder')} {...field} value={field.value || ''}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

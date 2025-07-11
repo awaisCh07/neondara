@@ -29,6 +29,7 @@ import { useLanguage } from "./language-provider"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogPortal } from "./ui/dialog"
+import { Separator } from "./ui/separator"
 
 
 type FormValues = z.infer<ReturnType<typeof getFormSchema>>
@@ -66,9 +67,7 @@ const getFormSchema = (t: (key: string) => string) => z.object({
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description of the sweet is required.', path: ['description'] });
         }
     } else if (data.giftType === 'Gift') {
-        if (!data.description || !data.description.startsWith('data:image')) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('giftImageRequired'), path: ['description'] });
-        }
+        // No validation needed here anymore, image and description are optional
     } else if (data.giftType === 'Other') {
       if (!data.description || data.description.trim().length < 2) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description for the gift is required.', path: ['description'] });
@@ -123,9 +122,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     useEffect(() => {
         if (giftType !== 'Gift') {
             setImagePreview(null);
-            if (form.getValues('description')?.startsWith('data:image')) {
-                form.setValue('description', '');
-            }
         }
     }, [giftType, form]);
 
@@ -137,6 +133,8 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             reader.onloadend = () => {
                 const dataUrl = reader.result as string;
                 setImagePreview(dataUrl);
+                // When an image is set, we use its data URL as the description.
+                // We clear the text description to avoid conflict.
                 form.setValue('description', dataUrl, { shouldValidate: true }); 
             };
             reader.readAsDataURL(file);
@@ -145,7 +143,9 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     
     const removeImage = () => {
         setImagePreview(null);
-        form.setValue('description', '', { shouldValidate: true });
+        if(form.getValues('description')?.startsWith('data:image')) {
+            form.setValue('description', '', { shouldValidate: true });
+        }
         if(fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -200,6 +200,8 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 return t('sweetDescriptionPlaceholder');
             case 'Other':
                 return t('otherDescriptionPlaceholder');
+            case 'Gift':
+                return t('giftDescriptionPlaceholder');
             default:
                 return t('otherDescriptionPlaceholder');
         }
@@ -395,44 +397,62 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             )}
 
             {giftType === 'Gift' && (
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('giftImage')} *</FormLabel>
-                     <FormControl>
+              <div className="space-y-4">
+                <div>
+                  <FormLabel>{t('giftImage')}</FormLabel>
+                  <div 
+                      className="mt-2 w-full h-48 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground hover:border-primary cursor-pointer relative"
+                      onClick={() => fileInputRef.current?.click()}
+                  >
                       {imagePreview ? (
-                        <div className="relative w-full h-48">
-                            <Image src={imagePreview} alt="Preview" fill className="object-contain rounded-md border" />
-                            <Button variant="ghost" size="icon" className="absolute top-1 right-1 bg-background/50 hover:bg-background/80 rounded-full h-7 w-7" onClick={removeImage}>
+                        <>
+                            <Image src={imagePreview} alt="Preview" fill className="object-contain rounded-md" />
+                            <Button variant="ghost" size="icon" className="absolute top-1 right-1 bg-background/50 hover:bg-background/80 rounded-full h-7 w-7" onClick={(e) => { e.stopPropagation(); removeImage();}}>
                                 <X className="h-4 w-4" />
                             </Button>
-                        </div>
+                        </>
                       ) : (
-                        <div 
-                            className="w-full h-48 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground hover:border-primary cursor-pointer"
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            <div className="text-center">
-                                <Upload className="mx-auto h-8 w-8" />
-                                <p>{t('uploadImage')}</p>
-                                <p className="text-xs text-muted-foreground">{t('giftImageRequired')}</p>
-                            </div>
-                        </div>
+                          <div className="text-center">
+                              <Upload className="mx-auto h-8 w-8" />
+                              <p>{t('uploadImage')}</p>
+                              <p className="text-xs text-muted-foreground">{t('giftImageRequired')}</p>
+                          </div>
                       )}
-                    </FormControl>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                    />
-                     <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  </div>
+                  <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Separator className="flex-1" />
+                  <span className="text-xs text-muted-foreground">{t('or')}</span>
+                  <Separator className="flex-1" />
+                </div>
+              
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('giftDescription')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder={getDescriptionPlaceholder()} {...field} value={field.value?.startsWith('data:image') ? '' : field.value || ''}
+                          onChange={(e) => {
+                            removeImage(); // Clear image if user types description
+                            field.onChange(e);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             )}
             
             <FormField
@@ -459,3 +479,4 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     </Sheet>
   )
 }
+

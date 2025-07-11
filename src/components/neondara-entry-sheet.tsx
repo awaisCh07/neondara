@@ -410,16 +410,8 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                         accept="image/*"
                         onChange={handleImageChange}
                     />
-                    <FormMessage />
-                    <div className="relative text-center my-2">
-                        <span className="bg-background px-2 text-xs text-muted-foreground">{t('or')}</span>
-                        <div className="absolute left-0 top-1/2 -z-10 w-full border-t"></div>
-                    </div>
-                    <Input 
-                      placeholder={t('giftDescriptionPlaceholder')}
-                      value={field.value?.startsWith('data:image') ? '' : field.value || ''}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
+                     <FormMessage />
+                    {/* The conflicting text input was here. It has been removed. */}
                   </FormItem>
                 )}
               />

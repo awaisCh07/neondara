@@ -71,7 +71,7 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
               </a>
             );
          }
-         // Fallback for gift with only text description
+         // Fallback for gift with only text description or if description is missing
          return (
             <div className="flex items-center gap-4">
                 <ImageIcon className="h-8 w-8 text-muted-foreground" />

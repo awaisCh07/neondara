@@ -130,8 +130,8 @@ export const translations: Translations = {
     balance: { en: 'Balance', ur: 'بیلنس' },
     viewHistory: { en: 'View History', ur: 'ہسٹری دیکھیں' },
     allSquare: { en: 'All square', ur: 'حساب برابر' },
-    youWillReceive: { en: 'You are owed', ur: 'آپ کو ملیں گے' },
-    youWillGive: { en: 'You need to give', ur: 'آپ کو دینا ہے' },
+    youAreOwed: { en: 'You are owed {{amount}}', ur: 'آپ کو {{amount}} ملیں گے' },
+    youHaveGivenMore: { en: 'You have given {{amount}} more', ur: 'آپ نے {{amount}} زیادہ دیے ہیں' },
 
     // Person Detail Page
     backToPeople: { en: 'Back to People', ur: 'لوگوں کی فہرست پر واپس' },
@@ -148,7 +148,15 @@ export const translations: Translations = {
 };
 
 export const useTranslation = (language: Language) => {
-    return (key: keyof typeof translations) => {
-        return translations[key] ? translations[key][language] : key;
+    return (key: keyof typeof translations, options?: { [key: string]: string | number }) => {
+        let translation = translations[key] ? translations[key][language] : key;
+        if (options) {
+            Object.keys(options).forEach(optionKey => {
+                translation = translation.replace(`{{${optionKey}}}`, String(options[optionKey]));
+            });
+        }
+        return translation;
     }
 }
+
+    

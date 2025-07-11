@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (key: any) => string;
+  t: (key: any, options?: { [key: string]: string | number }) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -51,3 +51,5 @@ export function useLanguage() {
   }
   return context;
 }
+
+    

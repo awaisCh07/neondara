@@ -18,7 +18,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { CalendarIcon, Upload } from "lucide-react"
+import { CalendarIcon, Upload, X } from "lucide-react"
 import { Calendar } from "./ui/calendar"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
@@ -28,8 +28,6 @@ import { useEffect, useState, useRef } from "react"
 import { useLanguage } from "./language-provider"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
-
-const MAX_FILE_SIZE = 500 * 1024; // 500KB
 
 const formSchema = z.object({
   direction: z.enum(['given', 'received'], { required_error: "Please select a direction." }),
@@ -130,14 +128,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            if (file.size > MAX_FILE_SIZE) {
-                toast({
-                    title: "Image Too Large",
-                    description: `Please select an image smaller than ${MAX_FILE_SIZE / 1024}KB.`,
-                    variant: "destructive"
-                });
-                return;
-            }
             const reader = new FileReader();
             reader.onloadend = () => {
                 const dataUrl = reader.result as string;
@@ -147,6 +137,14 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             reader.readAsDataURL(file);
         }
     };
+    
+    const removeImage = () => {
+        setImagePreview(null);
+        form.setValue('description', '', { shouldValidate: true });
+        if(fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    }
     
     async function onSubmit(values: FormValues) {
         setIsSubmitting(true);
@@ -394,21 +392,26 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('giftImage')} *</FormLabel>
-                    <FormControl>
-                      <div 
-                          className="w-full h-48 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground hover:border-primary cursor-pointer"
-                          onClick={() => fileInputRef.current?.click()}
-                      >
-                          {imagePreview ? (
-                              <Image src={imagePreview} alt="Preview" width={200} height={192} className="h-full w-full object-contain rounded-md" />
-                          ) : (
-                              <div className="text-center">
-                                  <Upload className="mx-auto h-8 w-8" />
-                                  <p>{t('uploadImage')}</p>
-                                  <p className="text-xs text-muted-foreground">{t('giftImageRequired')}</p>
-                              </div>
-                          )}
-                      </div>
+                     <FormControl>
+                      {imagePreview ? (
+                        <div className="relative w-full h-48">
+                            <Image src={imagePreview} alt="Preview" fill className="object-contain rounded-md border" />
+                            <Button variant="ghost" size="icon" className="absolute top-1 right-1 bg-background/50 hover:bg-background/80 rounded-full h-7 w-7" onClick={removeImage}>
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </div>
+                      ) : (
+                        <div 
+                            className="w-full h-48 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground hover:border-primary cursor-pointer"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <div className="text-center">
+                                <Upload className="mx-auto h-8 w-8" />
+                                <p>{t('uploadImage')}</p>
+                                <p className="text-xs text-muted-foreground">{t('giftImageRequired')}</p>
+                            </div>
+                        </div>
+                      )}
                     </FormControl>
                     <input
                         type="file"
@@ -447,3 +450,5 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     </Sheet>
   )
 }
+
+    

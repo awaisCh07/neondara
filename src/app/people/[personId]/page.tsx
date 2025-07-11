@@ -75,7 +75,7 @@ export default function PersonDetailPage() {
     return { 
         moneyGiven, 
         moneyReceived, 
-        netMoney: moneyReceived - moneyGiven,
+        netMoney: moneyGiven - moneyReceived,
         sweetsGiven,
         sweetsReceived,
         giftsGivenCount,
@@ -117,7 +117,7 @@ export default function PersonDetailPage() {
   }
 
   const balanceColor = summaryStats.netMoney === 0 ? 'text-foreground' : summaryStats.netMoney > 0 ? 'text-green-600' : 'text-red-600';
-  const balanceText = summaryStats.netMoney === 0 ? t('allSquare') : summaryStats.netMoney > 0 ? `${t('youWillReceive')} ${new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney))}` : `${t('youWillGive')} ${new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney))}`;
+  const balanceText = summaryStats.netMoney === 0 ? t('allSquare') : summaryStats.netMoney > 0 ? t('youHaveGivenMore', { amount: new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney)) }) : t('youAreOwed', { amount: new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney)) });
 
   return (
     <AppLayout onExport={handleExport}>
@@ -212,3 +212,5 @@ export default function PersonDetailPage() {
     </AppLayout>
   );
 }
+
+    

@@ -16,19 +16,15 @@ import { useToast } from '@/hooks/use-toast';
 import { deleteDoc, addDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { useLanguage } from '@/components/language-provider';
 import { AppLayout } from '@/components/layout';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { format } from 'date-fns';
 
 
-type PersonDetailPageProps = {
-  params: {
-    personId: string;
-  };
-};
-
-export default function PersonDetailPage({ params: { personId } }: PersonDetailPageProps) {
+export default function PersonDetailPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const personId = params.personId as string;
   const [person, setPerson] = useState<Person | null>(null);
   const [entries, setEntries] = useState<NeondaraEntry[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
@@ -83,15 +79,15 @@ export default function PersonDetailPage({ params: { personId } }: PersonDetailP
       let given = 0;
       let received = 0;
       entriesData.forEach(entry => {
-        if (entry.giftType === 'Money') {
+        if (entry.giftType === 'Money' && entry.amount) {
           if (entry.direction === 'given') {
-            given += entry.amount || 0;
+            given += entry.amount;
           } else {
-            received += entry.amount || 0;
+            received += entry.amount;
           }
         }
       });
-      setBalance({ given, received, net: given - received });
+      setBalance({ given, received, net: received - given });
 
     } catch (error) {
       console.error("Error fetching person details: ", error);
@@ -112,7 +108,7 @@ export default function PersonDetailPage({ params: { personId } }: PersonDetailP
       return;
     }
     if (personId) {
-        fetchPersonAndEntries(personId as string);
+        fetchPersonAndEntries(personId);
     }
   }, [user, authLoading, personId, router]);
 
@@ -129,7 +125,7 @@ export default function PersonDetailPage({ params: { personId } }: PersonDetailP
         title: t('success'),
         description: t('entryDeletedSuccess'),
       });
-      fetchPersonAndEntries(personId as string); // Refetch to update list and balance
+      fetchPersonAndEntries(personId); // Refetch to update list and balance
     } catch (error) {
       console.error("Error deleting entry: ", error);
       toast({
@@ -152,7 +148,7 @@ export default function PersonDetailPage({ params: { personId } }: PersonDetailP
         title: t('success'),
         description: t('entryAddedSuccess'),
       });
-      fetchPersonAndEntries(personId as string);
+      fetchPersonAndEntries(personId);
     } catch (error) {
       console.error("Error adding entry: ", error);
       toast({
@@ -175,7 +171,7 @@ export default function PersonDetailPage({ params: { personId } }: PersonDetailP
         title: t('success'),
         description: t('entryUpdatedSuccess'),
       });
-      fetchPersonAndEntries(personId as string);
+      fetchPersonAndEntries(personId);
     } catch (error) {
       console.error("Error updating entry: ", error);
       toast({

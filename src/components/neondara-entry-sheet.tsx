@@ -24,12 +24,27 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import type { NeondaraEntry, Person } from "@/lib/types"
 import { Textarea } from "./ui/textarea"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useMemo } from "react"
 import { useLanguage } from "./language-provider"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
+import { Dialog, DialogPortal } from "./ui/dialog"
 
-const formSchema = z.object({
+
+type FormValues = z.infer<ReturnType<typeof getFormSchema>>
+type EntryInput = Omit<NeondaraEntry, 'id' | 'userId' | 'person'>;
+type EntryUpdate = Omit<NeondaraEntry, 'userId' | 'person'>
+
+interface NeondaraEntrySheetProps {
+    isOpen: boolean;
+    onOpenChange: (isOpen: boolean) => void;
+    onAddEntry: (entry: EntryInput) => Promise<void>;
+    onUpdateEntry: (entry: EntryUpdate) => Promise<void>;
+    entry?: Omit<NeondaraEntry, 'userId'>;
+    people: Person[];
+}
+
+const getFormSchema = (t: (key: string) => string) => z.object({
   direction: z.enum(['given', 'received'], { required_error: "Please select a direction." }),
   personId: z.string({ required_error: "Please select a person." }),
   date: z.date({ required_error: "A date is required." }),
@@ -52,7 +67,7 @@ const formSchema = z.object({
         }
     } else if (data.giftType === 'Gift') {
         if (!data.description || !data.description.startsWith('data:image')) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'An image of the gift is required.', path: ['description'] });
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('giftImageRequired'), path: ['description'] });
         }
     } else if (data.giftType === 'Other') {
       if (!data.description || data.description.trim().length < 2) {
@@ -61,18 +76,6 @@ const formSchema = z.object({
     }
 });
 
-type FormValues = z.infer<typeof formSchema>
-type EntryInput = Omit<NeondaraEntry, 'id' | 'userId' | 'person'>;
-type EntryUpdate = Omit<NeondaraEntry, 'userId' | 'person'>
-
-interface NeondaraEntrySheetProps {
-    isOpen: boolean;
-    onOpenChange: (isOpen: boolean) => void;
-    onAddEntry: (entry: EntryInput) => Promise<void>;
-    onUpdateEntry: (entry: EntryUpdate) => Promise<void>;
-    entry?: Omit<NeondaraEntry, 'userId'>;
-    people: Person[];
-}
 
 export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateEntry, entry, people }: NeondaraEntrySheetProps) {
     const { t } = useLanguage();
@@ -80,6 +83,8 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const formSchema = useMemo(() => getFormSchema(t), [t]);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -248,7 +253,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('person')} *</FormLabel>
-                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                   <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={t('person')} />
@@ -264,54 +269,58 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 </FormItem>
               )}
             />
-             <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>{t('dateOfOccasion')} *</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Dialog>
+                <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                    <FormLabel>{t('dateOfOccasion')} *</FormLabel>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                        <FormControl>
+                            <Button
+                            variant={"outline"}
+                            className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                            )}
+                            >
+                            {field.value ? (
+                                format(field.value, "PPP")
+                            ) : (
+                                <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                        </FormControl>
+                        </PopoverTrigger>
+                        <DialogPortal>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                date > new Date() || date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                            />
+                            </PopoverContent>
+                        </DialogPortal>
+                    </Popover>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </Dialog>
             <FormField
               control={form.control}
               name="occasion"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('occasion')} *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={t('occasion')} />
@@ -335,7 +344,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('giftType')} *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={t('giftType')} />
@@ -450,5 +459,3 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     </Sheet>
   )
 }
-
-    

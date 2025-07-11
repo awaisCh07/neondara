@@ -58,12 +58,13 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
       case 'Sweets':
         return `${entry.amount}kg ${entry.description}`;
       case 'Gift':
+         // Check if the description is a data URL for an image
          if (entry.description && entry.description.startsWith('data:image')) {
             return (
-              <a href={entry.description} download={`gift_from_${nameToDisplay}.png`}>
+              <a href={entry.description} download={`gift_from_${nameToDisplay}.png`} title="Click to download image">
                 <Image
                   src={entry.description}
-                  alt="Gift"
+                  alt={`Gift from ${nameToDisplay}`}
                   width={400}
                   height={300}
                   className="rounded-lg object-cover w-full aspect-video transition-transform duration-300 hover:scale-105"
@@ -71,10 +72,11 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
               </a>
             );
          }
+         // If it's not an image URL, display the text description
          return (
             <div className="flex items-center gap-4">
                 <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                <p className="text-2xl font-headline text-foreground/90">{entry.description}</p>
+                <p className="text-2xl font-headline text-foreground/90">{entry.description || "Gift"}</p>
             </div>
          );
       case 'Other':

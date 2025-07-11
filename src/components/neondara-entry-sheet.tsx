@@ -119,6 +119,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     useEffect(() => {
         if (giftType !== 'Gift') {
             setImagePreview(null);
+            // Don't clear description if it's not image data
             if (form.getValues('description')?.startsWith('data:image')) {
                 form.setValue('description', '');
             }
@@ -172,9 +173,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
         }
         onOpenChange(false);
     }
-
-    const descriptionValue = form.watch('description');
-    const isDescriptionImageData = descriptionValue && descriptionValue.startsWith('data:image');
     
     const getDescriptionLabel = () => {
         switch(giftType) {
@@ -366,7 +364,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 />
             )}
             
-            {giftType !== 'Gift' && giftType !== 'Money' && (
+            {(giftType === 'Sweets' || giftType === 'Other') && (
               <FormField
                 control={form.control}
                 name="description"
@@ -383,46 +381,49 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             )}
 
             {giftType === 'Gift' && (
-              <FormItem>
-                <FormLabel>{t('giftImage')}</FormLabel>
-                <FormControl>
-                    <div 
-                        className="w-full h-48 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground hover:border-primary cursor-pointer"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        {imagePreview ? (
-                             <Image src={imagePreview} alt="Preview" width={200} height={192} className="h-full w-full object-contain rounded-md" />
-                        ) : (
-                            <div className="text-center">
-                                <Upload className="mx-auto h-8 w-8" />
-                                <p>{t('uploadImage')}</p>
-                            </div>
-                        )}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('giftImage')} *</FormLabel>
+                    <FormControl>
+                      <div 
+                          className="w-full h-48 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground hover:border-primary cursor-pointer"
+                          onClick={() => fileInputRef.current?.click()}
+                      >
+                          {imagePreview ? (
+                              <Image src={imagePreview} alt="Preview" width={200} height={192} className="h-full w-full object-contain rounded-md" />
+                          ) : (
+                              <div className="text-center">
+                                  <Upload className="mx-auto h-8 w-8" />
+                                  <p>{t('uploadImage')}</p>
+                                  <p className="text-xs text-muted-foreground">{t('giftOrDescription')}</p>
+                              </div>
+                          )}
+                      </div>
+                    </FormControl>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                    />
+                    <FormMessage />
+                    <div className="relative text-center my-2">
+                        <span className="bg-background px-2 text-xs text-muted-foreground">{t('or')}</span>
+                        <div className="absolute left-0 top-1/2 -z-10 w-full border-t"></div>
                     </div>
-                </FormControl>
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                />
-                 <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem className="mt-2">
-                      <FormLabel>{t('giftDescription')} *</FormLabel>
-                      <FormControl>
-                          <Input placeholder={t('giftDescriptionPlaceholder')} {...field} value={isDescriptionImageData ? '' : field.value || ''} onChange={(e) => field.onChange(e.target.value)}/>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </FormItem>
+                    <Input 
+                      placeholder={t('giftDescriptionPlaceholder')}
+                      value={field.value?.startsWith('data:image') ? '' : field.value || ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
+                  </FormItem>
+                )}
+              />
             )}
-
             
             <FormField
               control={form.control}
@@ -446,3 +447,5 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     </Sheet>
   )
 }
+
+    

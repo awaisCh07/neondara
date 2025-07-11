@@ -30,6 +30,7 @@ export const translations: Translations = {
     date: { en: 'Date', ur: 'تاریخ' },
     relation: { en: 'Relation', ur: 'رشتہ' },
     search: { en: 'Search', ur: 'تلاش کریں' },
+    or: { en: 'OR', ur: 'یا' },
     
     // Login Page
     loginTitle: { en: 'Login', ur: 'لاگ ان' },
@@ -110,6 +111,7 @@ export const translations: Translations = {
     saveChanges: { en: 'Save Changes', ur: 'تبدیلیاں محفوظ کریں' },
     uploadImage: { en: 'Upload an Image', ur: ' تصویر اپلوڈ کریں' },
     giftImage: { en: 'Gift Image', ur: 'تحفہ کی تصویر'},
+    giftOrDescription: { en: 'or write a description below', ur: 'یا نیچے تفصیل لکھیں'},
     giftDescription: { en: 'Gift Description', ur: 'تحفے کی تفصیل' },
     giftDescriptionPlaceholder: { en: 'e.g., Dinner Set', ur: 'مثلاً، ڈنر سیٹ' },
     
@@ -149,3 +151,5 @@ export const useTranslation = (language: Language) => {
         return translations[key] ? translations[key][language] : key;
     }
 }
+
+    

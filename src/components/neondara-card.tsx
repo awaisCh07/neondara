@@ -155,3 +155,5 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
     </Card>
   );
 }
+
+    

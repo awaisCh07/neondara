@@ -18,7 +18,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import Link from 'next/link';
@@ -96,7 +96,10 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
                    </Button>
                  </SheetTrigger>
                  <SheetContent side="left" className="w-full max-w-xs">
-                   <nav className="flex flex-col gap-4 mt-8">
+                    <SheetHeader>
+                        <SheetTitle className="text-left font-headline text-2xl mb-4">{t('appTitle')}</SheetTitle>
+                    </SheetHeader>
+                   <nav className="flex flex-col gap-4">
                      {navItems.map(item => (
                        <SheetClose asChild key={item.href}>
                          <Link href={item.href} passHref>

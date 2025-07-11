@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import { Popover, PopoverContent, PopoverTrigger, PopoverPortal } from "./ui/popover"
 import { CalendarIcon, Upload, X } from "lucide-react"
 import { Calendar } from "./ui/calendar"
 import { cn } from "@/lib/utils"
@@ -28,7 +28,6 @@ import { useEffect, useState, useRef, useMemo } from "react"
 import { useLanguage } from "./language-provider"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
-import { Dialog, DialogPortal } from "./ui/dialog"
 import { Separator } from "./ui/separator"
 
 
@@ -67,7 +66,9 @@ const getFormSchema = (t: (key: string) => string) => z.object({
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description of the sweet is required.', path: ['description'] });
         }
     } else if (data.giftType === 'Gift') {
-        // No validation needed here anymore, image and description are optional
+        if (!data.description || data.description.trim().length === 0) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('giftImageRequired'), path: ['description'] });
+        }
     } else if (data.giftType === 'Other') {
       if (!data.description || data.description.trim().length < 2) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description for the gift is required.', path: ['description'] });
@@ -271,51 +272,49 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 </FormItem>
               )}
             />
-            <Dialog>
-                <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                    <FormLabel>{t('dateOfOccasion')} *</FormLabel>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                        <FormControl>
-                            <Button
-                            variant={"outline"}
-                            className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                            )}
-                            >
-                            {field.value ? (
-                                format(field.value, "PPP")
-                            ) : (
-                                <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                        </FormControl>
-                        </PopoverTrigger>
-                        <DialogPortal>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                date > new Date() || date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                            />
-                            </PopoverContent>
-                        </DialogPortal>
-                    </Popover>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-            </Dialog>
+            <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+                <FormItem className="flex flex-col">
+                <FormLabel>{t('dateOfOccasion')} *</FormLabel>
+                <Popover>
+                    <PopoverTrigger asChild>
+                    <FormControl>
+                        <Button
+                        variant={"outline"}
+                        className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                        )}
+                        >
+                        {field.value ? (
+                            format(field.value, "PPP")
+                        ) : (
+                            <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                    </FormControl>
+                    </PopoverTrigger>
+                    <PopoverPortal>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                        />
+                        </PopoverContent>
+                    </PopoverPortal>
+                </Popover>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
             <FormField
               control={form.control}
               name="occasion"
@@ -415,7 +414,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                           <div className="text-center">
                               <Upload className="mx-auto h-8 w-8" />
                               <p>{t('uploadImage')}</p>
-                              <p className="text-xs text-muted-foreground">{t('giftImageRequired')}</p>
+                              <p className="text-xs text-muted-foreground">{t('or')}</p>
                           </div>
                       )}
                   </div>
@@ -426,6 +425,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                       accept="image/*"
                       onChange={handleImageChange}
                   />
+                  <FormMessage>{form.formState.errors.description?.message}</FormMessage>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -480,3 +480,4 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
   )
 }
 
+    

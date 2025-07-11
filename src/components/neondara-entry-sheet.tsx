@@ -66,9 +66,7 @@ const getFormSchema = (t: (key: string) => string) => z.object({
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description of the sweet is required.', path: ['description'] });
         }
     } else if (data.giftType === 'Gift') {
-        if (!data.description || data.description.trim().length === 0) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('giftImageRequired'), path: ['description'] });
-        }
+        // Gift image/description is now optional
     } else if (data.giftType === 'Other') {
       if (!data.description || data.description.trim().length < 2) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description for the gift is required.', path: ['description'] });
@@ -278,7 +276,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             render={({ field }) => (
                 <FormItem className="flex flex-col">
                 <FormLabel>{t('dateOfOccasion')} *</FormLabel>
-                <Popover>
+                <Popover modal={false}>
                     <PopoverTrigger asChild>
                     <FormControl>
                         <Button
@@ -297,19 +295,17 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                         </Button>
                     </FormControl>
                     </PopoverTrigger>
-                    <PopoverPortal>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                        />
-                        </PopoverContent>
-                    </PopoverPortal>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                      />
+                    </PopoverContent>
                 </Popover>
                 <FormMessage />
                 </FormItem>

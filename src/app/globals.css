@@ -74,3 +74,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .font-urdu {
+    line-height: 2 !important;
+  }
+}

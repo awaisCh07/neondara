@@ -2,7 +2,7 @@
 import type { Timestamp } from "firebase/firestore";
 
 export type Occasion = "Wedding" | "Birth" | "Housewarming" | "Other";
-export type GiftType = "Money" | "Sweets" | "Gift";
+export type GiftType = "Money" | "Sweets" | "Gift" | "Other";
 
 export type RelationType = 
   | "Aunt"

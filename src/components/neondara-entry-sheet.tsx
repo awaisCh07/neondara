@@ -36,7 +36,7 @@ const formSchema = z.object({
   personId: z.string({ required_error: "Please select a person." }),
   date: z.date({ required_error: "A date is required." }),
   occasion: z.enum(['Wedding', 'Birth', 'Housewarming', 'Other']),
-  giftType: z.enum(['Money', 'Sweets', 'Gift']),
+  giftType: z.enum(['Money', 'Sweets', 'Gift', 'Other']),
   amount: z.coerce.number().positive("Amount must be positive.").optional(),
   description: z.string().min(1, "A description or image is required."), // Now only checks for non-emptiness
   notes: z.string().optional(),
@@ -58,6 +58,10 @@ const formSchema = z.object({
     } else if (data.giftType === 'Gift') {
         if (!data.description || data.description.trim().length < 2) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description or image of the gift is required.', path: ['description'] });
+        }
+    } else if (data.giftType === 'Other') {
+      if (!data.description || data.description.trim().length < 2) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description for the gift is required.', path: ['description'] });
         }
     }
 });
@@ -170,6 +174,32 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
 
     const descriptionValue = form.watch('description');
     const isDescriptionImageData = descriptionValue && descriptionValue.startsWith('data:image');
+    
+    const getDescriptionLabel = () => {
+        switch(giftType) {
+            case 'Money':
+                return `${t('currency')} *`;
+            case 'Sweets':
+                return `${t('description')} *`;
+            case 'Other':
+                return `${t('description')} *`;
+            default:
+                return `${t('description')} *`;
+        }
+    }
+    const getDescriptionPlaceholder = () => {
+        switch(giftType) {
+            case 'Money':
+                return t('currencyPlaceholder');
+            case 'Sweets':
+                return t('sweetDescriptionPlaceholder');
+            case 'Other':
+                return t('otherDescriptionPlaceholder');
+            default:
+                return t('otherDescriptionPlaceholder');
+        }
+    }
+
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -315,6 +345,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                       <SelectItem value="Money">{t('giftTypeMoney')}</SelectItem>
                       <SelectItem value="Sweets">{t('giftTypeSweets')}</SelectItem>
                       <SelectItem value="Gift">{t('giftTypeGift')}</SelectItem>
+                      <SelectItem value="Other">{t('giftTypeOther')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -344,9 +375,9 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{giftType === 'Money' ? `${t('currency')} *` : `${t('description')} *`}</FormLabel>
+                    <FormLabel>{getDescriptionLabel()}</FormLabel>
                     <FormControl>
-                      <Input placeholder={giftType === 'Money' ? t('currencyPlaceholder') : t('sweetDescriptionPlaceholder')} {...field} />
+                      <Input placeholder={getDescriptionPlaceholder()} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -418,5 +449,3 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     </Sheet>
   )
 }
-
-    

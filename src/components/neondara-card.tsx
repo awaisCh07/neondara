@@ -58,16 +58,24 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
       case 'Sweets':
         return `${entry.amount}kg ${entry.description}`;
       case 'Gift':
-        return (
-          <div className="flex items-center gap-4">
-            <ImageIcon className="h-8 w-8 text-muted-foreground" />
-            <p className="text-2xl font-headline text-foreground/90">{entry.description}</p>
-          </div>
-        );
+         if (entry.description.startsWith('data:image')) {
+            // This case is handled by the JSX below, returning null here
+            return null;
+         }
+         return (
+            <div className="flex items-center gap-4">
+                <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                <p className="text-2xl font-headline text-foreground/90">{entry.description}</p>
+            </div>
+         );
+      case 'Other':
+        return entry.description;
       default:
         return entry.description;
     }
   };
+
+  const giftDisplayContent = giftDisplay();
 
   return (
     <Card className="w-full transition-all duration-300 ease-in-out hover:shadow-xl flex flex-col">
@@ -102,7 +110,7 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
               />
             </div>
           ) : (
-            <p className="text-2xl font-headline text-foreground/90">{giftDisplay()}</p>
+            giftDisplayContent && <p className="text-2xl font-headline text-foreground/90">{giftDisplayContent}</p>
           )
         }
         {entry.notes && (

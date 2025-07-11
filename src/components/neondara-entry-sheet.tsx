@@ -30,6 +30,7 @@ import { useLanguage } from "./language-provider"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
 import { Separator } from "./ui/separator"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 
 type FormValues = z.infer<ReturnType<typeof getFormSchema>>
@@ -45,7 +46,7 @@ interface NeondaraEntrySheetProps {
     people: Person[];
 }
 
-const getFormSchema = (t: (key: string) => string) => z.object({
+const getFormSchema = (t: (key: any) => string) => z.object({
   direction: z.enum(['given', 'received'], { required_error: t('errorSelectDirection') }),
   personId: z.string({ required_error: t('errorSelectPerson') }),
   date: z.date({ required_error: t('errorSelectDate') }),
@@ -79,7 +80,8 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const isMobile = useIsMobile();
+    
     const formSchema = useMemo(() => getFormSchema(t), [t]);
 
     const form = useForm<FormValues>({
@@ -132,8 +134,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             reader.onloadend = () => {
                 const dataUrl = reader.result as string;
                 setImagePreview(dataUrl);
-                // When an image is set, we use its data URL as the description.
-                // We clear the text description to avoid conflict.
                 form.setValue('description', dataUrl, { shouldValidate: true }); 
             };
             reader.readAsDataURL(file);
@@ -208,7 +208,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
 
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange} modal={false}>
+    <Sheet open={isOpen} onOpenChange={onOpenChange} modal>
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{entry ? t('editEntry') : t('addNewEntry')}</SheetTitle>
@@ -276,6 +276,19 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             render={({ field }) => (
                 <FormItem className="flex flex-col">
                 <FormLabel>{t('dateOfOccasion')} *</FormLabel>
+                {isMobile ? (
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
+                      onChange={(e) => {
+                        const date = new Date(e.target.value);
+                        const adjustedDate = new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000);
+                        field.onChange(adjustedDate);
+                      }}
+                    />
+                  </FormControl>
+                ) : (
                 <Popover>
                     <PopoverTrigger asChild>
                     <FormControl>
@@ -299,6 +312,9 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                             mode="single"
+                            captionLayout="dropdown-buttons"
+                            fromYear={1950}
+                            toYear={new Date().getFullYear()}
                             selected={field.value}
                             onSelect={field.onChange}
                             disabled={(date) =>
@@ -309,6 +325,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                       </PopoverContent>
                     </PopoverPortal>
                 </Popover>
+                )}
                 <FormMessage />
                 </FormItem>
             )}

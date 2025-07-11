@@ -18,6 +18,7 @@ export const translations: Translations = {
     delete: { en: 'Delete', ur: 'حذف کریں' },
     cancel: { en: 'Cancel', ur: 'منسوخ' },
     save: { en: 'Save', ur: 'محفوظ کریں' },
+    saving: { en: 'Saving...', ur: 'محفوظ کیا جا رہا ہے۔..' },
     loading: { en: 'Loading...', ur: 'لوڈ ہو رہا ہے۔۔۔' },
     error: { en: 'Error', ur: 'خرابی' },
     success: { en: 'Success', ur: 'کامیابی' },
@@ -110,6 +111,7 @@ export const translations: Translations = {
     saveChanges: { en: 'Save Changes', ur: 'تبدیلیاں محفوظ کریں' },
     uploadImage: { en: 'Upload an Image', ur: ' تصویر اپلوڈ کریں' },
     giftImage: { en: 'Gift Image', ur: 'تحفہ کی تصویر'},
+    giftImageRequired: { en: 'An image of the gift is required.', ur: 'تحفے کی تصویر درکار ہے۔' },
     giftOrDescription: { en: 'or write a description below', ur: 'یا نیچے تفصیل لکھیں'},
     giftDescription: { en: 'Gift Description', ur: 'تحفے کی تفصیل' },
     giftDescriptionPlaceholder: { en: 'e.g., Dinner Set', ur: 'مثلاً، ڈنر سیٹ' },
@@ -128,8 +130,8 @@ export const translations: Translations = {
     balance: { en: 'Balance', ur: 'بیلنس' },
     viewHistory: { en: 'View History', ur: 'ہسٹری دیکھیں' },
     allSquare: { en: 'All square', ur: 'حساب برابر' },
-    youWillReceive: { en: 'You will receive', ur: 'آپ وصول کریں گے' },
-    youWillGive: { en: 'You will give', ur: 'آپ دیں گے' },
+    youWillReceive: { en: 'You are owed', ur: 'آپ کو ملیں گے' },
+    youWillGive: { en: 'You need to give', ur: 'آپ کو دینا ہے' },
 
     // Person Detail Page
     backToPeople: { en: 'Back to People', ur: 'لوگوں کی فہرست پر واپس' },

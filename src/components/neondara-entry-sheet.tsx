@@ -53,8 +53,8 @@ const formSchema = z.object({
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description of the sweet is required.', path: ['description'] });
         }
     } else if (data.giftType === 'Gift') {
-        if (!data.description || data.description.trim().length < 2) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description or image of the gift is required.', path: ['description'] });
+        if (!data.description || !data.description.startsWith('data:image')) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'An image of the gift is required.', path: ['description'] });
         }
     } else if (data.giftType === 'Other') {
       if (!data.description || data.description.trim().length < 2) {
@@ -70,8 +70,8 @@ type EntryUpdate = Omit<NeondaraEntry, 'userId' | 'person'>
 interface NeondaraEntrySheetProps {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
-    onAddEntry: (entry: EntryInput) => void;
-    onUpdateEntry: (entry: EntryUpdate) => void;
+    onAddEntry: (entry: EntryInput) => Promise<void>;
+    onUpdateEntry: (entry: EntryUpdate) => Promise<void>;
     entry?: Omit<NeondaraEntry, 'userId'>;
     people: Person[];
 }
@@ -81,6 +81,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     const { toast } = useToast();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -119,7 +120,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     useEffect(() => {
         if (giftType !== 'Gift') {
             setImagePreview(null);
-            // Don't clear description if it's not image data
             if (form.getValues('description')?.startsWith('data:image')) {
                 form.setValue('description', '');
             }
@@ -148,30 +148,37 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
         }
     };
     
-    function onSubmit(values: FormValues) {
-        let submissionValues = { ...values };
-        
-        if (values.giftType === 'Money') {
-            submissionValues.amount = values.amount!;
-            submissionValues.description = ""; // No description for money
-        } else if (values.giftType === 'Sweets') {
-            submissionValues.amount = values.amount!;
-        } else {
-            submissionValues.amount = null;
-        }
-        
-        const newEntryData = {
-            ...submissionValues,
-            description: submissionValues.description || '',
-            amount: submissionValues.amount
-        }
+    async function onSubmit(values: FormValues) {
+        setIsSubmitting(true);
+        try {
+            let submissionValues = { ...values };
+            
+            if (values.giftType === 'Money') {
+                submissionValues.amount = values.amount!;
+                submissionValues.description = "";
+            } else if (values.giftType === 'Sweets') {
+                submissionValues.amount = values.amount!;
+            } else {
+                submissionValues.amount = null;
+            }
+            
+            const newEntryData = {
+                ...submissionValues,
+                description: submissionValues.description || '',
+                amount: submissionValues.amount
+            }
 
-        if (entry) {
-            onUpdateEntry({ ...newEntryData, id: entry.id });
-        } else {
-            onAddEntry(newEntryData);
+            if (entry) {
+                await onUpdateEntry({ ...newEntryData, id: entry.id });
+            } else {
+                await onAddEntry(newEntryData);
+            }
+            onOpenChange(false);
+        } catch (error) {
+            // Error toast is handled in DataProvider
+        } finally {
+            setIsSubmitting(false);
         }
-        onOpenChange(false);
     }
     
     const getDescriptionLabel = () => {
@@ -398,7 +405,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                               <div className="text-center">
                                   <Upload className="mx-auto h-8 w-8" />
                                   <p>{t('uploadImage')}</p>
-                                  <p className="text-xs text-muted-foreground">{t('giftOrDescription')}</p>
+                                  <p className="text-xs text-muted-foreground">{t('giftImageRequired')}</p>
                               </div>
                           )}
                       </div>
@@ -411,7 +418,6 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                         onChange={handleImageChange}
                     />
                      <FormMessage />
-                    {/* The conflicting text input was here. It has been removed. */}
                   </FormItem>
                 )}
               />
@@ -431,7 +437,9 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
               )}
             />
             <SheetFooter>
-                <Button type="submit">{entry ? t('saveChanges') : t('addEntry')}</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? t('saving') : (entry ? t('saveChanges') : t('addEntry'))}
+                </Button>
             </SheetFooter>
           </form>
         </Form>
@@ -439,5 +447,3 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     </Sheet>
   )
 }
-
-    

@@ -89,7 +89,7 @@ export default function SignupPage() {
             </Button>
             <div className="mt-4 text-center text-sm">
               {t('haveAccount')}{' '}
-              <Link href="/login" className="underline">
+              <Link href="/login" className="underline" prefetch={false}>
                 {t('logIn')}
               </Link>
             </div>

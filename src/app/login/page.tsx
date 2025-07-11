@@ -75,7 +75,7 @@ export default function LoginPage() {
             </Button>
             <div className="mt-4 text-center text-sm">
               {t('noAccount')}{' '}
-              <Link href="/signup" className="underline">
+              <Link href="/signup" className="underline" prefetch={false}>
                 {t('signUp')}
               </Link>
             </div>

@@ -130,8 +130,8 @@ export const translations: Translations = {
     balance: { en: 'Balance', ur: 'بیلنس' },
     viewHistory: { en: 'View History', ur: 'ہسٹری دیکھیں' },
     allSquare: { en: 'All square', ur: 'حساب برابر' },
-    youAreOwed: { en: 'They will pay you {{amount}}', ur: 'وہ آپ کو {{amount}} ادا کریں گے۔' },
-    youHaveGivenMore: { en: 'You will give {{amount}}', ur: 'آپ {{amount}} دیں گے' },
+    youAreOwed: { en: 'They have given {{amount}} more', ur: 'انہوں نے {{amount}} زیادہ دیے ہیں۔' },
+    youHaveGivenMore: { en: 'You have given {{amount}} more', ur: 'آپ نے {{amount}} زیادہ دیے ہیں' },
 
     // Person Detail Page
     backToPeople: { en: 'Back to People', ur: 'لوگوں کی فہرست پر واپس' },

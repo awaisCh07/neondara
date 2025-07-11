@@ -3,7 +3,7 @@
 
 import { useAuth } from './auth-provider';
 import { useRouter, usePathname } from 'next/navigation';
-import { LogOut, User as UserIcon, Users, Home as HomeIcon, Languages, Download } from 'lucide-react';
+import { LogOut, User as UserIcon, Users, Home as HomeIcon, Languages, Download, Menu } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import Link from 'next/link';
@@ -85,7 +86,34 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
                 </nav>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+               {/* Mobile Menu */}
+               <Sheet>
+                 <SheetTrigger asChild>
+                   <Button variant="ghost" size="icon" className="md:hidden">
+                     <Menu className="h-6 w-6" />
+                     <span className="sr-only">Open menu</span>
+                   </Button>
+                 </SheetTrigger>
+                 <SheetContent side="left" className="w-full max-w-xs">
+                   <nav className="flex flex-col gap-4 mt-8">
+                     {navItems.map(item => (
+                       <SheetClose asChild key={item.href}>
+                         <Link href={item.href} passHref>
+                           <Button variant={pathname === item.href ? "secondary" : "ghost"} className={cn(
+                             "w-full justify-start text-base",
+                             language === 'ur' && 'text-lg'
+                           )}>
+                             <item.icon className="mr-2 h-5 w-5" />
+                             {item.label}
+                           </Button>
+                         </Link>
+                       </SheetClose>
+                     ))}
+                   </nav>
+                 </SheetContent>
+               </Sheet>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">

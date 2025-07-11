@@ -45,31 +45,28 @@ interface NeondaraEntrySheetProps {
 }
 
 const getFormSchema = (t: (key: string) => string) => z.object({
-  direction: z.enum(['given', 'received'], { required_error: "Please select a direction." }),
-  personId: z.string({ required_error: "Please select a person." }),
-  date: z.date({ required_error: "A date is required." }),
+  direction: z.enum(['given', 'received'], { required_error: t('errorSelectDirection') }),
+  personId: z.string({ required_error: t('errorSelectPerson') }),
+  date: z.date({ required_error: t('errorSelectDate') }),
   occasion: z.enum(['Wedding', 'Birth', 'Housewarming', 'Other']),
   giftType: z.enum(['Money', 'Sweets', 'Gift', 'Other']),
-  amount: z.coerce.number().positive("Amount must be positive.").optional(),
+  amount: z.coerce.number().positive(t('errorPositiveAmount')).optional(),
   description: z.string().optional(),
   notes: z.string().optional(),
 }).superRefine((data, ctx) => {
     if (data.giftType === 'Money') {
         if (!data.amount) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'An amount is required for money gifts.', path: ['amount'] });
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('errorAmountRequired'), path: ['amount'] });
         }
     } else if (data.giftType === 'Sweets') {
         if (!data.amount) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'An amount in kg is required.', path: ['amount'] });
-        }
-        if (!data.description || data.description.length < 2) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description of the sweet is required.', path: ['description'] });
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('errorAmountKgRequired'), path: ['amount'] });
         }
     } else if (data.giftType === 'Gift') {
         // Gift image/description is now optional
     } else if (data.giftType === 'Other') {
       if (!data.description || data.description.trim().length < 2) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A description for the gift is required.', path: ['description'] });
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('errorDescriptionRequired'), path: ['description'] });
         }
     }
 });
@@ -186,7 +183,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
     const getDescriptionLabel = () => {
         switch(giftType) {
             case 'Sweets':
-                return `${t('description')} *`;
+                return `${t('description')}`;
             case 'Other':
                 return `${t('description')} *`;
             default:

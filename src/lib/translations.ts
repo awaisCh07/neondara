@@ -115,6 +115,18 @@ export const translations: Translations = {
     giftOrDescription: { en: 'or write a description below', ur: 'یا نیچے تفصیل لکھیں'},
     giftDescription: { en: 'Gift Description', ur: 'تحفے کی تفصیل' },
     giftDescriptionPlaceholder: { en: 'e.g., Dinner Set', ur: 'مثلاً، ڈنر سیٹ' },
+
+    // Validation Errors
+    errorSelectDirection: { en: "Please select a direction.", ur: "براہ کرم ایک سمت منتخب کریں۔" },
+    errorSelectPerson: { en: "Please select a person.", ur: "براہ کرم ایک شخص کو منتخب کریں۔" },
+    errorSelectDate: { en: "A date is required.", ur: "تاریخ درکار ہے۔" },
+    errorPositiveAmount: { en: "Amount must be positive.", ur: "رقم مثبت ہونی چاہیے۔" },
+    errorAmountRequired: { en: "An amount is required for money gifts.", ur: "پیسے کے تحائف کے لیے رقم درکار ہے۔" },
+    errorAmountKgRequired: { en: "An amount in kg is required.", ur: "کلوگرام میں مقدار درکار ہے۔" },
+    errorSweetDescRequired: { en: "A description of the sweet is required.", ur: "مٹھائی کی تفصیل درکار ہے۔" },
+    errorDescriptionRequired: { en: "A description for the gift is required.", ur: "تحفے کے لیے تفصیل درکار ہے۔" },
+    errorMin2Chars: { en: "Must be at least 2 characters.", ur: "کم از کم 2 حروف کا ہونا ضروری ہے۔" },
+    errorSelectRelation: { en: "Please select a relation.", ur: "براہ کرم ایک رشتہ منتخب کریں۔" },
     
     // People Page
     backToHistory: { en: 'Back to History', ur: 'ہسٹری پر واپس' },
@@ -130,7 +142,7 @@ export const translations: Translations = {
     balance: { en: 'Balance', ur: 'بیلنس' },
     viewHistory: { en: 'View History', ur: 'ہسٹری دیکھیں' },
     allSquare: { en: 'All square', ur: 'حساب برابر' },
-    youAreOwed: { en: 'They have given {{amount}} more', ur: 'انہوں نے {{amount}} زیادہ دیے ہیں۔' },
+    youAreOwed: { en: 'They have given {{amount}} more', ur: 'انہوں نے {{amount}} زیادہ دیے ہیں' },
     youHaveGivenMore: { en: 'You have given {{amount}} more', ur: 'آپ نے {{amount}} زیادہ دیے ہیں' },
 
     // Person Detail Page

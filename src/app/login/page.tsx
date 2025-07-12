@@ -5,12 +5,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   signInWithEmailAndPassword, 
-  sendPasswordResetEmail,
+  sendPasswordResetEmail
+} from 'firebase/auth';
+import { 
   query,
   collection,
   where,
   getDocs
-} from 'firebase/auth';
+} from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";

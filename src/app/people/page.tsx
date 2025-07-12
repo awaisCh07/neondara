@@ -290,7 +290,7 @@ export default function PeoplePage() {
                               <AlertDialogHeader>
                               <AlertDialogTitle>{t('deleteConfirmTitle')}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                  Are you sure you want to delete {person.name}? This will not delete their transaction history, but it will remove them from your contacts. This action cannot be undone.
+                                  {t('deletePersonConfirmDescription', {name: person.name})}
                               </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
@@ -336,5 +336,3 @@ export default function PeoplePage() {
     </AppLayout>
   );
 }
-
-    

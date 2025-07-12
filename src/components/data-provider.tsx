@@ -191,11 +191,31 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const deletePerson = async (personId: string) => {
     if (!user) return;
     try {
-      await deleteDoc(doc(db, 'people', personId));
+      // Find all entries for this person
+      const entriesQuery = query(collection(db, "neondara_entries"), where("userId", "==", user.uid), where("personId", "==", personId));
+      const entriesSnapshot = await getDocs(entriesQuery);
+      
+      const batch = writeBatch(db);
+
+      // Delete all found entries
+      entriesSnapshot.forEach(doc => {
+          batch.delete(doc.ref);
+      });
+
+      // Delete the person document
+      const personRef = doc(db, 'people', personId);
+      batch.delete(personRef);
+      
+      // Commit the batch
+      await batch.commit();
+
+      // Update local state
       setPeople(prev => prev.filter(p => p.id !== personId));
-      toast({ title: t('success'), description: "Person has been deleted." });
+      setEntries(prev => prev.filter(e => e.personId !== personId));
+      
+      toast({ title: t('success'), description: "Person and their history have been deleted." });
     } catch (error) {
-      console.error("Error deleting person: ", error);
+      console.error("Error deleting person and their history: ", error);
       toast({ title: t('error'), description: "Failed to delete person.", variant: "destructive" });
     }
   };

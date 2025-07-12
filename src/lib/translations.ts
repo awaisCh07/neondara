@@ -145,6 +145,7 @@ export const translations: Translations = {
     allSquare: { en: 'All square', ur: 'حساب برابر' },
     youAreOwed: { en: 'They have given {{amount}} more', ur: 'انہوں نے {{amount}} زیادہ دیے ہیں' },
     youHaveGivenMore: { en: 'You have given {{amount}} more', ur: 'آپ نے {{amount}} زیادہ دیے ہیں' },
+    deletePersonConfirmDescription: { en: 'Are you sure you want to delete {{name}}? This will also delete their entire transaction history. This action cannot be undone.', ur: 'کیا آپ واقعی {{name}} کو حذف کرنا چاہتے ہیں؟ یہ ان کی تمام ٹرانزیکشن ہسٹری کو بھی حذف کر دے گا۔ یہ عمل واپس نہیں کیا جا سکتا۔' },
 
     // Person Detail Page
     backToPeople: { en: 'Back to People', ur: 'لوگوں کی فہرست پر واپس' },

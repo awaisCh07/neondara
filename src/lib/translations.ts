@@ -27,7 +27,6 @@ export const translations: Translations = {
     name: { en: 'Name', ur: 'نام' },
     email: { en: 'Email', ur: 'ای میل' },
     password: { en: 'Password', ur: 'پاس ورڈ' },
-    phone: { en: 'Phone', ur: 'فون' },
     notes: { en: 'Notes', ur: 'نوٹس' },
     description: { en: 'Description', ur: 'تفصیل' },
     amount: { en: 'Amount', ur: 'رقم' },
@@ -60,13 +59,6 @@ export const translations: Translations = {
     creatingAccount: { en: 'Creating Account...', ur: 'اکاؤنٹ بن رہا ہے۔۔۔' },
     haveAccount: { en: 'Already have an account?', ur: 'پہلے سے اکاؤنٹ ہے؟' },
     logIn: { en: 'Log in', ur: 'لاگ ان کریں' },
-    verificationCode: { en: 'Verification Code', ur: 'تصدیقی کوڈ' },
-    verifying: { en: 'Verifying...', ur: 'تصدیق ہو رہی ہے۔۔۔' },
-    verifyAndSignup: { en: 'Verify & Sign Up', ur: 'تصدیق کریں اور سائن اپ کریں' },
-    sendingCode: { en: 'Sending code...', ur: 'کوڈ بھیجا جا رہا ہے۔۔۔' },
-    sendVerificationCode: { en: 'Send Verification Code', ur: 'تصدیقی کوڈ بھیجیں' },
-    otpSent: { en: 'OTP Sent', ur: 'OTP بھیج دیا گیا ہے' },
-    checkYourPhone: { en: 'Please check your phone for the verification code.', ur: 'براہ کرم تصدیقی کوڈ کے لیے اپنا فون چیک کریں۔' },
 
     // Layout / Header
     navHistory: { en: 'History', ur: 'ہسٹری' },
@@ -204,5 +196,3 @@ export const useTranslation = (language: Language) => {
         return translation;
     }
 }
-
-    

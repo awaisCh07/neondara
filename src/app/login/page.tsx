@@ -7,13 +7,7 @@ import {
   signInWithEmailAndPassword, 
   sendPasswordResetEmail
 } from 'firebase/auth';
-import { 
-  query,
-  collection,
-  where,
-  getDocs
-} from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { auth } from '@/lib/firebase';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,45 +23,27 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [identifier, setIdentifier] = useState(''); // Can be email or phone
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
-  const [resetIdentifier, setResetIdentifier] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
   
-  const isEmail = (input: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    let userEmail = identifier;
-
     try {
-      if (!isEmail(identifier)) {
-        // It's a phone number, we need to find the associated auth email.
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where("phone", "==", identifier));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-          throw new Error("User with this phone number not found.");
-        }
-        
-        const userData = querySnapshot.docs[0].data();
-        userEmail = userData.authEmail; // Use the authEmail for login
-      }
-
-      await signInWithEmailAndPassword(auth, userEmail, password);
+      await signInWithEmailAndPassword(auth, email, password);
       router.push('/');
     } catch (err: any) {
         if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-            setError("Invalid credentials. Please check your email/phone and password.");
+            setError("Invalid credentials. Please check your email and password.");
         } else {
             setError(err.message);
         }
@@ -78,37 +54,24 @@ export default function LoginPage() {
 
 
   const handlePasswordReset = async () => {
-    if (!resetIdentifier) return;
+    if (!resetEmail) return;
     setResetLoading(true);
 
-    if (isEmail(resetIdentifier)) {
-        try {
-            await sendPasswordResetEmail(auth, resetIdentifier);
-            toast({
-                title: t('passwordResetTitle'),
-                description: t('passwordResetDescription'),
-            });
-            setIsResetDialogOpen(false);
-        } catch (err: any) {
-            toast({
-                title: t('error'),
-                description: err.message,
-                variant: "destructive",
-            })
-        } finally {
-            setResetLoading(false);
-        }
-    } else {
-        // It's a phone number. Standard Firebase Auth password reset via phone is not available on the client.
-        // We will inform the user about the limitation.
+    try {
+        await sendPasswordResetEmail(auth, resetEmail);
         toast({
-            title: "Password Reset Not Available",
-            description: "Password reset is not available for accounts created with a phone number. Please create a new account or contact support.",
-            variant: "destructive",
-            duration: 9000
+            title: t('passwordResetTitle'),
+            description: t('passwordResetDescription'),
         });
-        setResetLoading(false);
         setIsResetDialogOpen(false);
+    } catch (err: any) {
+        toast({
+            title: t('error'),
+            description: err.message,
+            variant: "destructive",
+        })
+    } finally {
+        setResetLoading(false);
     }
   }
 
@@ -126,14 +89,14 @@ export default function LoginPage() {
             <CardContent className="grid gap-4 pt-4">
             {error && <p className="text-sm font-medium text-destructive">{error}</p>}
             <div className="grid gap-2">
-                <Label htmlFor="identifier">{t('email')} / {t('phone')}</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
-                id="identifier"
-                type="text"
-                placeholder="Email or Phone Number"
+                id="email"
+                type="email"
+                placeholder="m@example.com"
                 required
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 />
             </div>
             <div className="grid gap-2">
@@ -172,17 +135,17 @@ export default function LoginPage() {
           <DialogHeader>
             <DialogTitle>{t('forgotPassword')}</DialogTitle>
             <DialogDescription>
-                Enter your email to receive a password reset link. If you signed up with a phone number, this feature is not available.
+                {t('forgotPasswordDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <Label htmlFor="reset-identifier">{t('email')} / {t('phone')}</Label>
+            <Label htmlFor="reset-email">{t('email')}</Label>
             <Input
-              id="reset-identifier"
-              type="text"
-              value={resetIdentifier}
-              onChange={(e) => setResetIdentifier(e.target.value)}
-              placeholder="your@example.com or 1234567890"
+              id="reset-email"
+              type="email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              placeholder="your@example.com"
             />
           </div>
           <DialogFooter>

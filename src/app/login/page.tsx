@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import Link from 'next/link';
 import { useLanguage } from '@/components/language-provider';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
   const { language, t } = useLanguage();
@@ -20,6 +22,11 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +41,27 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const handlePasswordReset = async () => {
+    if (!resetEmail) return;
+    setResetLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      toast({
+        title: t('passwordResetTitle'),
+        description: t('passwordResetDescription'),
+      });
+      setIsResetDialogOpen(false);
+    } catch (err: any) {
+      toast({
+        title: t('error'),
+        description: err.message,
+        variant: "destructive",
+      })
+    } finally {
+      setResetLoading(false);
+    }
+  }
 
   return (
     <div className={cn("flex items-center justify-center min-h-screen bg-background", language === 'ur' ? 'font-urdu' : 'font-body')}>
@@ -59,7 +87,12 @@ export default function LoginPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">{t('password')}</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">{t('password')}</Label>
+                <Button variant="link" type="button" onClick={() => setIsResetDialogOpen(true)} className="p-0 h-auto text-xs">
+                  {t('forgotPassword')}
+                </Button>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -82,6 +115,33 @@ export default function LoginPage() {
           </CardFooter>
         </form>
       </Card>
+
+      <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('forgotPassword')}</DialogTitle>
+            <DialogDescription>{t('forgotPasswordDescription')}</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Label htmlFor="reset-email">{t('email')}</Label>
+            <Input
+              id="reset-email"
+              type="email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              placeholder="you@example.com"
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+                <Button variant="outline">{t('cancel')}</Button>
+            </DialogClose>
+            <Button onClick={handlePasswordReset} disabled={resetLoading}>
+              {resetLoading ? t('sendingLink') : t('sendResetLink')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

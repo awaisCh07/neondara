@@ -27,6 +27,7 @@ export const translations: Translations = {
     name: { en: 'Name', ur: 'نام' },
     email: { en: 'Email', ur: 'ای میل' },
     password: { en: 'Password', ur: 'پاس ورڈ' },
+    phone: { en: 'Phone', ur: 'فون' },
     notes: { en: 'Notes', ur: 'نوٹس' },
     description: { en: 'Description', ur: 'تفصیل' },
     amount: { en: 'Amount', ur: 'رقم' },
@@ -43,6 +44,13 @@ export const translations: Translations = {
     signingIn: { en: 'Signing In...', ur: 'سائن ان ہو رہا ہے۔۔۔' },
     noAccount: { en: "Don't have an account?", ur: 'اکاؤنٹ نہیں ہے؟' },
     signUp: { en: 'Sign up', ur: 'سائن اپ' },
+    forgotPassword: { en: 'Forgot Password?', ur: 'پاس ورڈ بھول گئے؟' },
+    forgotPasswordDescription: { en: 'Enter your email to receive a password reset link.', ur: 'پاس ورڈ ری سیٹ لنک حاصل کرنے کے لیے اپنا ای میل درج کریں۔' },
+    passwordResetTitle: { en: 'Reset link sent!', ur: 'ری سیٹ لنک بھیج دیا گیا!' },
+    passwordResetDescription: { en: 'Check your email for the reset link.', ur: 'ری سیٹ لنک کے لیے اپنا ای میل چیک کریں۔' },
+    sendingLink: { en: 'Sending link...', ur: 'لنک بھیجا جا رہا ہے۔۔۔' },
+    sendResetLink: { en: 'Send Reset Link', ur: 'ری سیٹ لنک بھیجیں' },
+
 
     // Signup Page
     signupTitle: { en: 'Sign Up', ur: 'سائن اپ' },
@@ -52,6 +60,13 @@ export const translations: Translations = {
     creatingAccount: { en: 'Creating Account...', ur: 'اکاؤنٹ بن رہا ہے۔۔۔' },
     haveAccount: { en: 'Already have an account?', ur: 'پہلے سے اکاؤنٹ ہے؟' },
     logIn: { en: 'Log in', ur: 'لاگ ان کریں' },
+    verificationCode: { en: 'Verification Code', ur: 'تصدیقی کوڈ' },
+    verifying: { en: 'Verifying...', ur: 'تصدیق ہو رہی ہے۔۔۔' },
+    verifyAndSignup: { en: 'Verify & Sign Up', ur: 'تصدیق کریں اور سائن اپ کریں' },
+    sendingCode: { en: 'Sending code...', ur: 'کوڈ بھیجا جا رہا ہے۔۔۔' },
+    sendVerificationCode: { en: 'Send Verification Code', ur: 'تصدیقی کوڈ بھیجیں' },
+    otpSent: { en: 'OTP Sent', ur: 'OTP بھیج دیا گیا ہے' },
+    checkYourPhone: { en: 'Please check your phone for the verification code.', ur: 'براہ کرم تصدیقی کوڈ کے لیے اپنا فون چیک کریں۔' },
 
     // Layout / Header
     navHistory: { en: 'History', ur: 'ہسٹری' },

@@ -248,7 +248,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         DATE: format(entry.date, 'yyyy-MM-dd'),
         PERSON: entry.person,
         STATUS: entry.direction.toUpperCase(),
-        EVENT: entry.event.toUpperCase(),
+        EVENT: (entry.event || 'OTHER').toUpperCase(),
         'GIFT TYPE': entry.giftType.toUpperCase(),
         AMOUNT: entry.giftType === 'Money' ? `Rs ${entry.amount}` : entry.amount, // Add Rs prefix and handle non-money amounts
         'DESCRIPTION/GIFT': entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? 'Image Embedded' : entry.description,

@@ -242,11 +242,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const headers = ['S.No.', 'Date', 'Person', 'Status', 'Event', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'];
     
     const dataForSheet = dataToExport.map((entry, index) => {
-      let amountDisplay = '';
+      let amountDisplay: number | string = '';
       if (entry.giftType === 'Money' && entry.amount) {
-        amountDisplay = entry.amount.toLocaleString();
+        amountDisplay = entry.amount;
       } else if (entry.giftType === 'Sweets' && entry.amount) {
-        amountDisplay = `${entry.amount} kg`;
+        amountDisplay = entry.amount;
       }
 
       return {
@@ -299,7 +299,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 fill: isEven ? { fgColor: { rgb: "FFF0F0F0" } } : undefined,
             };
             if (C === 6) { // Amount column
-                 ws[cell_ref].s.alignment.horizontal = "center";
+                 ws[cell_ref].s.alignment = { ...ws[cell_ref].s.alignment, horizontal: "center" };
             }
         }
     }

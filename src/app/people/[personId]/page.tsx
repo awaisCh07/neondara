@@ -153,16 +153,6 @@ export default function PersonDetailPage() {
                     {t('backToPeople')}
                 </Link>
                 <div className="flex items-center gap-2">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder={t('searchByGift')}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 w-full sm:w-64"
-                            aria-label={t('searchByGift')}
-                        />
-                    </div>
                     <Button size="sm" onClick={handleExport}>
                         <Download className="mr-2 h-4 w-4" />
                         {t('exportData')}
@@ -228,8 +218,20 @@ export default function PersonDetailPage() {
                    </div>
               </CardContent>
           </Card>
-
-          <h2 className="text-2xl font-bold mb-4">{t('transactionHistory')}</h2>
+          
+          <div className="flex justify-between items-center mb-4 gap-4 flex-wrap">
+            <h2 className="text-2xl font-bold">{t('transactionHistory')}</h2>
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                    placeholder={t('searchByGift')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 w-full sm:w-64"
+                    aria-label={t('searchByGift')}
+                />
+            </div>
+          </div>
            {personEntries.length > 0 ? (
               <div className="grid gap-6">
                   {personEntries.map(entry => {

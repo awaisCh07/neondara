@@ -222,6 +222,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [people]);
 
   const exportData = useCallback((options?: { personId?: string }) => {
+    const toTitleCase = (str: string) => str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+
     const dataToExport = options?.personId 
       ? entries.filter(e => e.personId === options.personId)
       : entries;
@@ -240,14 +242,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const headers = ['Date', 'Person', 'Status', 'Event', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'];
     
     const dataForSheet = dataToExport.map(entry => ({
-        Date: format(entry.date, 'yyyy-MM-dd'),
-        Person: entry.person,
-        Status: entry.direction.toUpperCase(),
-        Event: (entry.event || 'OTHER').toUpperCase(),
-        'Gift Type': entry.giftType.toUpperCase(),
-        Amount: entry.giftType === 'Money' && entry.amount ? `Rs ${entry.amount}` : (entry.amount || ''),
+        'Date': format(entry.date, 'yyyy-MM-dd'),
+        'Person': entry.person,
+        'Status': toTitleCase(entry.direction),
+        // @ts-ignore - Handle legacy 'occasion' field
+        'Event': toTitleCase(entry.event || entry.occasion || 'Other'),
+        'Gift Type': toTitleCase(entry.giftType),
+        'Amount': entry.giftType === 'Money' && entry.amount ? `Rs ${entry.amount}` : (entry.amount || ''),
         'Description/Gift': entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? 'Image Embedded' : entry.description,
-        Notes: entry.notes || '',
+        'Notes': entry.notes || '',
     }));
 
     let moneyGiven = 0;
@@ -261,21 +264,33 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const netMoney = moneyGiven - moneyReceived;
 
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(dataForSheet, { header: headers });
+    const ws = XLSX.utils.json_to_sheet([], { header: headers });
+    
+    const headerStyle = { font: { bold: true, color: { rgb: "FFFFFFFF" } }, fill: { fgColor: { rgb: "FF4F4F4F" } } };
+    const summaryHeaderStyle = { font: { bold: true }, fill: { fgColor: { rgb: "FFD3D3D3" } } };
+    const summaryValueStyle = { fill: { fgColor: { rgb: "FFD3D3D3" } } };
+
+    headers.forEach((h, i) => {
+        const cellRef = XLSX.utils.encode_cell({c: i, r: 0});
+        ws[cellRef].s = headerStyle;
+    });
+
+    XLSX.utils.sheet_add_json(ws, dataForSheet, { origin: 'A2', skipHeader: true });
 
     const range = XLSX.utils.decode_range(ws['!ref']!);
-    for (let R = range.s.r; R <= range.e.r; ++R) {
+    for (let R = 1; R <= range.e.r; ++R) { // Start from R=1 to skip header
+        const isEven = R % 2 === 0;
         for (let C = range.s.c; C <= range.e.c; ++C) {
             const cell_address = { c: C, r: R };
             const cell_ref = XLSX.utils.encode_cell(cell_address);
-            if (ws[cell_ref]) {
-                ws[cell_ref].s = { 
-                    alignment: { wrapText: true, vertical: 'top' },
-                };
-                 // Center align amount column
-                if (C === 5 && R > 0) { // 5 is the index for Amount column, R > 0 to skip header
-                     ws[cell_ref].s.alignment.horizontal = "center";
-                }
+            if (!ws[cell_ref]) continue;
+
+            ws[cell_ref].s = { 
+                alignment: { wrapText: true, vertical: 'top' },
+                fill: isEven ? { fgColor: { rgb: "FFF0F0F0" } } : undefined,
+            };
+            if (C === 5) { // Amount column
+                 ws[cell_ref].s.alignment.horizontal = "center";
             }
         }
     }
@@ -287,15 +302,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
         { wch: 15 }, // Event
         { wch: 15 }, // Gift Type
         { wch: 12 }, // Amount
-        { wch: 30 }, // Description
+        { wch: 25 }, // Description
         { wch: 30 }, // Notes
     ];
     
-    XLSX.utils.sheet_add_aoa(ws, [[]], { origin: -1 });
-    XLSX.utils.sheet_add_aoa(ws, [["Balance Summary"]], { origin: -1 });
-    XLSX.utils.sheet_add_aoa(ws, [["Total Given", `Rs ${moneyGiven.toLocaleString()}`]], { origin: -1 });
-    XLSX.utils.sheet_add_aoa(ws, [["Total Received", `Rs ${moneyReceived.toLocaleString()}`]], { origin: -1 });
-    XLSX.utils.sheet_add_aoa(ws, [["Net Balance", `Rs ${netMoney.toLocaleString()}`]], { origin: -1 });
+    const summaryStartRow = range.e.r + 3;
+    XLSX.utils.sheet_add_aoa(ws, [["Balance Summary"]], { origin: `A${summaryStartRow}` });
+    ws[`A${summaryStartRow}`].s = { font: { bold: true, sz: 14 } };
+
+    XLSX.utils.sheet_add_aoa(ws, [["Total Given", `Rs ${moneyGiven.toLocaleString()}`]], { origin: `A${summaryStartRow + 1}` });
+    ws[`A${summaryStartRow + 1}`].s = summaryHeaderStyle;
+    ws[`B${summaryStartRow + 1}`].s = summaryValueStyle;
+
+    XLSX.utils.sheet_add_aoa(ws, [["Total Received", `Rs ${moneyReceived.toLocaleString()}`]], { origin: `A${summaryStartRow + 2}` });
+    ws[`A${summaryStartRow + 2}`].s = summaryHeaderStyle;
+    ws[`B${summaryStartRow + 2}`].s = summaryValueStyle;
+
+    XLSX.utils.sheet_add_aoa(ws, [["Net Balance", `Rs ${netMoney.toLocaleString()}`]], { origin: `A${summaryStartRow + 3}` });
+    ws[`A${summaryStartRow + 3}`].s = summaryHeaderStyle;
+    ws[`B${summaryStartRow + 3}`].s = summaryValueStyle;
+
 
     XLSX.utils.book_append_sheet(wb, ws, "Neondara History");
     

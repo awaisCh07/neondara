@@ -248,7 +248,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         // @ts-ignore - Handle legacy 'occasion' field
         'Event': toTitleCase(entry.event || entry.occasion || 'Other'),
         'Gift Type': toTitleCase(entry.giftType),
-        'Amount': entry.giftType === 'Money' && entry.amount ? `Rs ${entry.amount}` : (entry.amount || ''),
+        'Amount': entry.giftType === 'Money' ? entry.amount : '',
         'Description/Gift': entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? 'Image Embedded' : entry.description,
         'Notes': entry.notes || '',
     }));
@@ -268,7 +268,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     
     const headerStyle = { font: { bold: true, color: { rgb: "FFFFFFFF" } }, fill: { fgColor: { rgb: "FF4F4F4F" } } };
     const summaryHeaderStyle = { font: { bold: true }, fill: { fgColor: { rgb: "FFD3D3D3" } } };
-    const summaryValueStyle = { fill: { fgColor: { rgb: "FFD3D3D3" } } };
+    const summaryValueStyle = { font: { bold: false }, fill: { fgColor: { rgb: "FFD3D3D3" } } };
 
     headers.forEach((h, i) => {
         const cellRef = XLSX.utils.encode_cell({c: i, r: 0});
@@ -310,15 +310,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     XLSX.utils.sheet_add_aoa(ws, [["Balance Summary"]], { origin: `A${summaryStartRow}` });
     ws[`A${summaryStartRow}`].s = { font: { bold: true, sz: 14 } };
 
-    XLSX.utils.sheet_add_aoa(ws, [["Total Given", `Rs ${moneyGiven.toLocaleString()}`]], { origin: `A${summaryStartRow + 1}` });
+    XLSX.utils.sheet_add_aoa(ws, [["Total Given", `${moneyGiven.toLocaleString()}`]], { origin: `A${summaryStartRow + 1}` });
     ws[`A${summaryStartRow + 1}`].s = summaryHeaderStyle;
     ws[`B${summaryStartRow + 1}`].s = summaryValueStyle;
 
-    XLSX.utils.sheet_add_aoa(ws, [["Total Received", `Rs ${moneyReceived.toLocaleString()}`]], { origin: `A${summaryStartRow + 2}` });
+    XLSX.utils.sheet_add_aoa(ws, [["Total Received", `${moneyReceived.toLocaleString()}`]], { origin: `A${summaryStartRow + 2}` });
     ws[`A${summaryStartRow + 2}`].s = summaryHeaderStyle;
     ws[`B${summaryStartRow + 2}`].s = summaryValueStyle;
 
-    XLSX.utils.sheet_add_aoa(ws, [["Net Balance", `Rs ${netMoney.toLocaleString()}`]], { origin: `A${summaryStartRow + 3}` });
+    XLSX.utils.sheet_add_aoa(ws, [["Net Balance", `${netMoney.toLocaleString()}`]], { origin: `A${summaryStartRow + 3}` });
     ws[`A${summaryStartRow + 3}`].s = summaryHeaderStyle;
     ws[`B${summaryStartRow + 3}`].s = summaryValueStyle;
 

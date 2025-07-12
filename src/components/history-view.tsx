@@ -5,7 +5,7 @@ import { useState } from 'react';
 import type { NeondaraEntry, Person } from '@/lib/types';
 import { NeondaraEntrySheet } from '@/components/neondara-entry-sheet';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Download } from 'lucide-react';
 import { NeondaraTimeline } from './neondara-timeline';
 import { useLanguage } from './language-provider';
 import { AppLayout } from './layout';
@@ -35,14 +35,20 @@ export function HistoryView() {
   }
   
   return (
-    <AppLayout onExport={handleExport}>
+    <AppLayout>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-8 gap-4">
                 <h1 className="text-4xl font-headline">{t('transactionHistory')}</h1>
-                <Button size="sm" onClick={() => handleOpenSheet()}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                    {t('addEntry')}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button size="sm" variant="outline" onClick={handleExport}>
+                        <Download className="mr-2 h-4 w-4" />
+                        {t('exportData')}
+                    </Button>
+                    <Button size="sm" onClick={() => handleOpenSheet()}>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        {t('addEntry')}
+                    </Button>
+                </div>
             </div>
             
             <NeondaraTimeline 

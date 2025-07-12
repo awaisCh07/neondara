@@ -27,7 +27,7 @@ import { auth } from '@/lib/firebase';
 import { useLanguage } from './language-provider';
 import React, { useEffect } from 'react';
 
-export function AppLayout({ children, onExport }: { children: React.ReactNode, onExport?: () => void }) {
+export function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const router = useRouter();
@@ -144,15 +144,7 @@ export function AppLayout({ children, onExport }: { children: React.ReactNode, o
                       </p>
                     </div>
                   </DropdownMenuLabel>
-                  {onExport && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={onExport}>
-                        <Download className="mr-2 h-4 w-4" />
-                        <span>{t('exportData')}</span>
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                  <DropdownMenuSeparator />
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger>
                       <Languages className="mr-2 h-4 w-4" />

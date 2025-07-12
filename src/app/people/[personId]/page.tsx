@@ -4,7 +4,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import type { NeondaraEntry, Person } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Gift, Grape } from 'lucide-react';
+import { ArrowLeft, Gift, Grape, Download } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { NeondaraEntrySheet } from '@/components/neondara-entry-sheet';
@@ -82,6 +82,8 @@ export default function PersonDetailPage() {
         giftsReceivedCount
     };
   }, [personEntries]);
+  
+  const balanceColor = useMemo(() => summaryStats.netMoney === 0 ? 'text-foreground' : summaryStats.netMoney > 0 ? 'text-green-600' : 'text-red-600', [summaryStats.netMoney]);
 
   const balanceText = useMemo(() => {
       if (summaryStats.netMoney === 0) return t('allSquare');
@@ -124,16 +126,21 @@ export default function PersonDetailPage() {
     );
   }
 
-  const balanceColor = summaryStats.netMoney === 0 ? 'text-foreground' : summaryStats.netMoney > 0 ? 'text-green-600' : 'text-red-600';
-
   return (
-    <AppLayout onExport={handleExport}>
+    <AppLayout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-              <Link href="/people" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
-                   <ArrowLeft className="mr-2 h-4 w-4"/>
-                  {t('backToPeople')}
-              </Link>
+              <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+                <Link href="/people" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground">
+                    <ArrowLeft className="mr-2 h-4 w-4"/>
+                    {t('backToPeople')}
+                </Link>
+                <Button size="sm" onClick={handleExport}>
+                    <Download className="mr-2 h-4 w-4" />
+                    {t('exportData')}
+                </Button>
+              </div>
+
                <h1 className="text-4xl font-headline">{person.name}</h1>
                {person.relation && <p className="text-lg text-muted-foreground">{person.relation}</p>}
           </div>

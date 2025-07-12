@@ -309,24 +309,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
     ];
     
     const summaryStartRow = range.e.r + 3;
-    XLSX.utils.sheet_add_aoa(ws, [["Balance Summary"]], { origin: `A${summaryStartRow}` });
-    ws[`A${summaryStartRow}`].s = { font: { bold: true, sz: 14 } };
+    XLSX.utils.sheet_add_aoa(ws, [["Balance Summary"]], { origin: `B${summaryStartRow}` });
+    ws[`B${summaryStartRow}`].s = { font: { bold: true, sz: 14 } };
 
-    XLSX.utils.sheet_add_aoa(ws, [["Total Given", `${moneyGiven.toLocaleString()}`]], { origin: `A${summaryStartRow + 1}` });
-    ws[`A${summaryStartRow + 1}`].s = summaryHeaderStyle;
-    ws[`B${summaryStartRow + 1}`].s = summaryValueStyle;
+    XLSX.utils.sheet_add_aoa(ws, [["Total Given", `${moneyGiven.toLocaleString()}`]], { origin: `B${summaryStartRow + 1}` });
+    ws[`B${summaryStartRow + 1}`].s = summaryHeaderStyle;
+    ws[`C${summaryStartRow + 1}`].s = summaryValueStyle;
 
-    XLSX.utils.sheet_add_aoa(ws, [["Total Received", `${moneyReceived.toLocaleString()}`]], { origin: `A${summaryStartRow + 2}` });
-    ws[`A${summaryStartRow + 2}`].s = summaryHeaderStyle;
-    ws[`B${summaryStartRow + 2}`].s = summaryValueStyle;
+    XLSX.utils.sheet_add_aoa(ws, [["Total Received", `${moneyReceived.toLocaleString()}`]], { origin: `B${summaryStartRow + 2}` });
+    ws[`B${summaryStartRow + 2}`].s = summaryHeaderStyle;
+    ws[`C${summaryStartRow + 2}`].s = summaryValueStyle;
 
-    XLSX.utils.sheet_add_aoa(ws, [["Net Balance", `${netMoney.toLocaleString()}`]], { origin: `A${summaryStartRow + 3}` });
-    ws[`A${summaryStartRow + 3}`].s = summaryHeaderStyle;
-    ws[`B${summaryStartRow + 3}`].s = summaryValueStyle;
+    XLSX.utils.sheet_add_aoa(ws, [["Net Balance", `${netMoney.toLocaleString()}`]], { origin: `B${summaryStartRow + 3}` });
+    ws[`B${summaryStartRow + 3}`].s = summaryHeaderStyle;
+    ws[`C${summaryStartRow + 3}`].s = summaryValueStyle;
 
     if (!ws['!cols']) ws['!cols'] = [];
-    ws['!cols'][0] = { wch: 15 }; // Widen first column for "Total Given", etc.
-    ws['!cols'][1] = { wch: 15 }; // Widen second column for amounts
+    ws['!cols'][1] = { wch: 15 }; // Widen second column for "Total Given", etc.
+    ws['!cols'][2] = { wch: 15 }; // Widen third column for amounts
 
     XLSX.utils.book_append_sheet(wb, ws, "Neondara History");
     

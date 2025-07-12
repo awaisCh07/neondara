@@ -239,9 +239,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return;
     }
 
-    const headers = ['Date', 'Person', 'Status', 'Event', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'];
+    const headers = ['S.No.', 'Date', 'Person', 'Status', 'Event', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'];
     
-    const dataForSheet = dataToExport.map(entry => ({
+    const dataForSheet = dataToExport.map((entry, index) => ({
+        'S.No.': index + 1,
         'Date': format(entry.date, 'yyyy-MM-dd'),
         'Person': entry.person,
         'Status': toTitleCase(entry.direction),
@@ -289,13 +290,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 alignment: { wrapText: true, vertical: 'top' },
                 fill: isEven ? { fgColor: { rgb: "FFF0F0F0" } } : undefined,
             };
-            if (C === 5) { // Amount column
+            if (C === 6) { // Amount column
                  ws[cell_ref].s.alignment.horizontal = "center";
             }
         }
     }
     
     ws['!cols'] = [
+        { wch: 5 }, // S.No.
         { wch: 12 }, // Date
         { wch: 20 }, // Person
         { wch: 10 }, // Status
@@ -327,7 +329,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     
     const filename = person 
       ? `Neondara_History_${person.name}_${new Date().toISOString().split('T')[0]}.xlsx`
-      : `Neondara_History_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
+      : `Neondara_History_${new Date().toISOString().split('T')[0]}.xlsx`;
 
     XLSX.writeFile(wb, filename);
 

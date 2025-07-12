@@ -299,10 +299,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         { wch: 12 }, // Date
         { wch: 20 }, // Person
         { wch: 10 }, // Status
-        { wch: 15 }, // Event
-        { wch: 15 }, // Gift Type
+        { wch: 12 }, // Event
+        { wch: 12 }, // Gift Type
         { wch: 12 }, // Amount
-        { wch: 25 }, // Description
+        { wch: 20 }, // Description
         { wch: 30 }, // Notes
     ];
     

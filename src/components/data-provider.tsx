@@ -70,7 +70,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     } catch (error) {
       console.error("Error fetching data: ", error);
-      toast({ title: t('error'), description: "Failed to fetch history data.", variant: "destructive" });
+      toast({ title: t('error'), description: t('fetchDataError'), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -107,7 +107,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         toast({ title: t('success'), description: t('entryAddedSuccess') });
     } catch (error) {
         console.error("Error adding entry: ", error);
-        toast({ title: t('error'), description: "Failed to add new entry.", variant: "destructive" });
+        toast({ title: t('error'), description: t('addEntryError'), variant: "destructive" });
     }
   };
   
@@ -130,7 +130,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       toast({ title: t('success'), description: t('entryUpdatedSuccess') });
     } catch (error) {
       console.error("Error updating entry: ", error);
-      toast({ title: t('error'), description: "Failed to update entry.", variant: "destructive" });
+      toast({ title: t('error'), description: t('updateEntryError'), variant: "destructive" });
     }
   };
 
@@ -142,7 +142,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         toast({ title: t('success'), description: t('entryDeletedSuccess') });
     } catch (error) {
         console.error("Error deleting entry: ", error);
-        toast({ title: t('error'), description: "Failed to delete entry.", variant: "destructive" });
+        toast({ title: t('error'), description: t('deleteEntryError'), variant: "destructive" });
     }
   };
 
@@ -151,7 +151,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     
     const existingPerson = people.find(p => p.name.trim().toLowerCase() === personData.name.trim().toLowerCase());
     if (existingPerson) {
-        toast({ title: t('error'), description: `A person named "${personData.name}" already exists.`, variant: "destructive" });
+        toast({ title: t('error'), description: t('personExistsError', {name: personData.name}), variant: "destructive" });
         return;
     }
 
@@ -162,10 +162,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       });
       const newPerson: Person = { id: docRef.id, userId: user.uid, ...personData, relation: personData.relation as RelationType };
       setPeople(prev => [...prev, newPerson].sort((a,b) => a.name.localeCompare(b.name)));
-      toast({ title: t('success'), description: `${personData.name} has been added.` });
+      toast({ title: t('success'), description: t('personAddedSuccess', {name: personData.name}) });
     } catch (error) {
       console.error("Error adding person: ", error);
-      toast({ title: t('error'), description: "Failed to add person.", variant: "destructive" });
+      toast({ title: t('error'), description: t('addPersonError'), variant: "destructive" });
     }
   };
   
@@ -174,7 +174,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     
     const existingPerson = people.find(p => p.id !== personData.id && p.name.trim().toLowerCase() === personData.name.trim().toLowerCase());
     if (existingPerson) {
-        toast({ title: t('error'), description: `Another person named "${personData.name}" already exists.`, variant: "destructive" });
+        toast({ title: t('error'), description: t('personExistsError', { name: personData.name }), variant: "destructive" });
         return;
     }
 
@@ -183,10 +183,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const personRef = doc(db, 'people', id);
       await updateDoc(personRef, dataToUpdate);
       setPeople(prev => prev.map(p => p.id === id ? personData : p).sort((a,b) => a.name.localeCompare(b.name)));
-      toast({ title: t('success'), description: `${personData.name} has been updated.` });
+      toast({ title: t('success'), description: t('personUpdatedSuccess', { name: personData.name }) });
     } catch (error) {
       console.error("Error updating person: ", error);
-      toast({ title: t('error'), description: "Failed to update person.", variant: "destructive" });
+      toast({ title: t('error'), description: t('updatePersonError'), variant: "destructive" });
     }
   };
 
@@ -210,10 +210,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setPeople(prev => prev.filter(p => p.id !== personId));
       setEntries(prev => prev.filter(e => e.personId !== personId));
       
-      toast({ title: t('success'), description: "Person and their history have been deleted." });
+      toast({ title: t('success'), description: t('personDeletedSuccess') });
     } catch (error) {
       console.error("Error deleting person and their history: ", error);
-      toast({ title: t('error'), description: "Failed to delete person.", variant: "destructive" });
+      toast({ title: t('error'), description: t('deletePersonError'), variant: "destructive" });
     }
   };
 
@@ -232,8 +232,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     if (dataToExport.length === 0) {
         toast({
-            title: "No Data to Export",
-            description: "There are no history entries to export.",
+            title: t('noDataToExport'),
+            description: t('noHistoryToExport'),
             variant: "destructive"
         })
         return;
@@ -254,8 +254,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         'Date': format(entry.date, 'yyyy-MM-dd'),
         'Person': entry.person,
         'Status': toTitleCase(entry.direction),
-        // @ts-ignore - Handle legacy 'occasion' field
-        'Event': toTitleCase(entry.event || entry.occasion || 'Other'),
+        'Event': toTitleCase(entry.event || (entry as any).occasion || 'Other'),
         'Gift Type': toTitleCase(entry.giftType),
         'Amount': amountDisplay,
         'Description/Gift': entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? 'Image Embedded' : entry.description,
@@ -287,7 +286,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     XLSX.utils.sheet_add_json(ws, dataForSheet, { origin: 'A2', skipHeader: true });
 
     const range = XLSX.utils.decode_range(ws['!ref']!);
-    for (let R = 1; R <= range.e.r; ++R) { // Start from R=1 to skip header
+    for (let R = 1; R <= range.e.r; ++R) {
         const isEven = R % 2 === 0;
         for (let C = range.s.c; C <= range.e.c; ++C) {
             const cell_address = { c: C, r: R };
@@ -298,7 +297,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 alignment: { wrapText: true, vertical: 'top' },
                 fill: isEven ? { fgColor: { rgb: "FFF0F0F0" } } : undefined,
             };
-            if (C === 6) { // Amount column
+            if (C === 6) { 
                  ws[cell_ref].s.alignment = { ...ws[cell_ref].s.alignment, horizontal: "center" };
             }
         }
@@ -333,8 +332,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     ws[`C${summaryStartRow + 3}`].s = summaryValueStyle;
 
     if (!ws['!cols']) ws['!cols'] = [];
-    ws['!cols'][1] = { wch: 15 }; // Widen second column for "Total Given", etc.
-    ws['!cols'][2] = { wch: 15 }; // Widen third column for amounts
+    ws['!cols'][1] = { wch: 15 };
+    ws['!cols'][2] = { wch: 15 }; 
 
     XLSX.utils.book_append_sheet(wb, ws, "Neondara History");
     
@@ -344,7 +343,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     XLSX.writeFile(wb, filename);
 
-    toast({ title: "Export Successful", description: "Your data has been downloaded as an Excel file." });
+    toast({ title: t('exportSuccessTitle'), description: t('exportSuccessDescription') });
 }, [entries, getPersonById, t, toast]);
 
 
@@ -372,5 +371,7 @@ export function useData() {
   }
   return context;
 }
+
+    
 
     

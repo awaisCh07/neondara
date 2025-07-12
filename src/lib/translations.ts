@@ -174,6 +174,23 @@ export const translations: Translations = {
     startTracking: { en: 'Add a new entry to start tracking your exchanges with', ur: 'کے ساتھ اپنے تبادلے کا ٹریک رکھنا شروع کرنے کے لیے ایک نیا اندراج شامل کریں۔' },
     loadingDetails: { en: 'Loading details...', ur: 'تفصیلات لوڈ ہو رہی ہیں...' },
     personNotFound: { en: 'Person not found', ur: 'شخص نہیں ملا' },
+
+    // Toast Messages
+    fetchDataError: { en: "Failed to fetch history data.", ur: "ہسٹری ڈیٹا حاصل کرنے میں ناکامی۔" },
+    addEntryError: { en: "Failed to add new entry.", ur: "نیا اندراج شامل کرنے میں ناکامی۔" },
+    updateEntryError: { en: "Failed to update entry.", ur: "اندراج کو اپ ڈیٹ کرنے میں ناکامی۔" },
+    deleteEntryError: { en: "Failed to delete entry.", ur: "اندراج کو حذف کرنے میں ناکامی۔" },
+    personExistsError: { en: "A person named \"{{name}}\" already exists.", ur: "\"{{name}}\" نام کا ایک شخص پہلے سے موجود ہے۔" },
+    personAddedSuccess: { en: "{{name}} has been added.", ur: "{{name}} کو شامل کر دیا گیا ہے۔" },
+    addPersonError: { en: "Failed to add person.", ur: "شخص کو شامل کرنے میں ناکامی۔" },
+    personUpdatedSuccess: { en: "{{name}} has been updated.", ur: "{{name}} کو اپ ڈیٹ کر دیا گیا ہے۔" },
+    updatePersonError: { en: "Failed to update person.", ur: "شخص کو اپ ڈیٹ کرنے میں ناکامی۔" },
+    personDeletedSuccess: { en: "Person and their history have been deleted.", ur: "شخص اور ان کی ہسٹری کو حذف کر دیا گیا ہے۔" },
+    deletePersonError: { en: "Failed to delete person.", ur: "شخص کو حذف کرنے میں ناکامی۔" },
+    noDataToExport: { en: "No Data to Export", ur: "برآمد کرنے کے لیے کوئی ڈیٹا نہیں" },
+    noHistoryToExport: { en: "There are no history entries to export.", ur: "برآمد کرنے کے لیے کوئی ہسٹری اندراجات نہیں ہیں۔" },
+    exportSuccessTitle: { en: "Export Successful", ur: "برآمد کامیاب" },
+    exportSuccessDescription: { en: "Your data has been downloaded as an Excel file.", ur: "آپ کا ڈیٹا ایکسل فائل کے طور پر ڈاؤن لوڈ کر لیا گیا ہے۔" },
 };
 
 export const useTranslation = (language: Language) => {
@@ -187,3 +204,5 @@ export const useTranslation = (language: Language) => {
         return translation;
     }
 }
+
+    

@@ -324,6 +324,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     ws[`A${summaryStartRow + 3}`].s = summaryHeaderStyle;
     ws[`B${summaryStartRow + 3}`].s = summaryValueStyle;
 
+    if (!ws['!cols']) ws['!cols'] = [];
+    ws['!cols'][0] = { wch: 15 }; // Widen first column for "Total Given", etc.
+    ws['!cols'][1] = { wch: 15 }; // Widen second column for amounts
 
     XLSX.utils.book_append_sheet(wb, ws, "Neondara History");
     

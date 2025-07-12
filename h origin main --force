@@ -1,0 +1,1109 @@
+[33mcommit de56f474bfb64bbd59b261ebea2150d3f3d1a22c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:51:15 2025 +0000
+
+    Remove large folders from repo
+
+ .gitignore | 6 [32m+++++[m[31m-[m
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+[33mcommit 83637cf70c313802172de85fd8de010b65050c4c[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:33:57 2025 +0000
+
+    the search bar should be next to transaction history
+
+ src/app/people/[personId]/page.tsx | 26 [32m++++++++++++++[m[31m------------[m
+ 1 file changed, 14 insertions(+), 12 deletions(-)
+
+[33mcommit 3498c54e4f551e70c69eaa31b379c1706f6c4878[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:32:39 2025 +0000
+
+    there is no search in individual's history
+
+ src/app/people/[personId]/page.tsx | 53 [32m+++++++++++++++++++++++++++++++++++++++++[m[31m------------[m
+ 1 file changed, 41 insertions(+), 12 deletions(-)
+
+[33mcommit d898092d4920a180949c99d618182dee37835346[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:30:47 2025 +0000
+
+    change the hint search by gift.. to proper hint
+
+ src/lib/translations.ts | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit fa1fd82e358a2cc97666d6c784d575f5ac4e400e[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:28:49 2025 +0000
+
+    on history home, can we search by description and note too along with gi
+
+ src/components/neondara-card.tsx     | 39 [32m++++++++++++++++++++++++++++++[m[31m---------[m
+ src/components/neondara-timeline.tsx |  9 [32m+++++[m[31m----[m
+ 2 files changed, 35 insertions(+), 13 deletions(-)
+
+[33mcommit 084293d6d172a9555fdb164cd22537831f9ebbc1[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:25:21 2025 +0000
+
+    okay remove the signup with number lets just have the email login only
+
+ src/app/login/page.tsx  |  99 [32m+++++++++++++++++++++++++++++++[m[31m--------------------------------------------------------------------[m
+ src/app/signup/page.tsx | 106 [32m+++++++++++++++++++++++++[m[31m---------------------------------------------------------------------------------[m
+ src/lib/translations.ts |  10 [31m----------[m
+ 3 files changed, 56 insertions(+), 159 deletions(-)
+
+[33mcommit da36b1a0e9018dbecd9bc9622a1563afde9e77c4[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:21:58 2025 +0000
+
+    on clicking forgot password, the dialog asks for email of the account bu
+
+ src/app/login/page.tsx | 64 [32m++++++++++++++++++++++++++++++++++++++++[m[31m------------------------[m
+ 1 file changed, 40 insertions(+), 24 deletions(-)
+
+[33mcommit 4bf16bff9224877665c9d60e8c740c0163c4f7cb[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:19:55 2025 +0000
+
+    we should have the option to signup, either with email or number
+
+ src/app/login/page.tsx  |  10 [32m+++++++[m[31m---[m
+ src/app/signup/page.tsx | 119 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m--------------------------------------[m
+ 2 files changed, 88 insertions(+), 41 deletions(-)
+
+[33mcommit 3bc55ba4826ef3ae2ad1698852891f274eb3e4bb[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:18:05 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/login/page.tsx | 6 [32m++++[m[31m--[m
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+[33mcommit ef5a6c256091b199475bab68040f9ba31fc1ddd5[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:17:14 2025 +0000
+
+    you have made changes to login page, login should be using email or numb
+
+ src/app/login/page.tsx  | 224 [32m++++++++++++++++++++++++++++++++++++++++[m[31m----------------------------------------------------------------------------------------------------[m
+ src/app/signup/page.tsx | 187 [32m++++++++++++++++++++++++++++++++[m[31m-------------------------------------------------------------------------------------[m
+ 2 files changed, 115 insertions(+), 296 deletions(-)
+
+[33mcommit f2ba166a8e291be1c0fd75c27127ba8c069959f6[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:14:23 2025 +0000
+
+    do we have option if a user who signed up with a phone number forgot pas
+
+ src/app/login/page.tsx | 223 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-------------------------------[m
+ 1 file changed, 175 insertions(+), 48 deletions(-)
+
+[33mcommit fe9aac2529fc62dc8a157f087d6c529973cfd111[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:06:10 2025 +0000
+
+    the messages in snackbar are not converted to urdu
+
+ src/components/data-provider.tsx | 43 [32m++++++++++++++++++++++[m[31m---------------------[m
+ src/lib/translations.ts          | 19 [32m+++++++++++++++++++[m
+ 2 files changed, 41 insertions(+), 21 deletions(-)
+
+[33mcommit 7b73223f28784f068cacaf62253468e5d8acb738[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 17:03:58 2025 +0000
+
+    the data in AMount column should be number only
+
+ src/components/data-provider.tsx | 10 [32m+++++[m[31m-----[m
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+[33mcommit a945b9cf9be77127731870651140a2c1cc4c36e7[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:58:45 2025 +0000
+
+    you have removed the amount of sweet in excel
+
+ src/components/data-provider.tsx | 16 [32m+++++++++++++[m[31m---[m
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+[33mcommit f577d2fdb11f85b6616b5f714f2ff37fd9803f28[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:57:34 2025 +0000
+
+    we need to something if someone forgot their password. and we should als
+
+ src/app/login/page.tsx  |  64 [32m++++++++++++++++++++++++++++++++++++++++++[m[31m--[m
+ src/app/signup/page.tsx | 205 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m------------------------------------[m
+ src/lib/translations.ts |  15 [32m+++++++++++[m
+ 3 files changed, 229 insertions(+), 55 deletions(-)
+
+[33mcommit f84f4dbdb9a26228ecba47eb845091cc1ddd7bc8[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:56:12 2025 +0000
+
+    lessen the width of serial number column and shift the balance summary t
+
+ src/components/data-provider.tsx | 26 [32m+++++++++++++[m[31m-------------[m
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+
+[33mcommit 5b9d0aa0c4d75fa83c682548266cc767b99bfc1b[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:52:07 2025 +0000
+
+    the width of the cells of Balance summary are effected, increase their w
+
+ src/components/data-provider.tsx | 3 [32m+++[m
+ 1 file changed, 3 insertions(+)
+
+[33mcommit 30062f7e3d58cd321cf318cb94d0da526e84e484[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:48:42 2025 +0000
+
+    add serial number in first column for each entry, and are you not able t
+
+ src/components/data-provider.tsx | 10 [32m++++++[m[31m----[m
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+[33mcommit e456e66c2c1916b642a812c10550cd61872bcdc8[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:45:07 2025 +0000
+
+    adjust the width, make it less for the following widths
+
+ src/components/data-provider.tsx | 6 [32m+++[m[31m---[m
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+[33mcommit e538a4b229b29ee528038fcd7a0e95b80bfd00ea[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:37:48 2025 +0000
+
+    remove Rs from excel and the download button should be visible on front
+
+ src/app/people/[personId]/page.tsx | 23 [32m+++++++++++++++[m[31m--------[m
+ src/components/data-provider.tsx   | 10 [32m+++++[m[31m-----[m
+ src/components/history-view.tsx    | 20 [32m+++++++++++++[m[31m-------[m
+ src/components/layout.tsx          | 12 [32m++[m[31m----------[m
+ 4 files changed, 35 insertions(+), 30 deletions(-)
+
+[33mcommit dc3fe3d4ea36204ca9dbcb17785e06d85bfd280a[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:29:11 2025 +0000
+
+    the Event data are shown as OTHER but we saved ocassion , assume ocassio
+
+ src/components/data-provider.tsx | 72 [32m+++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-----------------------[m
+ 1 file changed, 49 insertions(+), 23 deletions(-)
+
+[33mcommit 01428e3b2557567a840d58c2ee8b5695637b1219[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:13:18 2025 +0000
+
+    the excel file should be like Neondara_History only first letter and it
+
+ src/components/data-provider.tsx | 69 [32m+++++++++++++++++++++++++++++++++[m[31m------------------------------------[m
+ 1 file changed, 33 insertions(+), 36 deletions(-)
+
+[33mcommit ca432626791c7ea7934fee7f592a167a1562516e[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:09:32 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/people/[personId]/page.tsx | 14 [32m++++++++[m[31m------[m
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+[33mcommit 514ebfa9e9d81ef0ce4ef704b5f4e3abba71871f[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:08:44 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/components/data-provider.tsx | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit 58056bbc28a2cbbf7c28126a82e92882e89a5f91[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 16:01:08 2025 +0000
+
+    update the excel downloaded style.the text should be properly adjusted i
+
+ package-lock.json                       | 104 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ package.json                            |   1 [32m+[m
+ src/app/people/[personId]/page.tsx      |  13 [32m++++++++[m[31m-----[m
+ src/app/people/page.tsx                 |  22 [32m+++++++++++++++++[m[31m-----[m
+ src/components/data-provider.tsx        | 106 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m--------------------------------------[m
+ src/components/neondara-card.tsx        |  30 [32m++++++++++++++++++++[m[31m----------[m
+ src/components/neondara-entry-sheet.tsx |  24 [32m+++++++++++++[m[31m-----------[m
+ src/components/neondara-timeline.tsx    |  30 [32m+++++++++++++++[m[31m---------------[m
+ src/lib/translations.ts                 |  24 [32m++++++++++++[m[31m------------[m
+ src/lib/types.ts                        |   4 [32m++[m[31m--[m
+ 10 files changed, 260 insertions(+), 98 deletions(-)
+
+[33mcommit 368cb86cbb3b2fa6bd11e3f9ff18c3fdeeb9f7d2[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Sat Jul 12 10:59:07 2025 +0000
+
+    Deleting a person should also delete the history of that person as well,
+
+ src/app/people/page.tsx          |  4 [32m+[m[31m---[m
+ src/components/data-provider.tsx | 26 [32m+++++++++++++++++++++++[m[31m---[m
+ src/lib/translations.ts          |  1 [32m+[m
+ 3 files changed, 25 insertions(+), 6 deletions(-)
+
+[33mcommit 9c9ef2fbb374d548ebc754b9fe99b46d12109a6b[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 19:25:08 2025 +0000
+
+    the header that is hwoing July 2025 can be at top and under this we can
+
+ src/components/ui/calendar.tsx | 8 [32m++++[m[31m----[m
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+[33mcommit 31c1752b0b741d650c394b4aadc37b8e5eb16bac[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 19:23:22 2025 +0000
+
+    one change , please adjust the buttons which are used to move to next or
+
+ src/components/ui/calendar.tsx | 3 [32m++[m[31m-[m
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+[33mcommit 1526496402a823c16c496dfbf65ffee2a94babe7[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 19:19:19 2025 +0000
+
+    the ui of this calendar is so complex, make it look minimal, on selectin
+
+ src/components/neondara-entry-sheet.tsx |  7 [32m+++[m[31m----[m
+ src/components/ui/calendar.tsx          | 47 [32m+++++++++++++++++++++++++++++++++++++++[m[31m--------[m
+ 2 files changed, 42 insertions(+), 12 deletions(-)
+
+[33mcommit f361d41bb020f0c91cfa89bb9389a480fe934bf1[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 19:15:38 2025 +0000
+
+    can we use another date picker, as this one is not working fine on mobil
+
+ src/components/neondara-entry-sheet.tsx | 27 [32m++++++++++++++++++++++[m[31m-----[m
+ 1 file changed, 22 insertions(+), 5 deletions(-)
+
+[33mcommit 699affa2835b65d702f5dc4a9f3fdf0d49ffdb67[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 19:11:57 2025 +0000
+
+    when sweet is selected do not use Amount, use something else
+    and when i
+
+ src/components/neondara-entry-sheet.tsx | 9 [32m++++++[m[31m---[m
+ src/lib/translations.ts                 | 5 [32m+++[m[31m--[m
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+[33mcommit a7113eb39e4d71dc24ef5ba295fa170fde7713e0[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 19:07:39 2025 +0000
+
+    all the validation errors are not translated to urdu
+    and sweets descript
+
+ src/components/neondara-entry-sheet.tsx | 19 [32m++++++++[m[31m-----------[m
+ src/lib/translations.ts                 | 14 [32m+++++++++++++[m[31m-[m
+ 2 files changed, 21 insertions(+), 12 deletions(-)
+
+[33mcommit 3c70a9340276c3ad6bf23b5a47db83662e10dc99[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 19:03:13 2025 +0000
+
+    no, not working on mobile
+
+ src/components/neondara-entry-sheet.tsx | 28 [32m++++++++++++++[m[31m--------------[m
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+[33mcommit 73889c40bce59999681e77d6e090ee61082c8f4b[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 19:01:23 2025 +0000
+
+    it is opening in web but when i use this web on mobile the calendar is n
+
+ src/components/neondara-entry-sheet.tsx | 32 [32m++++++++++++++[m[31m------------------[m
+ 1 file changed, 14 insertions(+), 18 deletions(-)
+
+[33mcommit b8056695070dbc21a51f739d7b4721a02156eda7[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 18:59:09 2025 +0000
+
+    calendar is not opening again
+
+ src/components/neondara-entry-sheet.tsx | 99 [32m++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-------------------------------------------------[m
+ src/components/ui/popover.tsx           |  6 [32m+++++[m[31m-[m
+ 2 files changed, 55 insertions(+), 50 deletions(-)
+
+[33mcommit 625efe27337a73b8406af2d3c524ec66624be383[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 18:54:28 2025 +0000
+
+    while adding new person, the drop down has relations but they are not di
+
+ src/app/people/page.tsx | 48 [32m++++++++++++++++++++++[m[31m--------------------------[m
+ 1 file changed, 22 insertions(+), 26 deletions(-)
+
+[33mcommit ea7444a2ef4d334e3ce9cf3679fb813a6106899f[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 18:51:08 2025 +0000
+
+    gift image. is not compulsory
+
+ src/components/neondara-entry-sheet.tsx | 101 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m----------------------------------------[m
+ 1 file changed, 61 insertions(+), 40 deletions(-)
+
+[33mcommit 4ddea020d02150436032260dac8f2733507eab23[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 18:47:56 2025 +0000
+
+    the urdu texts are getting slightly hide from bottom
+
+ src/app/globals.css | 6 [32m++++++[m
+ 1 file changed, 6 insertions(+)
+
+[33mcommit d0fabe00f00d369e2c571440870247cb290e2db5[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 18:45:32 2025 +0000
+
+    An image of the gift is required.
+    
+     it was not translated to urdu
+
+ src/components/neondara-entry-sheet.tsx | 129 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-----------------------------------------------------------[m
+ 1 file changed, 68 insertions(+), 61 deletions(-)
+
+[33mcommit eb969822a1d1e28126dc1dd10b0b739c23299d36[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 18:42:18 2025 +0000
+
+    buddy,,,,, write You have given 500 more and they have given 600 more, i
+
+ src/lib/translations.ts | 4 [32m++[m[31m--[m
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+[33mcommit c4c1518b8a095e3ae00ca17feeb6a7cb7bd448fa[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 18:40:37 2025 +0000
+
+    you are owed looks ambigous use they pay you 23 more
+
+ src/lib/translations.ts | 6 [32m++[m[31m----[m
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+[33mcommit cfd9c28ca3e22806affeebb6450d9036455f6c3d[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 18:38:13 2025 +0000
+
+    MAKE FEW ADJUSTMENTS
+    If i upload a image while adding entry there should
+
+ src/app/people/[personId]/page.tsx      |  6 [32m++++[m[31m--[m
+ src/app/people/page.tsx                 | 14 [32m++++++++[m[31m------[m
+ src/components/language-provider.tsx    |  4 [32m+++[m[31m-[m
+ src/components/neondara-entry-sheet.tsx | 57 [32m+++++++++++++++++++++++++++++++[m[31m--------------------------[m
+ src/lib/translations.ts                 | 16 [32m++++++++++++[m[31m----[m
+ 5 files changed, 58 insertions(+), 39 deletions(-)
+
+[33mcommit 7314efd1cc0b80b9ca45d8c3898d5745013d1c2a[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 12:52:07 2025 +0000
+
+    on saving new person make sure it should not get match with already save
+
+ src/app/people/page.tsx          | 24 [32m++++++++++++++++[m[31m--------[m
+ src/components/data-provider.tsx | 14 [32m++++++++++++++[m
+ 2 files changed, 30 insertions(+), 8 deletions(-)
+
+[33mcommit 20e3b14ad0e5493f644d0c8c9b4bcb4c69b7dea9[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 12:49:34 2025 +0000
+
+    all good,
+    when new entry is added it takes time to add data until then
+
+ src/app/login/page.tsx                  |  2 [32m+[m[31m-[m
+ src/app/signup/page.tsx                 |  2 [32m+[m[31m-[m
+ src/components/neondara-entry-sheet.tsx | 70 [32m++++++++++++++++++++++++++++++++++++++[m[31m--------------------------------[m
+ src/lib/translations.ts                 |  6 [32m++++[m[31m--[m
+ 4 files changed, 44 insertions(+), 36 deletions(-)
+
+[33mcommit e0b623e4ba146eb8c70423b6c0c2793588a284f8[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 12:44:49 2025 +0000
+
+    what other easy word we can use instead of ledger
+
+ src/app/layout.tsx                                   |  2 [32m+[m[31m-[m
+ src/app/page.tsx                                     |  4 [32m++[m[31m--[m
+ src/app/people/[personId]/page.tsx                   |  4 [32m++[m[31m--[m
+ src/app/people/page.tsx                              | 12 [32m+++++[m[31m-------[m
+ src/components/data-provider.tsx                     |  8 [32m++++[m[31m----[m
+ src/components/{ledger-view.tsx => history-view.tsx} |  6 [32m+++[m[31m---[m
+ src/components/layout.tsx                            |  2 [32m+[m[31m-[m
+ src/lib/translations.ts                              | 21 [32m+++++++++[m[31m------------[m
+ 8 files changed, 27 insertions(+), 32 deletions(-)
+
+[33mcommit 974a11a29800dd46c66821d8cf7290c45ffb5000[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 12:42:01 2025 +0000
+
+    in the balance summary also show the sweet given and taken and mention t
+
+ src/app/people/[personId]/page.tsx | 107 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-------------------------[m
+ 1 file changed, 82 insertions(+), 25 deletions(-)
+
+[33mcommit 5113941999bd42383775c203ecd428ae3e93e1e2[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 12:41:07 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/people/page.tsx | 7 [32m+++++[m[31m--[m
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+[33mcommit b66058fc471a8aaf7cc1c9e7405ae061e685192f[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 12:40:12 2025 +0000
+
+    check the navigations, they are taking too much time, or maybe it is run
+
+ src/app/layout.tsx                 |   5 [32m++[m[31m-[m
+ src/app/people/[personId]/page.tsx | 274 [32m++++++++++++++++++++++++[m[31m---------------------------------------------------------------------------------------------------------[m
+ src/app/people/page.tsx            | 203 [32m+++++++++++++++++++++++++++++++[m[31m----------------------------------------------------------------[m
+ src/components/data-provider.tsx   | 274 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/components/layout.tsx          |  21 [32m+++++++[m[31m---[m
+ src/components/ledger-view.tsx     | 233 [32m+++++++++[m[31m----------------------------------------------------------------------------------------------------[m
+ 6 files changed, 426 insertions(+), 584 deletions(-)
+
+[33mcommit 3c0d4b320f6dc3171b813e75bbc15141d8cffe5f[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 12:23:26 2025 +0000
+
+    add download button on that dialog o which we are showing the image
+
+ src/components/neondara-card.tsx | 13 [32m+++++++[m[31m------[m
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+[33mcommit c3154efb595d15b7b9729be0c9df0366436d75dc[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 11:39:29 2025 +0000
+
+    it should be viewable on our web not externally
+    and make this image smal
+
+ src/components/neondara-card.tsx | 100 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-----------------------[m
+ 1 file changed, 77 insertions(+), 23 deletions(-)
+
+[33mcommit a6bb56c6b9dd07a9016e2d35ce1a48383771f53c[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 10:56:01 2025 +0000
+
+    the image is too large, and it is directly downloaded on clicking, it sh
+
+ src/components/neondara-card.tsx | 30 [32m++++++++++++++++++++++++[m[31m------[m
+ 1 file changed, 24 insertions(+), 6 deletions(-)
+
+[33mcommit 9afdf5ea4c8ea5ad0afd6e7eff57dd112babf20a[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 10:22:26 2025 +0000
+
+    can not open image, there is image icon only
+    it does not store the image
+
+ src/components/neondara-card.tsx        |  2 [32m+[m[31m-[m
+ src/components/neondara-entry-sheet.tsx | 12 [32m++[m[31m----------[m
+ 2 files changed, 3 insertions(+), 11 deletions(-)
+
+[33mcommit 022f30ed8369154521f8735cda2527339f167957[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 09:53:24 2025 +0000
+
+    well i think you are not storing the url of the image in database entrie
+
+ src/components/neondara-card.tsx        |  2 [32m++[m
+ src/components/neondara-entry-sheet.tsx | 87 [32m+++++++++++++++++++++++++++++++++++++++++++++[m[31m------------------------------------------[m
+ src/lib/translations.ts                 |  4 [32m++++[m
+ 3 files changed, 51 insertions(+), 42 deletions(-)
+
+[33mcommit 6650d4492321d6e26d1e3861ea6b3ef322cda00a[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 09:49:49 2025 +0000
+
+    you are not fixing the issue whihc is that the image should get displaye
+
+ src/app/people/[personId]/page.tsx | 6 [32m+++[m[31m---[m
+ src/app/people/page.tsx            | 8 [32m++++[m[31m----[m
+ src/components/neondara-card.tsx   | 5 [32m+++[m[31m--[m
+ 3 files changed, 10 insertions(+), 9 deletions(-)
+
+[33mcommit bd1218081ee459d47837cd93dabdeee964609a31[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 08:11:01 2025 +0000
+
+    the issue is not resolved yet
+
+ src/components/neondara-card.tsx | 18 [32m+++++[m[31m-------------[m
+ 1 file changed, 5 insertions(+), 13 deletions(-)
+
+[33mcommit 8761261727e1a9702581622263ac91e2993d221d[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:57:21 2025 +0000
+
+    the image should be displayed in the cards of history and it should be d
+
+ src/components/neondara-card.tsx | 8 [32m+++++[m[31m---[m
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+[33mcommit 0cf844c574ce981bc39b71f9897a3f2d0f581a27[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:43:03 2025 +0000
+
+    calculations are wrong , instead of saying that you will give 50 it says
+
+ src/app/people/[personId]/page.tsx |  2 [32m+[m[31m-[m
+ src/app/people/page.tsx            |  2 [32m+[m[31m-[m
+ src/components/neondara-card.tsx   | 32 [32m++++++++++++++++[m[31m----------------[m
+ 3 files changed, 18 insertions(+), 18 deletions(-)
+
+[33mcommit 1eb26b6e7646c000fbd534a5a61b8c8005699806[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:33:40 2025 +0000
+
+    remove currency option
+
+ src/components/neondara-card.tsx        |  6 [32m+++[m[31m---[m
+ src/components/neondara-entry-sheet.tsx | 33 [32m+++++++++++++++[m[31m------------------[m
+ 2 files changed, 18 insertions(+), 21 deletions(-)
+
+[33mcommit b4a48244b7e67f75bdc3f206b25c48b6ea72f460[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:32:50 2025 +0000
+
+    while entering new entry add another gift type option that is Other so t
+
+ src/components/neondara-card.tsx        | 22 [32m+++++++++++++++[m[31m-------[m
+ src/components/neondara-entry-sheet.tsx | 39 [32m++++++++++++++++++++++++++++++++++[m[31m-----[m
+ src/lib/translations.ts                 |  2 [32m++[m
+ src/lib/types.ts                        |  2 [32m+[m[31m-[m
+ 4 files changed, 52 insertions(+), 13 deletions(-)
+
+[33mcommit 242be14db8d1b31e73a3699b373e9ca8083ea38d[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:27:12 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/components/layout.tsx | 7 [32m+++++[m[31m--[m
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+[33mcommit 7b9992e496e76269150ac8743d12c617e25bed14[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:25:59 2025 +0000
+
+    when it is viewed on smaller screens like mobile the top tabs that are L
+
+ src/components/layout.tsx | 32 [32m++++++++++++++++++++++++++++++[m[31m--[m
+ 1 file changed, 30 insertions(+), 2 deletions(-)
+
+[33mcommit e541895112b9d18104f34f5dae6714f04e10a620[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:25:02 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/people/[personId]/page.tsx | 28 [32m++++++++++++[m[31m----------------[m
+ 1 file changed, 12 insertions(+), 16 deletions(-)
+
+[33mcommit 2a4c3a48536b44485dffd6947cec4bfa4c813a16[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:24:18 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/people/[personId]/page.tsx | 5 [32m++[m[31m---[m
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+[33mcommit c6db3eb9c8a41714e57195274ecb7dba6bfb6b8c[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:18:25 2025 +0000
+
+    provide me the rules here in chat i can paste those in firebasse
+
+ firestore.rules | 39 [32m+++++++++++++[m[31m--------------------------[m
+ 1 file changed, 13 insertions(+), 26 deletions(-)
+
+[33mcommit 5615d8219a5a6de56e38126d3df21b3456a6d7ae[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:17:17 2025 +0000
+
+    these are the rules already there
+    rules_version = '2';
+    service cloud.fir
+
+ firestore.rules | 35 [32m+++++++++++++++++++++++++[m[31m----------[m
+ 1 file changed, 25 insertions(+), 10 deletions(-)
+
+[33mcommit b313ccba9a7ac7578056117ec11bf0fd988a62d2[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:16:11 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ firebase.json   |  3 [32m+++[m
+ firestore.rules | 20 [32m++++++++++++++++++++[m
+ 2 files changed, 23 insertions(+)
+
+[33mcommit ff86acd49dfd5bdbc17f06066f6382f63f5055f5[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 07:07:44 2025 +0000
+
+    the firebase got removed i dont know how, i added the keys in env.local
+
+ .firebaserc   |  3 [32m++[m[31m-[m
+ firebase.json | 14 [32m++++++++++++++[m
+ 2 files changed, 16 insertions(+), 1 deletion(-)
+
+[33mcommit c5c95df536df4487bd765147bfcd1b9dd163de92[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 06:56:04 2025 +0000
+
+    it says failed to add new entry when i uploaded a image after selecting
+
+ src/components/neondara-entry-sheet.tsx | 93 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-------------------------------------[m
+ 1 file changed, 56 insertions(+), 37 deletions(-)
+
+[33mcommit ff153efdd01af265c1469ef5705cacd9ed2d5c28[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Fri Jul 11 06:41:12 2025 +0000
+
+    do the following changes to our project:
+    Change Niondra spelling to Neon
+
+ README.md                               |  23 [32m+++++[m[31m---[m
+ src/app/layout.tsx                      |   4 [32m+[m[31m-[m
+ src/app/people/[personId]/page.tsx      |  97 [32m++++++++++++++++++++++++[m[31m------[m
+ src/app/people/page.tsx                 |   8 [32m+[m[31m--[m
+ src/components/language-provider.tsx    |   4 [32m+[m[31m-[m
+ src/components/ledger-view.tsx          |  40 [32m++++++[m[31m-------[m
+ src/components/neondara-card.tsx        | 154 [32m++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/components/neondara-entry-sheet.tsx | 403 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/components/neondara-timeline.tsx    | 107 [32m+++++++++++++++++++++++++++++++++[m
+ src/lib/translations.ts                 |  24 [32m++++[m[31m----[m
+ src/lib/types.ts                        |  11 [32m++[m[31m--[m
+ 11 files changed, 803 insertions(+), 72 deletions(-)
+
+[33mcommit a4330219e8c6d399f8e95748550504aebce5a093[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 14:28:17 2025 +0000
+
+    fix the minor error on people and balance page, it says that You will gi
+
+ src/app/people/[personId]/page.tsx | 6 [32m+++[m[31m---[m
+ src/app/people/page.tsx            | 8 [32m++++[m[31m----[m
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+[33mcommit cef22e00e60956b4985e7a37ea8a01a6d65bdc87[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 14:22:40 2025 +0000
+
+    you removed some of the functionalities or updated some, also there is n
+
+ src/app/people/[personId]/page.tsx |  8 [32m+++[m[31m-----[m
+ src/app/people/page.tsx            | 12 [32m+++++[m[31m-------[m
+ src/components/layout.tsx          |  4 [32m++[m[31m--[m
+ src/components/ledger-view.tsx     | 66 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m--[m
+ 4 files changed, 74 insertions(+), 16 deletions(-)
+
+[33mcommit ca12e1cbd67227ff298de799f4f339e37def4274[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 14:07:42 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ README.md                          | 71 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m---[m
+ apphosting.yaml                    | 38 [31m--------------------------------------[m
+ firebase.json                      | 13 [31m-------------[m
+ src/app/people/[personId]/page.tsx |  8 [32m+++[m[31m-----[m
+ src/app/people/page.tsx            |  6 [32m++[m[31m----[m
+ 5 files changed, 73 insertions(+), 63 deletions(-)
+
+[33mcommit 29ee2784d35d044ad2c11bd53f8aa6e4b64cbcee[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 14:02:14 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ apphosting.yaml | 38 [32m++++++++++++++++++++++++++++++++++++++[m
+ firebase.json   | 13 [32m+++++++++++++[m
+ 2 files changed, 51 insertions(+)
+
+[33mcommit 96e4e8810a6964ee81907dacbd2fddfdc7924da5[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 14:00:28 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ apphosting.yaml                    |   7 [31m---[m
+ firebase.json                      |  14 [31m------[m
+ src/app/(auth)/layout.tsx          |   5 [32m+[m[31m-[m
+ src/app/page.tsx                   |   8 [32m++[m[31m--[m
+ src/app/people/[personId]/page.tsx | 166 [32m+++++++++++++++++++++++++++++++++[m[31m-------------------------------[m
+ src/app/people/page.tsx            | 337 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m--------------------------------------------------------------[m
+ src/components/auth-provider.tsx   |   4 [32m+[m[31m-[m
+ src/components/layout.tsx          |  33 [32m++++[m[31m---------[m
+ src/components/ledger-view.tsx     |  31 [32m++++++++[m[31m----[m
+ 9 files changed, 300 insertions(+), 305 deletions(-)
+
+[33mcommit 8457d00db973dd57aabbdb45875cf87256cb71fd[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 13:45:26 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/(auth)/layout.tsx          | 28 [32m+++++++++++++++++++++++++++[m[31m-[m
+ src/app/page.tsx                   |  7 [32m++++++[m[31m-[m
+ src/app/people/[personId]/page.tsx |  6 [32m+++[m[31m---[m
+ src/app/people/page.tsx            |  8 [32m++++[m[31m----[m
+ src/components/auth-provider.tsx   | 51 [32m+++++[m[31m----------------------------------------------[m
+ src/components/layout.tsx          | 25 [32m++++++++++++++++++++++++[m[31m-[m
+ src/components/ledger-view.tsx     |  3 [31m---[m
+ 7 files changed, 69 insertions(+), 59 deletions(-)
+
+[33mcommit f7a79222593e48f8c3fe49a94cc440a795b89ce6[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 13:41:55 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/(auth)/layout.tsx        |  9 [32m+++++++++[m
+ src/components/auth-provider.tsx | 56 [32m++++++++++++++++++++++++[m[31m--------------------------------[m
+ 2 files changed, 33 insertions(+), 32 deletions(-)
+
+[33mcommit e3d0392e1fca9239ff90b9fdcd639e961ebc47c6[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 13:29:27 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/page.tsx                 |  8 [32m++[m[31m------[m
+ src/components/auth-provider.tsx | 15 [32m++++++++++++[m[31m---[m
+ src/components/ledger-view.tsx   | 61 [32m++++++++++++++++++++++++++++++++[m[31m-----------------------------[m
+ 3 files changed, 46 insertions(+), 38 deletions(-)
+
+[33mcommit 816752fe6d4e2cabb94713783018b81a52d9473a[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 13:27:01 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ .firebaserc                        |  5 [32m+++++[m
+ .idx/integrations.json             |  5 [32m+++++[m
+ firebase.json                      | 14 [32m++++++++++++++[m
+ src/app/page.tsx                   |  6 [32m+++++[m[31m-[m
+ src/app/people/[personId]/page.tsx | 17 [32m++++++++++++[m[31m-----[m
+ src/app/people/page.tsx            | 25 [32m++++++++++++++[m[31m-----------[m
+ src/components/auth-provider.tsx   |  8 [32m+[m[31m-------[m
+ src/components/layout.tsx          | 16 [32m++++++++++[m[31m------[m
+ src/components/ledger-view.tsx     | 53 [32m+++++++++++++[m[31m----------------------------------------[m
+ 9 files changed, 79 insertions(+), 70 deletions(-)
+
+[33mcommit b66d2f585f6769a2d15ce3e573e5078fe6660ae9[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 12:06:20 2025 +0000
+
+    how can i edit or remove the people
+
+ src/app/people/[personId]/page.tsx |  13 [32m+++++[m[31m-[m
+ src/app/people/page.tsx            | 308 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m--------------------------------------------------------[m
+ src/lib/types.ts                   |   2 [32m+[m
+ 3 files changed, 188 insertions(+), 135 deletions(-)
+
+[33mcommit ed11a341cf026fe71ca873f8fe8941cb5f8ae55a[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:59:37 2025 +0000
+
+    when to switch urdu the whole web should be in urdu
+
+ src/app/layout.tsx                     |   2 [32m+[m[31m-[m
+ src/app/login/page.tsx                 |  21 [32m++++++++++[m[31m--------[m
+ src/app/people/[personId]/page.tsx     |  48 [32m++++++++++++++++++++++[m[31m--------------------[m
+ src/app/people/page.tsx                |  60 [32m++++++++++++++++++++++++++[m[31m--------------------------[m
+ src/app/signup/page.tsx                |  25 [32m++++++++++++[m[31m----------[m
+ src/components/language-provider.tsx   |  16 [32m+++++++++++[m[31m---[m
+ src/components/layout.tsx              |  25 [32m+++++++++++[m[31m-----------[m
+ src/components/ledger-view.tsx         |  32 [32m+++++++++++++++[m[31m-------------[m
+ src/components/niondra-card.tsx        |  40 [32m+++++++++++++++++++++[m[31m--------------[m
+ src/components/niondra-entry-sheet.tsx |  52 [32m+++++++++++++++++++++++[m[31m----------------------[m
+ src/components/niondra-timeline.tsx    |  40 [32m++++++++++++++++++[m[31m-----------------[m
+ src/lib/translations.ts                | 145 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ tailwind.config.ts                     |   5 [32m+++[m[31m--[m
+ 13 files changed, 345 insertions(+), 166 deletions(-)
+
+[33mcommit 5c60c09cff9077d5fce4c063aec56f13f0fa76e6[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:54:45 2025 +0000
+
+    on people and balances the text that you will recieve is in red i think
+
+ src/app/layout.tsx                   |  3 [32m+++[m
+ src/app/people/page.tsx              | 76 [32m++++++++++++++++++++++++++++++++++++++++++++++[m[31m------------------------------[m
+ src/components/language-provider.tsx | 43 [32m+++++++++++++++++++++++++++++++++++++++++++[m
+ src/components/layout.tsx            | 24 [32m+++++++++++++++++++++++[m[31m-[m
+ src/lib/types.ts                     | 41 [32m+++++++++++++++++++++++[m[31m------------------[m
+ 5 files changed, 138 insertions(+), 49 deletions(-)
+
+[33mcommit 457ae4dd4b2e3bb99aebac227d3e20da0592b231[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:51:40 2025 +0000
+
+    the relations i provided you were in urdu please use english ones and th
+
+ src/app/people/page.tsx | 33 [32m+++++++++++++++++++++++++++[m[31m------[m
+ src/lib/types.ts        | 22 [32m+++++++++++++++++++[m[31m---[m
+ 2 files changed, 46 insertions(+), 9 deletions(-)
+
+[33mcommit f9a1ea508948d9dd2d0d43fa8685bb8db1a10eba[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:39:43 2025 +0000
+
+    owes you is confusing ,  use something easy
+
+ src/app/people/[personId]/page.tsx | 4 [32m++[m[31m--[m
+ src/app/people/page.tsx            | 8 [32m++++[m[31m----[m
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+[33mcommit a205f80eea8b40966aecd7dfd488d5a56a3c8427[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:36:19 2025 +0000
+
+    i gave 230 to awais and recieved 215 but it says that You owe 15. is it
+
+ src/app/people/[personId]/page.tsx |  6 [32m+++[m[31m---[m
+ src/app/people/page.tsx            | 26 [32m+++++++++++++++++[m[31m---------[m
+ 2 files changed, 20 insertions(+), 12 deletions(-)
+
+[33mcommit e154373fcd3c76d80a277e23c4f1ba3ab06f5605[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:32:04 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/components/niondra-entry-sheet.tsx | 3 [32m++[m[31m-[m
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+[33mcommit 2b351d31bf178f3599ac44d23b759b52971d955a[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:29:58 2025 +0000
+
+    also i should be able to search people
+
+ src/app/people/page.tsx | 139 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m------------------------------------------------------------[m
+ 1 file changed, 79 insertions(+), 60 deletions(-)
+
+[33mcommit 4edda88b9154a1cfef1e7cc6d6e95ebdf8cb7249[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:29:11 2025 +0000
+
+    add a back button on People & balance page
+
+ src/app/people/[personId]/page.tsx | 19 [32m+++++++++++[m[31m--------[m
+ src/app/people/page.tsx            | 10 [32m++++++++[m[31m--[m
+ 2 files changed, 19 insertions(+), 10 deletions(-)
+
+[33mcommit b0c94e086ff9bc898f3e7ee28313a8a097e62d3d[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:28:01 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/people/[personId]/page.tsx | 9 [32m+++++[m[31m----[m
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+[33mcommit 3c769151380eb642a853c685d8ccda14ddb5a7b6[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 11:22:36 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/people/page.tsx | 3 [32m++[m[31m-[m
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+[33mcommit 34ff9e1a3cfab33a0aa1aa29843e35b9a155655c[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 10:51:14 2025 +0000
+
+    we need to store the relation as well, Chachu, Chachi, Mamu , Mami, Dadi
+
+ src/app/people/[personId]/page.tsx |  1 [32m+[m
+ src/app/people/page.tsx            | 94 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m----------------[m
+ src/lib/types.ts                   |  6 [32m++++++[m
+ 3 files changed, 85 insertions(+), 16 deletions(-)
+
+[33mcommit c75bfaf269d0bab859cdc17227652534c9e01ab4[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 10:43:22 2025 +0000
+
+    also we need to make the amount solved like if i gave 500 to awais on th
+
+ src/app/layout.tsx                     |   2 [32m+[m[31m-[m
+ src/app/page.tsx                       |   1 [32m+[m
+ src/app/people/[personId]/page.tsx     | 250 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/app/people/page.tsx                | 223 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/components/auth-provider.tsx       |  28 [32m++++++++++++[m[31m--[m
+ src/components/layout.tsx              | 111 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/components/ledger-view.tsx         | 222 [32m++++++++++++++++++++++++++++++++++++++++[m[31m-----------------------------------------------------------------------[m
+ src/components/niondra-card.tsx        |   6 [32m++[m[31m-[m
+ src/components/niondra-entry-sheet.tsx |  42 [32m++++++++++[m[31m-----------[m
+ src/components/niondra-timeline.tsx    |  30 [32m+++++++++++[m[31m----[m
+ src/lib/firebase.ts                    |   7 [32m+[m[31m---[m
+ src/lib/types.ts                       |  12 [32m+++++[m[31m-[m
+ 12 files changed, 748 insertions(+), 186 deletions(-)
+
+[33mcommit 58bb331eb84d0cf8d7b54e52a3c49a4bcc90f348[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 10:23:14 2025 +0000
+
+    Firebase: Error (auth/configuration-not-found).
+    
+    while sign up
+    
+    also we
+
+ src/app/signup/page.tsx        | 17 [32m+++++++++++++++[m[31m--[m
+ src/components/ledger-view.tsx | 19 [32m++++++++++++++[m[31m-----[m
+ 2 files changed, 29 insertions(+), 7 deletions(-)
+
+[33mcommit 4c0120fb3f2f972f029ccc7742adf7b26664710e[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 10:20:57 2025 +0000
+
+    alright, we need to add login signup functionalities and we need to main
+
+ src/app/layout.tsx                     |   5 [32m+++[m[31m-[m
+ src/app/login/page.tsx                 |  84 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/app/signup/page.tsx                |  85 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/components/auth-provider.tsx       |  68 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/components/ledger-view.tsx         | 166 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m------------------------------[m
+ src/components/niondra-card.tsx        |   4 [32m+[m[31m--[m
+ src/components/niondra-entry-sheet.tsx |   8 [32m+++[m[31m---[m
+ src/components/niondra-timeline.tsx    |   9 [32m++++[m[31m---[m
+ src/lib/firebase.ts                    |   4 [32m++[m[31m-[m
+ src/lib/types.ts                       |   1 [32m+[m
+ 10 files changed, 383 insertions(+), 51 deletions(-)
+
+[33mcommit 09ec28472032a9985c6d0916ed09074b1f8aa095[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 10:15:53 2025 +0000
+
+    I see this error with the app, reported by NextJS, please fix it. The er
+
+ src/app/layout.tsx | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit 303f591a7841e12d8d5095a21575a8e89cd60583[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 08:48:48 2025 +0000
+
+    yes
+
+ .vscode/settings.json               |   4 [32m++[m
+ package-lock.json                   | 388 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m----------------------------------------------------------------[m
+ package.json                        |   2 [32m+[m[31m-[m
+ src/components/ledger-view.tsx      | 115 [32m+++++++++++++++++++++++++++++++++++[m[31m---[m
+ src/components/niondra-card.tsx     |  92 [32m+++++++++++++++++++++++++[m[31m------[m
+ src/components/niondra-timeline.tsx |   6 [32m+[m[31m-[m
+ src/lib/data.ts                     |   2 [32m+[m
+ src/lib/firebase.ts                 |  25 [32m+++++++++[m
+ src/lib/types.ts                    |   6 [32m++[m
+ 9 files changed, 418 insertions(+), 222 deletions(-)
+
+[33mcommit 629d3b3e54db8f90d978e09f35c69bed48f1b29e[m
+Author: Awais Chaudhry <chaudhryawais.533@gmail.com>
+Date:   Thu Jul 10 08:18:30 2025 +0000
+
+    Updated app
+
+ .idx/icon.png                          | Bin [31m0[m -> [32m24734[m bytes
+ .modified                              |   0
+ docs/blueprint.md                      |  19 [32m++++++++[m
+ src/app/globals.css                    | 116 [32m+++++++++++++++++++++[m[31m-------------------------[m
+ src/app/layout.tsx                     |  18 [32m+++++[m[31m---[m
+ src/app/page.tsx                       |   4 [32m+[m[31m-[m
+ src/components/ledger-view.tsx         |  89 [32m++++++++++++++++++++++++++++++++++++[m
+ src/components/niondra-card.tsx        |  55 [32m++++++++++++++++++++++[m
+ src/components/niondra-entry-sheet.tsx | 313 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ src/components/niondra-timeline.tsx    |  87 [32m+++++++++++++++++++++++++++++++++++[m
+ src/lib/data.ts                        |  58 [32m+++++++++++++++++++++++[m
+ src/lib/types.ts                       |  14 [32m++++++[m
+ tailwind.config.ts                     |   3 [32m+[m[31m-[m
+ 13 files changed, 703 insertions(+), 73 deletions(-)
+
+[33mcommit eb610682e35d3ede4a169772be261870a7a07093[m
+Author: Your Name <you@example.com>
+Date:   Wed Jul 9 03:09:54 2025 +0000
+
+    initial scaffold
+
+ .gitignore                          |   45 [32m+[m
+ .idx/dev.nix                        |   43 [32m+[m
+ README.md                           |    5 [32m+[m
+ apphosting.yaml                     |    7 [32m+[m
+ components.json                     |   21 [32m+[m
+ next.config.ts                      |   23 [32m+[m
+ package-lock.json                   | 9948 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ package.json                        |   67 [32m+[m
+ postcss.config.mjs                  |    8 [32m+[m
+ src/ai/dev.ts                       |    1 [32m+[m
+ src/ai/genkit.ts                    |    7 [32m+[m
+ src/app/favicon.ico                 |  Bin [31m0[m -> [32m15086[m bytes
+ src/app/globals.css                 |   88 [32m++[m
+ src/app/layout.tsx                  |   24 [32m+[m
+ src/app/page.tsx                    |    3 [32m+[m
+ src/components/ui/accordion.tsx     |   58 [32m+[m
+ src/components/ui/alert-dialog.tsx  |  141 [32m++[m
+ src/components/ui/alert.tsx         |   59 [32m+[m
+ src/components/ui/avatar.tsx        |   50 [32m+[m
+ src/components/ui/badge.tsx         |   36 [32m+[m
+ src/components/ui/button.tsx        |   56 [32m+[m
+ src/components/ui/calendar.tsx      |   70 [32m+[m
+ src/components/ui/card.tsx          |   79 [32m++[m
+ src/components/ui/carousel.tsx      |  262 [32m++++[m
+ src/components/ui/chart.tsx         |  365 [32m+++++[m
+ src/components/ui/checkbox.tsx      |   30 [32m+[m
+ src/components/ui/collapsible.tsx   |   11 [32m+[m
+ src/components/ui/dialog.tsx        |  122 [32m++[m
+ src/components/ui/dropdown-menu.tsx |  200 [32m+++[m
+ src/components/ui/form.tsx          |  178 [32m+++[m
+ src/components/ui/input.tsx         |   22 [32m+[m
+ src/components/ui/label.tsx         |   26 [32m+[m
+ src/components/ui/menubar.tsx       |  256 [32m++++[m
+ src/components/ui/popover.tsx       |   31 [32m+[m
+ src/components/ui/progress.tsx      |   28 [32m+[m
+ src/components/ui/radio-group.tsx   |   44 [32m+[m
+ src/components/ui/scroll-area.tsx   |   48 [32m+[m
+ src/components/ui/select.tsx        |  160 [32m+++[m
+ src/components/ui/separator.tsx     |   31 [32m+[m
+ src/components/ui/sheet.tsx         |  140 [32m++[m
+ src/components/ui/sidebar.tsx       |  763 [32m++++++++++[m
+ src/components/ui/skeleton.tsx      |   15 [32m+[m
+ src/components/ui/slider.tsx        |   28 [32m+[m
+ src/components/ui/switch.tsx        |   29 [32m+[m
+ src/components/ui/table.tsx         |  117 [32m++[m
+ src/components/ui/tabs.tsx          |   55 [32m+[m
+ src/components/ui/textarea.tsx      |   21 [32m+[m
+ src/components/ui/toast.tsx         |  129 [32m++[m
+ src/components/ui/toaster.tsx       |   35 [32m+[m
+ src/components/ui/tooltip.tsx       |   30 [32m+[m
+ src/hooks/use-mobile.tsx            |   19 [32m+[m
+ src/hooks/use-toast.ts              |  194 [32m+++[m
+ src/lib/utils.ts                    |    6 [32m+[m
+ tailwind.config.ts                  |   99 [32m++[m
+ tsconfig.json                       |   27 [32m+[m
+ 55 files changed, 14360 insertions(+)

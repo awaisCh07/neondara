@@ -24,12 +24,13 @@ export function NeondaraTimeline({ entries, people, onEdit, onDelete }: Neondara
   const [personFilter, setPersonFilter] = useState<string>('all');
   
   const filteredEntries = useMemo(() => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
     return entries
       .filter(entry => {
         const searchMatch = searchTerm.length > 0 ?
-          entry.person.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          entry.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          entry.description.toLowerCase().includes(searchTerm.toLowerCase())
+          entry.person.toLowerCase().includes(lowerCaseSearchTerm) ||
+          (entry.description && entry.description.toLowerCase().includes(lowerCaseSearchTerm)) ||
+          (entry.notes && entry.notes.toLowerCase().includes(lowerCaseSearchTerm))
           : true;
         const eventMatch = eventFilter === 'all' || entry.event === eventFilter;
         const directionMatch = directionFilter === 'all' || entry.direction === directionFilter;
@@ -93,7 +94,7 @@ export function NeondaraTimeline({ entries, people, onEdit, onDelete }: Neondara
         <div className="grid gap-6">
           {filteredEntries.map(entry => {
             const { userId, ...cardEntry } = entry;
-            return <NeondaraCard key={entry.id} entry={cardEntry} onEdit={onEdit} onDelete={onDelete} />
+            return <NeondaraCard key={entry.id} entry={cardEntry} onEdit={onEdit} onDelete={onDelete} searchTerm={searchTerm} />
           })}
         </div>
       ) : (

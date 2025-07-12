@@ -42,9 +42,28 @@ interface NeondaraCardProps {
   onEdit: (entry: Omit<NeondaraEntry, 'userId'>) => void;
   onDelete: (id: string) => Promise<void>;
   personName?: string;
+  searchTerm?: string;
 }
 
-export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCardProps) {
+const HighlightedText = ({ text, highlight }: { text: string; highlight?: string }) => {
+  if (!highlight || !text) {
+    return <>{text}</>;
+  }
+  const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === highlight.toLowerCase() ? (
+          <mark key={i} className="bg-primary/30 p-0">{part}</mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+};
+
+export function NeondaraCard({ entry, onEdit, onDelete, personName, searchTerm }: NeondaraCardProps) {
   const { t } = useLanguage();
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -63,7 +82,9 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
 
   const isGiven = entry.direction === 'given';
   const nameToDisplay = personName || entry.person;
-  const title = isGiven ? `${t('to')}: ${nameToDisplay}` : `${t('from')}: ${nameToDisplay}`;
+  
+  const titleText = isGiven ? `${t('to')}: ${nameToDisplay}` : `${t('from')}: ${nameToDisplay}`;
+  const title = <HighlightedText text={titleText} highlight={searchTerm} />;
 
   const isImageDataUrl = entry.giftType === 'Gift' && entry.description && entry.description.startsWith('data:image');
 
@@ -91,7 +112,7 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
       case 'Money':
         return <p className="text-2xl font-headline text-foreground/90">{`Rs ${new Intl.NumberFormat().format(entry.amount || 0)}`}</p>;
       case 'Sweets':
-        return <p className="text-2xl font-headline text-foreground/90">{`${entry.amount || 0}kg ${entry.description || ''}`.trim()}</p>;
+        return <p className="text-2xl font-headline text-foreground/90"><HighlightedText text={`${entry.amount || 0}kg ${entry.description || ''}`.trim()} highlight={searchTerm} /></p>;
       case 'Gift':
         if (isImageDataUrl) {
           return (
@@ -132,7 +153,7 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
                 <p className="text-lg font-semibold text-foreground/90">{t('giftTypeGift')}</p>
                 {entry.notes && (
                   <blockquote className="mt-2 border-l-2 pl-4 italic text-muted-foreground font-serif">
-                    {entry.notes}
+                    <HighlightedText text={entry.notes} highlight={searchTerm} />
                   </blockquote>
                 )}
               </div>
@@ -144,19 +165,19 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
           <div className="flex items-center gap-4">
             <ImageIcon className="h-8 w-8 text-muted-foreground flex-shrink-0" />
             <div>
-                <p className="text-lg font-semibold text-foreground/90">{entry.description || "Gift"}</p>
+                <p className="text-lg font-semibold text-foreground/90"><HighlightedText text={entry.description || "Gift"} highlight={searchTerm} /></p>
                  {entry.notes && (
                     <blockquote className="mt-2 border-l-2 pl-4 italic text-muted-foreground font-serif">
-                        {entry.notes}
+                        <HighlightedText text={entry.notes} highlight={searchTerm} />
                     </blockquote>
                 )}
             </div>
           </div>
         );
       case 'Other':
-        return <p className="text-2xl font-headline text-foreground/90">{entry.description}</p>;
+        return <p className="text-2xl font-headline text-foreground/90"><HighlightedText text={entry.description} highlight={searchTerm} /></p>;
       default:
-        return <p className="text-2xl font-headline text-foreground/90">{entry.description}</p>;
+        return <p className="text-2xl font-headline text-foreground/90"><HighlightedText text={entry.description} highlight={searchTerm} /></p>;
     }
   };
   
@@ -165,7 +186,7 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
     if (entry.giftType !== 'Gift' && entry.notes) {
         return (
             <blockquote className="mt-4 border-l-2 pl-4 italic text-muted-foreground font-serif">
-                {entry.notes}
+                <HighlightedText text={entry.notes} highlight={searchTerm} />
             </blockquote>
         );
     }

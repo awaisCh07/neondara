@@ -40,23 +40,24 @@ import { useLanguage } from './language-provider';
 interface NeondaraCardProps {
   entry: Omit<NeondaraEntry, 'userId'>;
   onEdit: (entry: Omit<NeondaraEntry, 'userId'>) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string) => Promise<void>;
   personName?: string;
 }
 
 export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCardProps) {
   const { t } = useLanguage();
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   
-  const occasionIcons: Record<NeondaraEntry['occasion'], React.ReactNode> = {
+  const eventIcons: Record<NeondaraEntry['event'], React.ReactNode> = {
     Wedding: <Heart className="h-4 w-4" aria-label="Wedding" />,
     Birth: <Gift className="h-4 w-4" aria-label="Birth" />,
     Housewarming: <Home className="h-4 w-4" aria-label="Housewarming" />,
-    Other: <PartyPopper className="h-4 w-4" aria-label="Other occasion" />,
+    Other: <PartyPopper className="h-4 w-4" aria-label="Other event" />,
   };
 
-  const getOccasionTranslation = (occasion: NeondaraEntry['occasion']) => {
-    const key = `occasion${occasion}` as 'occasionWedding' | 'occasionBirth' | 'occasionHousewarming' | 'occasionOther';
+  const getEventTranslation = (event: NeondaraEntry['event']) => {
+    const key = `event${event}` as 'eventWedding' | 'eventBirth' | 'eventHousewarming' | 'eventOther';
     return t(key);
   }
 
@@ -76,10 +77,19 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
     document.body.removeChild(link);
   };
   
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+        await onDelete(entry.id);
+    } finally {
+        setIsDeleting(false);
+    }
+  }
+
   const giftDisplay = () => {
     switch (entry.giftType) {
       case 'Money':
-        return <p className="text-2xl font-headline text-foreground/90">{new Intl.NumberFormat().format(entry.amount || 0)}</p>;
+        return <p className="text-2xl font-headline text-foreground/90">{`Rs ${new Intl.NumberFormat().format(entry.amount || 0)}`}</p>;
       case 'Sweets':
         return <p className="text-2xl font-headline text-foreground/90">{`${entry.amount || 0}kg ${entry.description || ''}`.trim()}</p>;
       case 'Gift':
@@ -173,8 +183,8 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
               <span>{format(entry.date, 'PPP')}</span>
               <span className="text-muted-foreground/50">|</span>
               <div className="flex items-center gap-1">
-                {occasionIcons[entry.occasion]}
-                <span>{getOccasionTranslation(entry.occasion)}</span>
+                {eventIcons[entry.event]}
+                <span>{getEventTranslation(entry.event)}</span>
               </div>
             </div>
           </div>
@@ -220,8 +230,8 @@ export function NeondaraCard({ entry, onEdit, onDelete, personName }: NeondaraCa
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-              <AlertDialogAction onClick={() => onDelete(entry.id)} className="bg-destructive hover:bg-destructive/90">
-                {t('delete')}
+              <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+                {isDeleting ? t('deleting') : t('delete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

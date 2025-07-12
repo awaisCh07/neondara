@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import type { NeondaraEntry, Occasion, Person } from '@/lib/types';
+import type { NeondaraEntry, Event, Person } from '@/lib/types';
 import { NeondaraCard } from './neondara-card';
 import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -13,13 +13,13 @@ interface NeondaraTimelineProps {
   entries: NeondaraEntry[];
   people: Person[];
   onEdit: (entry: Omit<NeondaraEntry, 'userId'>) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string) => Promise<void>;
 }
 
 export function NeondaraTimeline({ entries, people, onEdit, onDelete }: NeondaraTimelineProps) {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
-  const [occasionFilter, setOccasionFilter] = useState<Occasion | 'all'>('all');
+  const [eventFilter, setEventFilter] = useState<Event | 'all'>('all');
   const [directionFilter, setDirectionFilter] = useState<'given' | 'received' | 'all'>('all');
   const [personFilter, setPersonFilter] = useState<string>('all');
   
@@ -28,16 +28,16 @@ export function NeondaraTimeline({ entries, people, onEdit, onDelete }: Neondara
       .filter(entry => {
         const searchMatch = searchTerm.length > 0 ?
           entry.person.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          entry.occasion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          entry.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
           entry.description.toLowerCase().includes(searchTerm.toLowerCase())
           : true;
-        const occasionMatch = occasionFilter === 'all' || entry.occasion === occasionFilter;
+        const eventMatch = eventFilter === 'all' || entry.event === eventFilter;
         const directionMatch = directionFilter === 'all' || entry.direction === directionFilter;
         const personMatch = personFilter === 'all' || entry.personId === personFilter;
-        return searchMatch && occasionMatch && directionMatch && personMatch;
+        return searchMatch && eventMatch && directionMatch && personMatch;
       })
       .sort((a, b) => b.date.getTime() - a.date.getTime());
-  }, [entries, searchTerm, occasionFilter, directionFilter, personFilter]);
+  }, [entries, searchTerm, eventFilter, directionFilter, personFilter]);
 
   return (
     <div>
@@ -64,16 +64,16 @@ export function NeondaraTimeline({ entries, people, onEdit, onDelete }: Neondara
               ))}
             </SelectContent>
           </Select>
-          <Select value={occasionFilter} onValueChange={(value) => setOccasionFilter(value as Occasion | 'all')}>
-            <SelectTrigger aria-label={t('filterByOccasion')}>
-              <SelectValue placeholder={t('filterByOccasion')} />
+          <Select value={eventFilter} onValueChange={(value) => setEventFilter(value as Event | 'all')}>
+            <SelectTrigger aria-label={t('filterByEvent')}>
+              <SelectValue placeholder={t('filterByEvent')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('allOccasions')}</SelectItem>
-              <SelectItem value="Wedding">{t('occasionWedding')}</SelectItem>
-              <SelectItem value="Birth">{t('occasionBirth')}</SelectItem>
-              <SelectItem value="Housewarming">{t('occasionHousewarming')}</SelectItem>
-              <SelectItem value="Other">{t('occasionOther')}</SelectItem>
+              <SelectItem value="all">{t('allEvents')}</SelectItem>
+              <SelectItem value="Wedding">{t('eventWedding')}</SelectItem>
+              <SelectItem value="Birth">{t('eventBirth')}</SelectItem>
+              <SelectItem value="Housewarming">{t('eventHousewarming')}</SelectItem>
+              <SelectItem value="Other">{t('eventOther')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={directionFilter} onValueChange={(value) => setDirectionFilter(value as 'given' | 'received' | 'all')}>

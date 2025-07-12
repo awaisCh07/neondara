@@ -1,7 +1,7 @@
 
 import type { Timestamp } from "firebase/firestore";
 
-export type Occasion = "Wedding" | "Birth" | "Housewarming" | "Other";
+export type Event = "Wedding" | "Birth" | "Housewarming" | "Other";
 export type GiftType = "Money" | "Sweets" | "Gift" | "Other";
 
 export type RelationType = 
@@ -45,7 +45,7 @@ export type NeondaraEntry = {
   person: string; // This is for display purposes, resolved from personId
   direction: 'given' | 'received';
   date: Date;
-  occasion: Occasion;
+  event: Event;
   giftType: GiftType;
   amount: number | null;
   description: string; // Used for currency, item description, or gift image URL

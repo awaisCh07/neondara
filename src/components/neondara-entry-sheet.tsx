@@ -49,7 +49,7 @@ const getFormSchema = (t: (key: any) => string) => z.object({
   direction: z.enum(['given', 'received'], { required_error: t('errorSelectDirection') }),
   personId: z.string({ required_error: t('errorSelectPerson') }),
   date: z.date({ required_error: t('errorSelectDate') }),
-  occasion: z.enum(['Wedding', 'Birth', 'Housewarming', 'Other']),
+  event: z.enum(['Wedding', 'Birth', 'Housewarming', 'Other']),
   giftType: z.enum(['Money', 'Sweets', 'Gift', 'Other']),
   amount: z.coerce.number().positive({ message: t('errorPositiveAmount') }).optional(),
   description: z.string().optional(),
@@ -64,7 +64,9 @@ const getFormSchema = (t: (key: any) => string) => z.object({
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('errorAmountKgRequired'), path: ['amount'] });
         }
     } else if (data.giftType === 'Gift') {
-        // Gift image/description is now optional
+        if (!data.description) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('giftImageRequired'), path: ['description'] });
+        }
     } else if (data.giftType === 'Other') {
       if (!data.description || data.description.trim().length < 2) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('errorDescriptionRequired'), path: ['description'] });
@@ -100,7 +102,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
                 direction: 'given',
                 personId: undefined,
                 date: new Date(),
-                occasion: 'Wedding',
+                event: 'Wedding',
                 giftType: 'Money',
                 amount: undefined,
                 description: '',
@@ -274,7 +276,7 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             name="date"
             render={({ field }) => (
                 <FormItem className="flex flex-col">
-                <FormLabel>{t('dateOfOccasion')} *</FormLabel>
+                <FormLabel>{t('dateOfEvent')} *</FormLabel>
                 {isMobile ? (
                   <FormControl>
                     <Input
@@ -332,21 +334,21 @@ export function NeondaraEntrySheet({ isOpen, onOpenChange, onAddEntry, onUpdateE
             />
             <FormField
               control={form.control}
-              name="occasion"
+              name="event"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('occasion')} *</FormLabel>
+                  <FormLabel>{t('event')} *</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('occasion')} />
+                        <SelectValue placeholder={t('event')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Wedding">{t('occasionWedding')}</SelectItem>
-                      <SelectItem value="Birth">{t('occasionBirth')}</SelectItem>
-                      <SelectItem value="Housewarming">{t('occasionHousewarming')}</SelectItem>
-                      <SelectItem value="Other">{t('occasionOther')}</SelectItem>
+                      <SelectItem value="Wedding">{t('eventWedding')}</SelectItem>
+                      <SelectItem value="Birth">{t('eventBirth')}</SelectItem>
+                      <SelectItem value="Housewarming">{t('eventHousewarming')}</SelectItem>
+                      <SelectItem value="Other">{t('eventOther')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

@@ -117,7 +117,12 @@ export default function PersonDetailPage() {
   }
 
   const balanceColor = summaryStats.netMoney === 0 ? 'text-foreground' : summaryStats.netMoney > 0 ? 'text-green-600' : 'text-red-600';
-  const balanceText = summaryStats.netMoney === 0 ? t('allSquare') : summaryStats.netMoney > 0 ? t('youHaveGivenMore', { amount: new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney)) }) : t('youAreOwed', { amount: new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney)) });
+  const balanceText = useMemo(() => {
+      if (summaryStats.netMoney === 0) return t('allSquare');
+      const formattedAmount = `Rs ${new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney))}`;
+      if (summaryStats.netMoney > 0) return t('youHaveGivenMore', { amount: formattedAmount });
+      return t('youAreOwed', { amount: formattedAmount });
+  }, [summaryStats.netMoney, t]);
 
   return (
     <AppLayout onExport={handleExport}>
@@ -142,11 +147,11 @@ export default function PersonDetailPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                         <div>
                             <p className="text-sm text-muted-foreground">{t('totalGiven')}</p>
-                            <p className="text-2xl font-bold">{new Intl.NumberFormat().format(summaryStats.moneyGiven)}</p>
+                            <p className="text-2xl font-bold">{`Rs ${new Intl.NumberFormat().format(summaryStats.moneyGiven)}`}</p>
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">{t('totalReceived')}</p>
-                            <p className="text-2xl font-bold">{new Intl.NumberFormat().format(summaryStats.moneyReceived)}</p>
+                            <p className="text-2xl font-bold">{`Rs ${new Intl.NumberFormat().format(summaryStats.moneyReceived)}`}</p>
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">{t('netBalance')}</p>
@@ -212,5 +217,3 @@ export default function PersonDetailPage() {
     </AppLayout>
   );
 }
-
-    

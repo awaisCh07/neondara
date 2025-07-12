@@ -84,6 +84,8 @@ export default function PeoplePage() {
   const [editingPerson, setEditingPerson] = useState<Person | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
   
   const { register, handleSubmit, reset, control, formState: { errors }, setValue } = useForm<PersonFormData>({
     resolver: zodResolver(personSchema),
@@ -140,6 +142,15 @@ export default function PeoplePage() {
     }
   };
 
+  const handleDeletePerson = async (personId: string) => {
+    setIsDeleting(personId);
+    try {
+        await deletePerson(personId);
+    } finally {
+        setIsDeleting(null);
+    }
+  }
+
   const getBalanceColor = (balance: number) => {
     if (balance > 0) return 'text-green-600'; // User has given more
     if (balance < 0) return 'text-red-600'; // User has received more (is owed)
@@ -148,8 +159,9 @@ export default function PeoplePage() {
   
   const getBalanceText = (balance: number) => {
     if (balance === 0) return t('allSquare');
-    if (balance > 0) return t('youHaveGivenMore', { amount: new Intl.NumberFormat().format(Math.abs(balance)) });
-    return t('youAreOwed', { amount: new Intl.NumberFormat().format(Math.abs(balance)) });
+    const formattedAmount = `Rs ${new Intl.NumberFormat().format(Math.abs(balance))}`;
+    if (balance > 0) return t('youHaveGivenMore', { amount: formattedAmount });
+    return t('youAreOwed', { amount: formattedAmount });
   }
 
   const getRelationDisplay = (relationKey: string) => {
@@ -295,8 +307,8 @@ export default function PeoplePage() {
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                               <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deletePerson(person.id)} className="bg-destructive hover:bg-destructive/90">
-                                  {t('delete')}
+                              <AlertDialogAction onClick={() => handleDeletePerson(person.id)} disabled={!!isDeleting} className="bg-destructive hover:bg-destructive/90">
+                                  {isDeleting === person.id ? t('deleting') : t('delete')}
                               </AlertDialogAction>
                               </AlertDialogFooter>
                           </AlertDialogContent>
@@ -305,7 +317,7 @@ export default function PeoplePage() {
                 </CardHeader>
                 <CardContent className="flex-grow">
                     <p className={`text-3xl font-bold ${getBalanceColor(person.balance)}`}>
-                    {new Intl.NumberFormat().format(Math.abs(person.balance))}
+                    {`Rs ${new Intl.NumberFormat().format(Math.abs(person.balance))}`}
                     </p>
                     <p className={`text-sm mt-1 ${getBalanceColor(person.balance)}`}>
                     {getBalanceText(person.balance)}

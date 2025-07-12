@@ -10,6 +10,8 @@ import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, T
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from './language-provider';
 import { format } from 'date-fns';
+import * as XLSX from 'xlsx';
+
 
 type EntryInput = Omit<NeondaraEntry, 'id' | 'userId' | 'person'>;
 type EntryUpdate = Omit<NeondaraEntry, 'userId' | 'person'>;
@@ -240,46 +242,74 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return;
     }
 
-    const headers = ['ID', 'Direction', 'Person', 'Date', 'Occasion', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'];
-    const escapeCsvCell = (cellData: any) => {
-        if (cellData === null || cellData === undefined) return '';
-        const stringData = String(cellData);
-        if (stringData.includes('"') || stringData.includes(',') || stringData.includes('\n')) {
-            return `"${stringData.replace(/"/g, '""')}"`;
+    const headers = ['DATE', 'PERSON', 'STATUS', 'EVENT', 'GIFT TYPE', 'AMOUNT', 'DESCRIPTION/GIFT', 'NOTES'];
+    
+    const dataForSheet = dataToExport.map(entry => ({
+        DATE: format(entry.date, 'yyyy-MM-dd'),
+        PERSON: entry.person,
+        STATUS: entry.direction.toUpperCase(),
+        EVENT: entry.event.toUpperCase(),
+        'GIFT TYPE': entry.giftType.toUpperCase(),
+        AMOUNT: entry.giftType === 'Money' ? `Rs ${entry.amount}` : entry.amount, // Add Rs prefix and handle non-money amounts
+        'DESCRIPTION/GIFT': entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? 'Image Embedded' : entry.description,
+        NOTES: entry.notes || '',
+    }));
+
+    // Calculate summary
+    let moneyGiven = 0;
+    let moneyReceived = 0;
+    dataToExport.forEach(entry => {
+        if (entry.giftType === 'Money' && entry.amount) {
+            if (entry.direction === 'given') moneyGiven += entry.amount;
+            else moneyReceived += entry.amount;
         }
-        return stringData;
-    };
+    });
+    const netMoney = moneyGiven - moneyReceived;
 
-    const csvContent = [
-        headers.join(','),
-        ...dataToExport.map(entry => [
-            escapeCsvCell(entry.id),
-            escapeCsvCell(entry.direction),
-            escapeCsvCell(entry.person),
-            escapeCsvCell(format(entry.date, 'yyyy-MM-dd')),
-            escapeCsvCell(entry.occasion),
-            escapeCsvCell(entry.giftType),
-            escapeCsvCell(entry.amount),
-            escapeCsvCell(entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? 'Image Embedded' : entry.description),
-            escapeCsvCell(entry.notes),
-        ].join(','))
-    ].join('\n');
+    // Create worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(dataForSheet, { header: headers });
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
+    // Set column widths
+    ws['!cols'] = [
+        { wch: 12 }, // Date
+        { wch: 20 }, // Person
+        { wch: 10 }, // Status
+        { wch: 15 }, // Event
+        { wch: 15 }, // Gift Type
+        { wch: 12 }, // Amount
+        { wch: 40 }, // Description
+        { wch: 40 }, // Notes
+    ];
+
+    // Center align amount column
+    const range = XLSX.utils.decode_range(ws['!ref']!);
+    for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+        const cell_address = { c: 5, r: R }; // 5 is the index for Amount column
+        const cell_ref = XLSX.utils.encode_cell(cell_address);
+        if (ws[cell_ref]) {
+            ws[cell_ref].s = { alignment: { horizontal: "center" } };
+        }
+    }
+     // Add balance summary at the bottom
+    XLSX.utils.sheet_add_aoa(ws, [[]], { origin: -1 }); // Add a blank row
+    XLSX.utils.sheet_add_aoa(ws, [["BALANCE SUMMARY"]], { origin: -1 });
+    XLSX.utils.sheet_add_aoa(ws, [["Total Given", `Rs ${moneyGiven.toLocaleString()}`]], { origin: -1 });
+    XLSX.utils.sheet_add_aoa(ws, [["Total Received", `Rs ${moneyReceived.toLocaleString()}`]], { origin: -1 });
+    XLSX.utils.sheet_add_aoa(ws, [["Net Balance", `Rs ${netMoney.toLocaleString()}`]], { origin: -1 });
+
+
+    // Create and download workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Neondara History");
+    
     const filename = person 
-      ? `neondara_history_${person.name}_${new Date().toISOString().split('T')[0]}.csv`
-      : `neondara_history_export_${new Date().toISOString().split('T')[0]}.csv`;
-    
-    link.setAttribute("href", URL.createObjectURL(blob));
-    link.setAttribute("download", filename);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({ title: "Export Successful", description: "Your data has been downloaded as a CSV file." });
-  }, [entries, getPersonById, t, toast]);
+      ? `NEONDARA_HISTORY_${person.name}_${new Date().toISOString().split('T')[0]}.xlsx`
+      : `NEONDARA_HISTORY_EXPORT_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+    XLSX.writeFile(wb, filename);
+
+    toast({ title: "Export Successful", description: "Your data has been downloaded as an Excel file." });
+}, [entries, getPersonById, t, toast]);
 
 
   const value = {

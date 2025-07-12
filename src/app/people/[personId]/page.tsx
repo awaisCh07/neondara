@@ -83,6 +83,14 @@ export default function PersonDetailPage() {
     };
   }, [personEntries]);
 
+  const balanceText = useMemo(() => {
+      if (summaryStats.netMoney === 0) return t('allSquare');
+      const formattedAmount = `Rs ${new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney))}`;
+      if (summaryStats.netMoney > 0) return t('youHaveGivenMore', { amount: formattedAmount });
+      return t('youAreOwed', { amount: formattedAmount });
+  }, [summaryStats.netMoney, t]);
+
+
   const handleOpenSheet = (entry?: Omit<NeondaraEntry, 'userId'>) => {
     setEditingEntry(entry as NeondaraEntry | undefined);
     setIsSheetOpen(true);
@@ -117,12 +125,6 @@ export default function PersonDetailPage() {
   }
 
   const balanceColor = summaryStats.netMoney === 0 ? 'text-foreground' : summaryStats.netMoney > 0 ? 'text-green-600' : 'text-red-600';
-  const balanceText = useMemo(() => {
-      if (summaryStats.netMoney === 0) return t('allSquare');
-      const formattedAmount = `Rs ${new Intl.NumberFormat().format(Math.abs(summaryStats.netMoney))}`;
-      if (summaryStats.netMoney > 0) return t('youHaveGivenMore', { amount: formattedAmount });
-      return t('youAreOwed', { amount: formattedAmount });
-  }, [summaryStats.netMoney, t]);
 
   return (
     <AppLayout onExport={handleExport}>

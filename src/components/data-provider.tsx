@@ -193,25 +193,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const deletePerson = async (personId: string) => {
     if (!user) return;
     try {
-      // Find all entries for this person
       const entriesQuery = query(collection(db, "neondara_entries"), where("userId", "==", user.uid), where("personId", "==", personId));
       const entriesSnapshot = await getDocs(entriesQuery);
       
       const batch = writeBatch(db);
 
-      // Delete all found entries
       entriesSnapshot.forEach(doc => {
           batch.delete(doc.ref);
       });
 
-      // Delete the person document
       const personRef = doc(db, 'people', personId);
       batch.delete(personRef);
       
-      // Commit the batch
       await batch.commit();
 
-      // Update local state
       setPeople(prev => prev.filter(p => p.id !== personId));
       setEntries(prev => prev.filter(e => e.personId !== personId));
       
@@ -242,20 +237,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return;
     }
 
-    const headers = ['DATE', 'PERSON', 'STATUS', 'EVENT', 'GIFT TYPE', 'AMOUNT', 'DESCRIPTION/GIFT', 'NOTES'];
+    const headers = ['Date', 'Person', 'Status', 'Event', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'];
     
     const dataForSheet = dataToExport.map(entry => ({
-        DATE: format(entry.date, 'yyyy-MM-dd'),
-        PERSON: entry.person,
-        STATUS: entry.direction.toUpperCase(),
-        EVENT: (entry.event || 'OTHER').toUpperCase(),
-        'GIFT TYPE': entry.giftType.toUpperCase(),
-        AMOUNT: entry.giftType === 'Money' ? `Rs ${entry.amount}` : entry.amount, // Add Rs prefix and handle non-money amounts
-        'DESCRIPTION/GIFT': entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? 'Image Embedded' : entry.description,
-        NOTES: entry.notes || '',
+        Date: format(entry.date, 'yyyy-MM-dd'),
+        Person: entry.person,
+        Status: entry.direction.toUpperCase(),
+        Event: (entry.event || 'OTHER').toUpperCase(),
+        'Gift Type': entry.giftType.toUpperCase(),
+        Amount: entry.giftType === 'Money' && entry.amount ? `Rs ${entry.amount}` : (entry.amount || ''),
+        'Description/Gift': entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? 'Image Embedded' : entry.description,
+        Notes: entry.notes || '',
     }));
 
-    // Calculate summary
     let moneyGiven = 0;
     let moneyReceived = 0;
     dataToExport.forEach(entry => {
@@ -266,11 +260,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
     const netMoney = moneyGiven - moneyReceived;
 
-    // Create worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(dataForSheet, { header: headers });
 
-    // Set column widths
+    const range = XLSX.utils.decode_range(ws['!ref']!);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = { c: C, r: R };
+            const cell_ref = XLSX.utils.encode_cell(cell_address);
+            if (ws[cell_ref]) {
+                ws[cell_ref].s = { 
+                    alignment: { wrapText: true, vertical: 'top' },
+                };
+                 // Center align amount column
+                if (C === 5 && R > 0) { // 5 is the index for Amount column, R > 0 to skip header
+                     ws[cell_ref].s.alignment.horizontal = "center";
+                }
+            }
+        }
+    }
+    
     ws['!cols'] = [
         { wch: 12 }, // Date
         { wch: 20 }, // Person
@@ -278,33 +287,21 @@ export function DataProvider({ children }: { children: ReactNode }) {
         { wch: 15 }, // Event
         { wch: 15 }, // Gift Type
         { wch: 12 }, // Amount
-        { wch: 40 }, // Description
-        { wch: 40 }, // Notes
+        { wch: 30 }, // Description
+        { wch: 30 }, // Notes
     ];
-
-    // Center align amount column
-    const range = XLSX.utils.decode_range(ws['!ref']!);
-    for (let R = range.s.r + 1; R <= range.e.r; ++R) {
-        const cell_address = { c: 5, r: R }; // 5 is the index for Amount column
-        const cell_ref = XLSX.utils.encode_cell(cell_address);
-        if (ws[cell_ref]) {
-            ws[cell_ref].s = { alignment: { horizontal: "center" } };
-        }
-    }
-     // Add balance summary at the bottom
-    XLSX.utils.sheet_add_aoa(ws, [[]], { origin: -1 }); // Add a blank row
-    XLSX.utils.sheet_add_aoa(ws, [["BALANCE SUMMARY"]], { origin: -1 });
+    
+    XLSX.utils.sheet_add_aoa(ws, [[]], { origin: -1 });
+    XLSX.utils.sheet_add_aoa(ws, [["Balance Summary"]], { origin: -1 });
     XLSX.utils.sheet_add_aoa(ws, [["Total Given", `Rs ${moneyGiven.toLocaleString()}`]], { origin: -1 });
     XLSX.utils.sheet_add_aoa(ws, [["Total Received", `Rs ${moneyReceived.toLocaleString()}`]], { origin: -1 });
     XLSX.utils.sheet_add_aoa(ws, [["Net Balance", `Rs ${netMoney.toLocaleString()}`]], { origin: -1 });
 
-
-    // Create and download workbook
     XLSX.utils.book_append_sheet(wb, ws, "Neondara History");
     
     const filename = person 
-      ? `NEONDARA_HISTORY_${person.name}_${new Date().toISOString().split('T')[0]}.xlsx`
-      : `NEONDARA_HISTORY_EXPORT_${new Date().toISOString().split('T')[0]}.xlsx`;
+      ? `Neondara_History_${person.name}_${new Date().toISOString().split('T')[0]}.xlsx`
+      : `Neondara_History_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
 
     XLSX.writeFile(wb, filename);
 

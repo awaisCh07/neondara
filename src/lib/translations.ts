@@ -78,7 +78,7 @@ export const translations: Translations = {
     entryDeletedSuccess: { en: 'Entry has been deleted.', ur: 'اندراج کو حذف کر دیا گیا ہے۔' },
     
     // Neondara Timeline / Filters
-    searchByGift: { en: 'Search by gift...', ur: 'تحفے کے لحاظ سے تلاش کریں...' },
+    searchByGift: { en: 'Search person, gift, notes...', ur: 'شخص، تحفہ، نوٹ تلاش کریں...' },
     allPeople: { en: 'All People', ur: 'تمام لوگ' },
     allEvents: { en: 'All Events', ur: 'تمام تقریبات' },
     givenAndReceived: { en: 'Given & Received', ur: 'دیا اور وصول کیا' },

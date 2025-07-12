@@ -50,7 +50,7 @@ export default function LoginPage() {
 
     try {
       if (!isEmail(identifier)) {
-        // It's a phone number, we need to find the associated email.
+        // It's a phone number, we need to find the associated auth email.
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where("phone", "==", identifier));
         const querySnapshot = await getDocs(q);
@@ -60,13 +60,17 @@ export default function LoginPage() {
         }
         
         const userData = querySnapshot.docs[0].data();
-        userEmail = userData.email;
+        userEmail = userData.authEmail; // Use the authEmail for login
       }
 
       await signInWithEmailAndPassword(auth, userEmail, password);
       router.push('/');
     } catch (err: any) {
-      setError(err.message);
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+            setError("Invalid credentials. Please check your email/phone and password.");
+        } else {
+            setError(err.message);
+        }
     } finally {
       setLoading(false);
     }

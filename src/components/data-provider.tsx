@@ -241,7 +241,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     const headers = ['S.No.', 'Date', 'Person', 'Status', 'Event', 'Gift Type', 'Amount', 'Description/Gift', 'Notes'];
     
-    const dataForSheet = dataToExport.map((entry, index) => ({
+    const dataForSheet = dataToExport.map((entry, index) => {
+      let amountDisplay = '';
+      if (entry.giftType === 'Money' && entry.amount) {
+        amountDisplay = entry.amount.toLocaleString();
+      } else if (entry.giftType === 'Sweets' && entry.amount) {
+        amountDisplay = `${entry.amount} kg`;
+      }
+
+      return {
         'S.No.': index + 1,
         'Date': format(entry.date, 'yyyy-MM-dd'),
         'Person': entry.person,
@@ -249,10 +257,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         // @ts-ignore - Handle legacy 'occasion' field
         'Event': toTitleCase(entry.event || entry.occasion || 'Other'),
         'Gift Type': toTitleCase(entry.giftType),
-        'Amount': entry.giftType === 'Money' ? entry.amount : '',
+        'Amount': amountDisplay,
         'Description/Gift': entry.giftType === 'Gift' && entry.description.startsWith('data:image') ? 'Image Embedded' : entry.description,
         'Notes': entry.notes || '',
-    }));
+    }});
 
     let moneyGiven = 0;
     let moneyReceived = 0;
@@ -364,3 +372,5 @@ export function useData() {
   }
   return context;
 }
+
+    

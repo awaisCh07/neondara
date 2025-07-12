@@ -4,9 +4,10 @@
 import { useEffect, useState, useMemo } from 'react';
 import type { NeondaraEntry, Person } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Gift, Grape, Download } from 'lucide-react';
+import { ArrowLeft, Gift, Grape, Download, Search } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { NeondaraEntrySheet } from '@/components/neondara-entry-sheet';
 import { useLanguage } from '@/components/language-provider';
 import { AppLayout } from '@/components/layout';
@@ -35,14 +36,27 @@ export default function PersonDetailPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<NeondaraEntry | undefined>(undefined);
   const { t } = useLanguage();
+  const [searchTerm, setSearchTerm] = useState('');
+
 
   const person = useMemo(() => getPersonById(personId), [personId, getPersonById]);
 
   const personEntries = useMemo(() => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
     return entries
-      .filter(entry => entry.personId === personId)
+      .filter(entry => {
+        if (entry.personId !== personId) return false;
+
+        if (searchTerm.length > 0) {
+          const descriptionMatch = entry.description && entry.description.toLowerCase().includes(lowerCaseSearchTerm);
+          const notesMatch = entry.notes && entry.notes.toLowerCase().includes(lowerCaseSearchTerm);
+          return descriptionMatch || notesMatch;
+        }
+        
+        return true;
+      })
       .sort((a, b) => b.date.getTime() - a.date.getTime());
-  }, [entries, personId]);
+  }, [entries, personId, searchTerm]);
 
   const summaryStats = useMemo(() => {
     let moneyGiven = 0;
@@ -52,7 +66,10 @@ export default function PersonDetailPage() {
     let giftsGivenCount = 0;
     let giftsReceivedCount = 0;
 
-    personEntries.forEach(entry => {
+    // Summary should be based on all entries for the person, not filtered ones.
+    const allPersonEntries = entries.filter(entry => entry.personId === personId);
+
+    allPersonEntries.forEach(entry => {
       if (entry.direction === 'given') {
         if (entry.giftType === 'Money' && entry.amount) {
           moneyGiven += entry.amount;
@@ -81,7 +98,7 @@ export default function PersonDetailPage() {
         giftsGivenCount,
         giftsReceivedCount
     };
-  }, [personEntries]);
+  }, [entries, personId]);
   
   const balanceColor = useMemo(() => summaryStats.netMoney === 0 ? 'text-foreground' : summaryStats.netMoney > 0 ? 'text-green-600' : 'text-red-600', [summaryStats.netMoney]);
 
@@ -135,10 +152,22 @@ export default function PersonDetailPage() {
                     <ArrowLeft className="mr-2 h-4 w-4"/>
                     {t('backToPeople')}
                 </Link>
-                <Button size="sm" onClick={handleExport}>
-                    <Download className="mr-2 h-4 w-4" />
-                    {t('exportData')}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder={t('searchByGift')}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 w-full sm:w-64"
+                            aria-label={t('searchByGift')}
+                        />
+                    </div>
+                    <Button size="sm" onClick={handleExport}>
+                        <Download className="mr-2 h-4 w-4" />
+                        {t('exportData')}
+                    </Button>
+                </div>
               </div>
 
                <h1 className="text-4xl font-headline">{person.name}</h1>
@@ -205,13 +234,13 @@ export default function PersonDetailPage() {
               <div className="grid gap-6">
                   {personEntries.map(entry => {
                       const { userId, ...cardEntry } = entry;
-                      return <NeondaraCard key={entry.id} entry={cardEntry} onEdit={handleOpenSheet} onDelete={deleteEntry} personName={person.name}/>
+                      return <NeondaraCard key={entry.id} entry={cardEntry} onEdit={handleOpenSheet} onDelete={deleteEntry} personName={person.name} searchTerm={searchTerm}/>
                   })}
               </div>
           ) : (
               <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
-                  <h3 className="text-xl font-semibold text-foreground">{t('noHistoryYet')}</h3>
-                  <p className="mt-2">{t('startTracking')} {person.name}.</p>
+                  <h3 className="text-xl font-semibold text-foreground">{t('noEntriesFound')}</h3>
+                  <p className="mt-2">{searchTerm ? t('adjustFilters') : `${t('noHistoryYet')} ${t('startTracking')} ${person.name}.`}</p>
               </div>
           )}
           <NeondaraEntrySheet

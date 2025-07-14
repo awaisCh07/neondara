@@ -73,9 +73,6 @@ export const translations: Translations = {
     // History View
     addEntry: { en: 'Add Entry', ur: 'اندراج شامل کریں' },
     loadingHistory: { en: 'Loading history...', ur: 'ہسٹری لوڈ ہو رہی ہے۔۔۔' },
-    entryAddedSuccess: { en: 'New entry added to the history.', ur: 'نیا اندراج ہسٹری میں شامل کر دیا گیا ہے۔' },
-    entryUpdatedSuccess: { en: 'Entry has been updated.', ur: 'اندراج کو اپ ڈیٹ کر دیا گیا ہے۔' },
-    entryDeletedSuccess: { en: 'Entry has been deleted.', ur: 'اندراج کو حذف کر دیا گیا ہے۔' },
     
     // Neondara Timeline / Filters
     searchByGift: { en: 'Search person, gift, notes...', ur: 'شخص، تحفہ، نوٹ تلاش کریں...' },
@@ -135,6 +132,8 @@ export const translations: Translations = {
     errorDescriptionRequired: { en: "A description for the gift is required.", ur: "تحفے کے لیے تفصیل درکار ہے۔" },
     errorMin2Chars: { en: "Must be at least 2 characters.", ur: "کم از کم 2 حروف کا ہونا ضروری ہے۔" },
     errorSelectRelation: { en: "Please select a relation.", ur: "براہ کرم ایک رشتہ منتخب کریں۔" },
+    emailInUseError: { en: "This email is already registered.", ur: "یہ ای میل پہلے ہی رجسٹرڈ ہے۔" },
+    invalidCredentialsError: { en: "Invalid credentials. Please check your email and password.", ur: "غلط اسناد۔ براہ کرم اپنا ای میل اور پاس ورڈ چیک کریں۔" },
     
     // People Page
     backToHistory: { en: 'Back to History', ur: 'ہسٹری پر واپس' },
@@ -173,16 +172,19 @@ export const translations: Translations = {
     updateEntryError: { en: "Failed to update entry.", ur: "اندراج کو اپ ڈیٹ کرنے میں ناکامی۔" },
     deleteEntryError: { en: "Failed to delete entry.", ur: "اندراج کو حذف کرنے میں ناکامی۔" },
     personExistsError: { en: "A person named \"{{name}}\" already exists.", ur: "\"{{name}}\" نام کا ایک شخص پہلے سے موجود ہے۔" },
-    personAddedSuccess: { en: "{{name}} has been added.", ur: "{{name}} کو شامل کر دیا گیا ہے۔" },
     addPersonError: { en: "Failed to add person.", ur: "شخص کو شامل کرنے میں ناکامی۔" },
-    personUpdatedSuccess: { en: "{{name}} has been updated.", ur: "{{name}} کو اپ ڈیٹ کر دیا گیا ہے۔" },
     updatePersonError: { en: "Failed to update person.", ur: "شخص کو اپ ڈیٹ کرنے میں ناکامی۔" },
-    personDeletedSuccess: { en: "Person and their history have been deleted.", ur: "شخص اور ان کی ہسٹری کو حذف کر دیا گیا ہے۔" },
     deletePersonError: { en: "Failed to delete person.", ur: "شخص کو حذف کرنے میں ناکامی۔" },
     noDataToExport: { en: "No Data to Export", ur: "برآمد کرنے کے لیے کوئی ڈیٹا نہیں" },
     noHistoryToExport: { en: "There are no history entries to export.", ur: "برآمد کرنے کے لیے کوئی ہسٹری اندراجات نہیں ہیں۔" },
     exportSuccessTitle: { en: "Export Successful", ur: "برآمد کامیاب" },
     exportSuccessDescription: { en: "Your data has been downloaded as an Excel file.", ur: "آپ کا ڈیٹا ایکسل فائل کے طور پر ڈاؤن لوڈ کر لیا گیا ہے۔" },
+    entryAddedSuccess: { en: 'New entry added to the history.', ur: 'نیا اندراج ہسٹری میں شامل کر دیا گیا ہے۔' },
+    entryUpdatedSuccess: { en: 'Entry has been updated.', ur: 'اندراج کو اپ ڈیٹ کر دیا گیا ہے۔' },
+    entryDeletedSuccess: { en: 'Entry has been deleted.', ur: 'اندراج کو حذف کر دیا گیا ہے۔' },
+    personAddedSuccess: { en: "{{name}} has been added.", ur: "{{name}} کو شامل کر دیا گیا ہے۔" },
+    personUpdatedSuccess: { en: "{{name}} has been updated.", ur: "{{name}} کو اپ ڈیٹ کر دیا گیا ہے۔" },
+    personDeletedSuccess: { en: "Person and their history have been deleted.", ur: "شخص اور ان کی ہسٹری کو حذف کر دیا گیا ہے۔" },
 };
 
 export const useTranslation = (language: Language) => {

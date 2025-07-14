@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import Link from 'next/link';
 import { useLanguage } from '@/components/language-provider';
 import { cn } from '@/lib/utils';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 export default function SignupPage() {
   const { language, t } = useLanguage();
@@ -47,7 +48,7 @@ export default function SignupPage() {
       router.push('/');
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
-          setError("This email is already registered.");
+          setError(t('emailInUseError'));
       } else {
        setError(err.message);
       }
@@ -59,6 +60,9 @@ export default function SignupPage() {
 
   return (
     <div className={cn("flex items-center justify-center min-h-screen bg-background", language === 'ur' ? 'font-urdu' : 'font-body')}>
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">{t('signupTitle')}</CardTitle>

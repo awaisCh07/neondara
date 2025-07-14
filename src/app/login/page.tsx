@@ -7,7 +7,13 @@ import {
   signInWithEmailAndPassword, 
   sendPasswordResetEmail
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import {
+    collection,
+    query,
+    where,
+    getDocs,
+} from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +23,7 @@ import { useLanguage } from '@/components/language-provider';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 export default function LoginPage() {
   const { language, t } = useLanguage();
@@ -43,7 +50,7 @@ export default function LoginPage() {
       router.push('/');
     } catch (err: any) {
         if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-            setError("Invalid credentials. Please check your email and password.");
+            setError(t('invalidCredentialsError'));
         } else {
             setError(err.message);
         }
@@ -77,6 +84,9 @@ export default function LoginPage() {
 
   return (
     <div className={cn("flex items-center justify-center min-h-screen bg-background", language === 'ur' ? 'font-urdu' : 'font-body')}>
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">{t('loginTitle')}</CardTitle>

@@ -10,8 +10,8 @@ type Translations = {
 
 export const translations: Translations = {
     // App Metadata
-    appTitle: { en: 'Neondara History', ur: 'نیوندرا ہسٹری' },
-    appDescription: { en: 'Manage and store records for the cultural tradition of Neondara.', ur: 'نیوندرا کی ثقافتی روایت کے لیے ریکارڈز کا نظم اور ذخیرہ کریں۔' },
+    appTitle: { en: 'Niondra Ledger', ur: 'نیوندرا لیجر' },
+    appDescription: { en: 'Manage and store records for the cultural tradition of Niondra.', ur: 'نیوندرا کی ثقافتی روایت کے لیے ریکارڈز کا نظم اور ذخیرہ کریں۔' },
 
     // General
     add: { en: 'Add', ur: 'شامل کریں' },
@@ -26,6 +26,7 @@ export const translations: Translations = {
     success: { en: 'Success', ur: 'کامیابی' },
     name: { en: 'Name', ur: 'نام' },
     email: { en: 'Email', ur: 'ای میل' },
+    yourEmail: { en: 'your email', ur: 'آپ کا ای میل' },
     password: { en: 'Password', ur: 'پاس ورڈ' },
     notes: { en: 'Notes', ur: 'نوٹس' },
     description: { en: 'Description', ur: 'تفصیل' },
@@ -53,7 +54,7 @@ export const translations: Translations = {
 
     // Signup Page
     signupTitle: { en: 'Sign Up', ur: 'سائن اپ' },
-    signupDescription: { en: 'Create an account to start using the Neondara History.', ur: 'نیوندرا ہسٹری استعمال شروع کرنے کے لیے ایک اکاؤنٹ بنائیں۔' },
+    signupDescription: { en: 'Create an account to start using the Niondra Ledger.', ur: 'نیوندرا لیجر استعمال شروع کرنے کے لیے ایک اکاؤنٹ بنائیں۔' },
     fullName: { en: 'Full Name', ur: 'پورا نام' },
     createAccount: { en: 'Create Account', ur: 'اکاؤنٹ بنائیں' },
     creatingAccount: { en: 'Creating Account...', ur: 'اکاؤنٹ بن رہا ہے۔۔۔' },
@@ -62,14 +63,14 @@ export const translations: Translations = {
 
     // Verify Email Page
     verifyEmailTitle: { en: 'Verify Your Email', ur: 'اپنا ای میل تصدیق کریں' },
-    verifyEmailDescription: { en: 'A verification link has been sent to {{email}}. Please check your inbox.', ur: 'ایک تصدیقی لنک {{email}} پر بھیج دیا گیا ہے۔ براہ کرم اپنا ان باکس چیک کریں۔' },
-    verifyEmailInstructions: { en: "Didn't receive the email? Click the button below to resend it.", ur: 'ای میل موصول نہیں ہوئی؟ اسے دوبارہ بھیجنے کے لیے نیچے دیا گیا بٹن دبائیں۔' },
+    verifyEmailDescription: { en: 'We have sent a verification link to {{email}}. Please check your inbox (and spam folder).', ur: 'ہم نے {{email}} پر ایک تصدیقی لنک بھیجا ہے۔ براہ کرم اپنا ان باکس (اور اسپام فولڈر) چیک کریں۔' },
+    verifyEmailInstructions: { en: 'Click the link in the email to activate your account. Once verified, you can log in.', ur: 'اپنا اکاؤنٹ فعال کرنے کے لیے ای میل میں موجود لنک پر کلک کریں۔ تصدیق کے بعد، آپ لاگ ان کر سکتے ہیں۔' },
     resendVerificationEmail: { en: 'Resend Verification Email', ur: 'تصدیقی ای میل دوبارہ بھیجیں' },
     sending: { en: 'Sending...', ur: 'بھیجا جا رہا ہے۔۔۔'},
     wrongAccount: { en: 'Wrong account?', ur: 'غلط اکاؤنٹ؟'},
     logInWithDifferentAccount: { en: 'Log in with a different account', ur: 'مختلف اکاؤنٹ سے لاگ ان کریں' },
     verificationEmailSentTitle: { en: 'Verification Email Sent', ur: 'تصدیقی ای میل بھیج دی گئی' },
-    verificationEmailSentDescription: { en: 'A link to verify your account has been sent to your email address.', ur: 'آپ کے اکاؤنٹ کی تصدیق کے لیے ایک لنک آپ کے ای میل ایڈریس پر بھیج دیا گیا ہے۔' },
+    verificationEmailSentDescription: { en: 'A new link to verify your account has been sent to your email address.', ur: 'آپ کے اکاؤنٹ کی تصدیق کے لیے ایک نیا لنک آپ کے ای میل ایڈریس پر بھیج دیا گیا ہے۔' },
 
 
     // Layout / Header
@@ -86,7 +87,7 @@ export const translations: Translations = {
     addEntry: { en: 'Add Entry', ur: 'اندراج شامل کریں' },
     loadingHistory: { en: 'Loading history...', ur: 'ہسٹری لوڈ ہو رہی ہے۔۔۔' },
     
-    // Neondara Timeline / Filters
+    // Niondra Timeline / Filters
     searchByGift: { en: 'Search person, gift, notes...', ur: 'شخص، تحفہ، نوٹ تلاش کریں...' },
     allPeople: { en: 'All People', ur: 'تمام لوگ' },
     allEvents: { en: 'All Events', ur: 'تمام تقریبات' },
@@ -97,7 +98,7 @@ export const translations: Translations = {
     noEntriesFound: { en: 'No Entries Found', ur: 'کوئی اندراج نہیں ملا' },
     adjustFilters: { en: 'Try adjusting your search or filters, or add a new entry.', ur: 'اپنی تلاش یا فلٹرز کو ایڈجسٹ کرنے کی کوشش کریں، یا ایک نیا اندراج شامل کریں۔' },
     
-    // Neondara Card
+    // Niondra Card
     to: { en: 'To', ur: 'بنام' },
     from: { en: 'From', ur: 'منجانب' },
     eventWedding: { en: 'Wedding', ur: 'شادی' },
@@ -109,10 +110,10 @@ export const translations: Translations = {
     deleteConfirmTitle: { en: 'Are you sure?', ur: 'کیا آپ واقعی حذف کرنا چاہتے ہیں؟' },
     deleteConfirmDescription: { en: 'This action cannot be undone. This will permanently delete this history entry.', ur: 'یہ عمل واپس نہیں کیا جا سکتا۔ یہ اس ہسٹری اندراج کو مستقل طور پر حذف کر دے گا۔' },
     
-    // Neondara Entry Sheet
+    // Niondra Entry Sheet
     addNewEntry: { en: 'Add New Entry', ur: 'نیا اندراج شامل کریں' },
     editEntry: { en: 'Edit Entry', ur: 'اندراج میں ترمیم کریں' },
-    entrySheetDescription: { en: 'Record a Neondara exchange. Fill in the details below.', ur: 'نیوندرا کے تبادلے کو ریکارڈ کریں۔ نیچے تفصیلات پر کریں۔' },
+    entrySheetDescription: { en: 'Record a Niondra exchange. Fill in the details below.', ur: 'نیوندرا کے تبادلے کو ریکارڈ کریں۔ نیچے تفصیلات پر کریں۔' },
     direction: { en: 'Direction', ur: 'سمت' },
     person: { en: 'Person', ur: 'شخص' },
     dateOfEvent: { en: 'Date of Event', ur: 'تقریب کی تاریخ' },
@@ -158,7 +159,7 @@ export const translations: Translations = {
     savePerson: { en: 'Save person', ur: 'شخص کو محفوظ کریں' },
     loadingContacts: { en: 'Loading your contacts...', ur: 'آپ کے رابطے لوڈ ہو رہے ہیں...' },
     noPeopleAdded: { en: 'No People Added Yet', ur: 'ابھی تک کوئی شخص شامل نہیں کیا گیا' },
-    clickAddPerson: { en: 'Click "Add Person" to start building your Neondara network.', ur: 'اپنا نیوندرا نیٹ ورک بنانا شروع کرنے کے لیے "شخص شامل کریں" پر کلک کریں۔' },
+    clickAddPerson: { en: 'Click "Add Person" to start building your Niondra network.', ur: 'اپنا نیوندرا نیٹ ورک بنانا شروع کرنے کے لیے "شخص شامل کریں" پر کلک کریں۔' },
     balance: { en: 'Balance', ur: 'بیلنس' },
     viewHistory: { en: 'View History', ur: 'ہسٹری دیکھیں' },
     allSquare: { en: 'All square', ur: 'حساب برابر' },

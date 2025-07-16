@@ -60,6 +60,18 @@ export const translations: Translations = {
     haveAccount: { en: 'Already have an account?', ur: 'پہلے سے اکاؤنٹ ہے؟' },
     logIn: { en: 'Log in', ur: 'لاگ ان کریں' },
 
+    // Verify Email Page
+    verifyEmailTitle: { en: 'Verify Your Email', ur: 'اپنا ای میل تصدیق کریں' },
+    verifyEmailDescription: { en: 'A verification link has been sent to {{email}}. Please check your inbox.', ur: 'ایک تصدیقی لنک {{email}} پر بھیج دیا گیا ہے۔ براہ کرم اپنا ان باکس چیک کریں۔' },
+    verifyEmailInstructions: { en: "Didn't receive the email? Click the button below to resend it.", ur: 'ای میل موصول نہیں ہوئی؟ اسے دوبارہ بھیجنے کے لیے نیچے دیا گیا بٹن دبائیں۔' },
+    resendVerificationEmail: { en: 'Resend Verification Email', ur: 'تصدیقی ای میل دوبارہ بھیجیں' },
+    sending: { en: 'Sending...', ur: 'بھیجا جا رہا ہے۔۔۔'},
+    wrongAccount: { en: 'Wrong account?', ur: 'غلط اکاؤنٹ؟'},
+    logInWithDifferentAccount: { en: 'Log in with a different account', ur: 'مختلف اکاؤنٹ سے لاگ ان کریں' },
+    verificationEmailSentTitle: { en: 'Verification Email Sent', ur: 'تصدیقی ای میل بھیج دی گئی' },
+    verificationEmailSentDescription: { en: 'A link to verify your account has been sent to your email address.', ur: 'آپ کے اکاؤنٹ کی تصدیق کے لیے ایک لنک آپ کے ای میل ایڈریس پر بھیج دیا گیا ہے۔' },
+
+
     // Layout / Header
     navHistory: { en: 'History', ur: 'ہسٹری' },
     navPeople: { en: 'People', ur: 'لوگ' },

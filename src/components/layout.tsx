@@ -34,10 +34,24 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return; // Wait until auth state is determined
+
+    // If no user, redirect to login
+    if (!user) {
       router.push('/login');
+      return;
     }
-  }, [user, loading, router]);
+    
+    // If user exists but email is not verified, redirect to verify-email page
+    // unless they are already on it.
+    if (!user.emailVerified) {
+        if (pathname !== '/verify-email') {
+             router.push('/verify-email');
+        }
+        return;
+    }
+
+  }, [user, loading, router, pathname]);
 
 
   const handleLogout = async () => {
@@ -64,7 +78,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       { href: '/people', label: t('navPeople'), icon: Users },
   ];
 
-  if (loading || !user) {
+  // If loading, or if the user is not logged in, or if the user's email is not verified,
+  // show a loading screen to prevent content flashing before redirection.
+  if (loading || !user || !user.emailVerified) {
     return (
         <div className="flex items-center justify-center min-h-screen bg-background">
           <p>Loading...</p>

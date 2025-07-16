@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   createUserWithEmailAndPassword, 
+  sendEmailVerification,
   updateProfile,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -17,10 +18,12 @@ import Link from 'next/link';
 import { useLanguage } from '@/components/language-provider';
 import { cn } from '@/lib/utils';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SignupPage() {
   const { language, t } = useLanguage();
   const router = useRouter();
+  const { toast } = useToast();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,7 +48,14 @@ export default function SignupPage() {
           email: email,
       });
 
-      router.push('/');
+      await sendEmailVerification(user);
+
+      toast({
+        title: t('verificationEmailSentTitle'),
+        description: t('verificationEmailSentDescription'),
+      })
+
+      router.push('/verify-email');
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
           setError(t('emailInUseError'));

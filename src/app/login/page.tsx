@@ -7,13 +7,7 @@ import {
   signInWithEmailAndPassword, 
   sendPasswordResetEmail
 } from 'firebase/auth';
-import {
-    collection,
-    query,
-    where,
-    getDocs,
-} from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { auth } from '@/lib/firebase';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,7 +33,6 @@ export default function LoginPage() {
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
-  const [resetError, setResetError] = useState<string | null>(null);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,19 +57,8 @@ export default function LoginPage() {
   const handlePasswordReset = async () => {
     if (!resetEmail) return;
     setResetLoading(true);
-    setResetError(null);
 
     try {
-        // Check if user exists with this email
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("email", "==", resetEmail));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            setResetError(t('emailNotFoundError'));
-            return;
-        }
-
         await sendPasswordResetEmail(auth, resetEmail);
         toast({
             title: t('passwordResetTitle'),
@@ -98,7 +80,6 @@ export default function LoginPage() {
   const openResetDialog = (isOpen: boolean) => {
       setIsResetDialogOpen(isOpen);
       if (!isOpen) {
-          setResetError(null);
           setResetEmail('');
       }
   }
@@ -178,7 +159,6 @@ export default function LoginPage() {
               onChange={(e) => setResetEmail(e.target.value)}
               placeholder="your@example.com"
             />
-            {resetError && <p className="text-sm font-medium text-destructive">{resetError}</p>}
           </div>
           <DialogFooter>
             <DialogClose asChild>

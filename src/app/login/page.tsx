@@ -39,6 +39,7 @@ export default function LoginPage() {
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,14 +64,26 @@ export default function LoginPage() {
   const handlePasswordReset = async () => {
     if (!resetEmail) return;
     setResetLoading(true);
+    setResetError(null);
 
     try {
+        // Check if user exists with this email
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("email", "==", resetEmail));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            setResetError(t('emailNotFoundError'));
+            return;
+        }
+
         await sendPasswordResetEmail(auth, resetEmail);
         toast({
             title: t('passwordResetTitle'),
             description: t('passwordResetDescription'),
         });
         setIsResetDialogOpen(false);
+        setResetEmail('');
     } catch (err: any) {
         toast({
             title: t('error'),
@@ -80,6 +93,14 @@ export default function LoginPage() {
     } finally {
         setResetLoading(false);
     }
+  }
+  
+  const openResetDialog = (isOpen: boolean) => {
+      setIsResetDialogOpen(isOpen);
+      if (!isOpen) {
+          setResetError(null);
+          setResetEmail('');
+      }
   }
 
   return (
@@ -112,7 +133,7 @@ export default function LoginPage() {
             <div className="grid gap-2">
                 <div className="flex items-center justify-between">
                 <Label htmlFor="password">{t('password')}</Label>
-                <Button variant="link" type="button" onClick={() => setIsResetDialogOpen(true)} className="p-0 h-auto text-xs">
+                <Button variant="link" type="button" onClick={() => openResetDialog(true)} className="p-0 h-auto text-xs">
                     {t('forgotPassword')}
                 </Button>
                 </div>
@@ -140,7 +161,7 @@ export default function LoginPage() {
         </div>
       </Card>
 
-      <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+      <Dialog open={isResetDialogOpen} onOpenChange={openResetDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('forgotPassword')}</DialogTitle>
@@ -157,6 +178,7 @@ export default function LoginPage() {
               onChange={(e) => setResetEmail(e.target.value)}
               placeholder="your@example.com"
             />
+            {resetError && <p className="text-sm font-medium text-destructive">{resetError}</p>}
           </div>
           <DialogFooter>
             <DialogClose asChild>

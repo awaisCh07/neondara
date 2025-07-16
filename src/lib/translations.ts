@@ -134,6 +134,7 @@ export const translations: Translations = {
     errorSelectRelation: { en: "Please select a relation.", ur: "براہ کرم ایک رشتہ منتخب کریں۔" },
     emailInUseError: { en: "This email is already registered.", ur: "یہ ای میل پہلے ہی رجسٹرڈ ہے۔" },
     invalidCredentialsError: { en: "Invalid credentials. Please check your email and password.", ur: "غلط اسناد۔ براہ کرم اپنا ای میل اور پاس ورڈ چیک کریں۔" },
+    emailNotFoundError: { en: "No account found with this email address.", ur: "اس ای میل ایڈریس کے ساتھ کوئی اکاؤنٹ نہیں ملا۔" },
     
     // People Page
     backToHistory: { en: 'Back to History', ur: 'ہسٹری پر واپس' },

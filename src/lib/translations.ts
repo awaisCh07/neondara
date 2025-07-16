@@ -66,11 +66,17 @@ export const translations: Translations = {
     verifyEmailDescription: { en: 'We have sent a verification link to {{email}}. Please check your inbox (and spam folder).', ur: 'ہم نے {{email}} پر ایک تصدیقی لنک بھیجا ہے۔ براہ کرم اپنا ان باکس (اور اسپام فولڈر) چیک کریں۔' },
     verifyEmailInstructions: { en: 'Click the link in the email to activate your account. Once verified, you can log in.', ur: 'اپنا اکاؤنٹ فعال کرنے کے لیے ای میل میں موجود لنک پر کلک کریں۔ تصدیق کے بعد، آپ لاگ ان کر سکتے ہیں۔' },
     resendVerificationEmail: { en: 'Resend Verification Email', ur: 'تصدیقی ای میل دوبارہ بھیجیں' },
+    resendCooldown: { en: 'Resend available in {{seconds}}s', ur: '{{seconds}} سیکنڈ میں دوبارہ بھیجیں' },
     sending: { en: 'Sending...', ur: 'بھیجا جا رہا ہے۔۔۔'},
     wrongAccount: { en: 'Wrong account?', ur: 'غلط اکاؤنٹ؟'},
     logInWithDifferentAccount: { en: 'Log in with a different account', ur: 'مختلف اکاؤنٹ سے لاگ ان کریں' },
     verificationEmailSentTitle: { en: 'Verification Email Sent', ur: 'تصدیقی ای میل بھیج دی گئی' },
     verificationEmailSentDescription: { en: 'A new link to verify your account has been sent to your email address.', ur: 'آپ کے اکاؤنٹ کی تصدیق کے لیے ایک نیا لنک آپ کے ای میل ایڈریس پر بھیج دیا گیا ہے۔' },
+    alreadyVerifiedPrompt: { en: 'Already verified your email?', ur: 'پہلے ہی اپنے ای میل کی تصدیق کر چکے ہیں؟' },
+    goToLogin: { en: 'Go to Login', ur: 'لاگ ان پر جائیں' },
+    redirecting: { en: 'Redirecting...', ur: 'ری ڈائریکٹ کیا جا رہا ہے۔۔۔' },
+    emailVerifiedSuccessTitle: { en: 'Email Verified!', ur: 'ای میل کی تصدیق ہو گئی!' },
+    emailVerifiedSuccessDescription: { en: 'You can now access the application.', ur: 'اب آپ ایپلیکیشن تک رسائی حاصل کر سکتے ہیں۔' },
 
 
     // Layout / Header

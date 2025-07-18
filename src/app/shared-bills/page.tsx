@@ -32,6 +32,7 @@ import { SharedBillSheet } from '@/components/shared-bill-sheet';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAuth } from '../auth-provider';
 
 const getInitials = (name: string) => {
     if (!name) return '?';
@@ -44,6 +45,7 @@ const getInitials = (name: string) => {
 
 
 export default function SharedBillsPage() {
+  const { user } = useAuth();
   const { people, sharedBills, loading, addSharedBill, updateSharedBill, deleteSharedBill, updateParticipantStatus, getPersonById } = useData();
   const { t } = useLanguage();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -71,6 +73,11 @@ export default function SharedBillsPage() {
   const handleTogglePaidStatus = (billId: string, personId: string, newStatus: boolean) => {
     updateParticipantStatus(billId, personId, newStatus);
   }
+  
+  const getParticipantName = (id: string) => {
+    if (id === user?.uid) return t('meYou');
+    return getPersonById(id)?.name || t('unknown');
+  }
 
   return (
     <AppLayout>
@@ -89,7 +96,7 @@ export default function SharedBillsPage() {
             {sortedBills.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sortedBills.map(bill => {
-                    const payer = getPersonById(bill.payerId);
+                    const payerName = getParticipantName(bill.payerId);
                     const allPaid = bill.participants.every(p => p.isPaid);
                     return (
                     <Card key={bill.id} className="flex flex-col">
@@ -140,14 +147,14 @@ export default function SharedBillsPage() {
                         <CardContent className="flex-grow space-y-4">
                             <div>
                                 <p className="text-3xl font-bold">{`Rs ${new Intl.NumberFormat().format(bill.totalAmount)}`}</p>
-                                <p className="text-sm text-muted-foreground">{t('paidBy', { name: payer?.name || t('unknown') })}</p>
+                                <p className="text-sm text-muted-foreground">{t('paidBy', { name: payerName || t('unknown') })}</p>
                             </div>
                             <div>
                                 <h4 className="text-sm font-medium mb-2">{t('participants')}</h4>
                                 <TooltipProvider>
                                 <div className="flex flex-wrap gap-2">
                                     {bill.participants.map(participant => {
-                                        const person = getPersonById(participant.personId);
+                                        const personName = getParticipantName(participant.personId);
                                         return (
                                             <Tooltip key={participant.personId}>
                                                 <TooltipTrigger asChild>
@@ -157,13 +164,13 @@ export default function SharedBillsPage() {
                                                     >
                                                         <Avatar className={`border-2 ${participant.isPaid ? 'border-green-500' : 'border-muted'}`}>
                                                             <AvatarFallback className={`${participant.isPaid ? 'bg-green-100 text-green-700' : 'bg-muted'}`}>
-                                                                {getInitials(person?.name || '')}
+                                                                {getInitials(personName || '')}
                                                             </AvatarFallback>
                                                         </Avatar>
                                                     </div>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
-                                                    <p>{person?.name}</p>
+                                                    <p>{personName}</p>
                                                     <p>{t('shareAmount', { amount: `Rs ${new Intl.NumberFormat().format(participant.shareAmount)}` })}</p>
                                                     <p className={`font-bold ${participant.isPaid ? 'text-green-600' : 'text-red-600'}`}>
                                                         {participant.isPaid ? t('paid') : t('unpaid')}

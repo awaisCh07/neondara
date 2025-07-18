@@ -179,9 +179,11 @@ export default function PeoplePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <p>{t('loadingContacts')}</p>
-      </div>
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-screen bg-background">
+            <p>{t('loadingContacts')}</p>
+        </div>
+      </AppLayout>
     );
   }
 

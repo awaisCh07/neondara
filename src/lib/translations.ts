@@ -37,6 +37,7 @@ export const translations: Translations = {
     or: { en: 'OR', ur: 'یا' },
     unknown: { en: 'Unknown', ur: 'نامعلوم' },
     pickDate: { en: 'Pick a date', ur: 'ایک تاریخ منتخب کریں'},
+    meYou: { en: 'Me (You)', ur: 'میں (آپ)' },
     
     // Login Page
     loginTitle: { en: 'Login', ur: 'لاگ ان' },
@@ -64,12 +65,12 @@ export const translations: Translations = {
 
     // Verify Email Page
     verifyEmailTitle: { en: 'Verify Your Email', ur: 'اپنا ای میل تصدیق کریں' },
-    verifyEmailDescription: { en: 'We have sent a verification link to {{email}}. Please check your inbox (and spam folder).', ur: 'ہم نے {{email}} پر ایک تصدیقی لنک بھیجا ہے۔ براہ کرم اپنا ان باکس (اور اسپام فولڈر) چیک کریں۔' },
+    verifyEmailDescription: { en: 'A verification link has been sent to {{email}}. Please check your inbox and spam folder.', ur: '{{email}} پر ایک تصدیقی لنک بھیجا گیا ہے۔ براہ کرم اپنا ان باکس اور اسپام فولڈر چیک کریں۔' },
     verifyEmailInstructions: { en: 'Click the link in the email to activate your account. Once verified, you can log in.', ur: 'اپنا اکاؤنٹ فعال کرنے کے لیے ای میل میں موجود لنک پر کلک کریں۔ تصدیق کے بعد، آپ لاگ ان کر سکتے ہیں۔' },
     resendVerificationEmail: { en: 'Resend Verification Email', ur: 'تصدیقی ای میل دوبارہ بھیجیں' },
     resendCooldown: { en: 'Resend available in {{seconds}}s', ur: '{{seconds}} سیکنڈ میں دوبارہ بھیجیں' },
     sending: { en: 'Sending...', ur: 'بھیجا جا رہا ہے۔۔۔'},
-    alreadyVerifiedPrompt: { en: 'Already verified your email?', ur: 'پہلے ہی اپنے ای میل کی تصدیق کر چکے ہیں؟' },
+    alreadyVerifiedPrompt: { en: 'Already verified your email? Click here to log in.', ur: 'پہلے ہی اپنے ای میل کی تصدیق کر چکے ہیں؟ لاگ ان کرنے کے لیے یہاں کلک کریں۔' },
     goToLogin: { en: 'Go to Login', ur: 'لاگ ان پر جائیں' },
     redirecting: { en: 'Redirecting...', ur: 'ری ڈائریکٹ کیا جا رہا ہے۔۔۔' },
     emailVerifiedSuccessTitle: { en: 'Email Verified!', ur: 'ای میل کی تصدیق ہو گئی!' },
@@ -210,6 +211,8 @@ export const translations: Translations = {
     saveBill: { en: 'Save Bill', ur: 'بل محفوظ کریں' },
     
     // Toast Messages
+    verificationEmailSentTitle: { en: "Verification Email Sent", ur: "تصدیقی ای میل بھیج دی گئی ہے۔" },
+    verificationEmailSentDescription: { en: "Please check your inbox to verify your email address.", ur: "اپنے ای میل ایڈریس کی تصدیق کے لیے براہ کرم اپنا ان باکس چیک کریں۔" },
     fetchDataError: { en: "Failed to fetch history data.", ur: "ہسٹری ڈیٹا حاصل کرنے میں ناکامی۔" },
     addEntryError: { en: "Failed to add new entry.", ur: "نیا اندراج شامل کرنے میں ناکامی۔" },
     updateEntryError: { en: "Failed to update entry.", ur: "اندراج کو اپ ڈیٹ کرنے میں ناکامی۔" },

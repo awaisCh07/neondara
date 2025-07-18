@@ -26,6 +26,7 @@ import { Textarea } from "./ui/textarea"
 import { useEffect, useState, useMemo } from "react"
 import { useLanguage } from "./language-provider"
 import { Checkbox } from "./ui/checkbox"
+import { useAuth } from "./auth-provider"
 
 type FormValues = z.infer<ReturnType<typeof getFormSchema>>
 
@@ -51,6 +52,7 @@ const getFormSchema = (t: (key: any) => string) => z.object({
 
 
 export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: SharedBillSheetProps) {
+    const { user } = useAuth();
     const { t } = useLanguage();
     const [isSubmitting, setIsSubmitting] = useState(false);
     
@@ -68,20 +70,40 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
         control: form.control,
         name: "participants"
     });
+    
+    // Combine people from props with the current user for dropdowns
+    const allAvailablePeople = useMemo(() => {
+        if (!user) return people;
+        
+        const currentUserAsPerson: Person = {
+            id: user.uid,
+            userId: user.uid,
+            name: `${t('meYou')}`, // "Me (You)"
+            relation: undefined
+        };
+        // Ensure user is not duplicated if they are somehow in the people list
+        if (people.find(p => p.id === user.uid)) return people;
+        return [currentUserAsPerson, ...people];
+    }, [people, user, t]);
+
 
     useEffect(() => {
         if (isOpen) {
-            form.reset(bill ? {
-                ...bill,
-            } : {
-                description: '',
-                totalAmount: undefined,
-                date: new Date(),
-                payerId: undefined,
-                participants: [],
-            });
+            if (bill) {
+                form.reset({
+                    ...bill
+                });
+            } else {
+                 form.reset({
+                    description: '',
+                    totalAmount: undefined,
+                    date: new Date(),
+                    payerId: user?.uid,
+                    participants: [],
+                });
+            }
         }
-    }, [bill, isOpen, form]);
+    }, [bill, isOpen, form, user]);
 
     const totalAmount = form.watch("totalAmount");
     const participantIds = form.watch("participants").map(p => p.personId);
@@ -95,7 +117,7 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
     }
 
     const addParticipant = () => {
-        const unselectedPerson = people.find(p => !participantIds.includes(p.id));
+        const unselectedPerson = allAvailablePeople.find(p => !participantIds.includes(p.id));
         if (unselectedPerson) {
             append({ personId: unselectedPerson.id, shareAmount: 0, isPaid: false });
         }
@@ -207,7 +229,7 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {people.map(p => (
+                      {allAvailablePeople.map(p => (
                         <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                       ))}
                     </SelectContent>
@@ -220,7 +242,7 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
             <div>
                 <div className="flex justify-between items-center mb-4">
                     <h4 className="font-medium">{t('participants')} *</h4>
-                    <Button type="button" variant="outline" size="sm" onClick={addParticipant} disabled={fields.length >= people.length}>
+                    <Button type="button" variant="outline" size="sm" onClick={addParticipant} disabled={fields.length >= allAvailablePeople.length}>
                         <UserPlus className="mr-2 h-4 w-4"/>
                         {t('addParticipant')}
                     </Button>
@@ -241,7 +263,7 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
                                             </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {people.filter(p => p.id === field.value || !participantIds.includes(p.id)).map(p => (
+                                                {allAvailablePeople.filter(p => p.id === field.value || !participantIds.includes(p.id)).map(p => (
                                                     <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                                                 ))}
                                             </SelectContent>

@@ -27,6 +27,7 @@ import { useEffect, useState, useMemo } from "react"
 import { useLanguage } from "./language-provider"
 import { Checkbox } from "./ui/checkbox"
 import { useAuth } from "./auth-provider"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 type FormValues = z.infer<ReturnType<typeof getFormSchema>>
 
@@ -55,6 +56,7 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
     const { user } = useAuth();
     const { t } = useLanguage();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isMobile = useIsMobile();
     
     const formSchema = useMemo(() => getFormSchema(t), [t]);
 
@@ -71,17 +73,15 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
         name: "participants"
     });
     
-    // Combine people from props with the current user for dropdowns
     const allAvailablePeople = useMemo(() => {
         if (!user) return people;
         
         const currentUserAsPerson: Person = {
             id: user.uid,
             userId: user.uid,
-            name: `${t('meYou')}`, // "Me (You)"
+            name: `${t('meYou')}`,
             relation: undefined
         };
-        // Ensure user is not duplicated if they are somehow in the people list
         if (people.find(p => p.id === user.uid)) return people;
         return [currentUserAsPerson, ...people];
     }, [people, user, t]);
@@ -173,12 +173,26 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
                         </FormItem>
                     )}
                 />
-                <FormField
+                 <FormField
                     control={form.control}
                     name="date"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="flex flex-col">
                         <FormLabel>{t('date')} *</FormLabel>
+                         {isMobile ? (
+                            <FormControl>
+                                <Input
+                                type="date"
+                                value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
+                                onChange={(e) => {
+                                    const date = new Date(e.target.value);
+                                    const adjustedDate = new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000);
+                                    field.onChange(adjustedDate);
+                                }}
+                                className="block w-full"
+                                />
+                            </FormControl>
+                        ) : (
                         <Popover>
                             <PopoverTrigger asChild>
                             <FormControl>
@@ -201,6 +215,9 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
                             <PopoverContent className="w-auto p-0" align="start">
                                 <Calendar
                                     mode="single"
+                                    captionLayout="dropdown-buttons"
+                                    fromYear={1950}
+                                    toYear={new Date().getFullYear()}
                                     selected={field.value}
                                     onSelect={field.onChange}
                                     disabled={(date) =>
@@ -210,6 +227,7 @@ export function SharedBillSheet({ isOpen, onOpenChange, onSave, bill, people }: 
                                 />
                             </PopoverContent>
                         </Popover>
+                        )}
                         <FormMessage />
                         </FormItem>
                     )}

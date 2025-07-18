@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { Logo } from '@/components/logo';
 
 export default function LoginPage() {
   const { language, t } = useLanguage();
@@ -90,7 +91,10 @@ export default function LoginPage() {
         <LanguageSwitcher />
       </div>
       <Card className="w-full max-w-sm">
-        <CardHeader>
+        <CardHeader className="text-center">
+            <div className="mx-auto mb-4">
+                <Logo className="h-12 w-12 text-primary" />
+            </div>
           <CardTitle className="text-2xl">{t('loginTitle')}</CardTitle>
           <CardDescription>
             {t('loginDescription')}

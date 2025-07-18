@@ -19,6 +19,7 @@ import { useLanguage } from '@/components/language-provider';
 import { cn } from '@/lib/utils';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { useToast } from '@/hooks/use-toast';
+import { Logo } from '@/components/logo';
 
 export default function SignupPage() {
   const { language, t } = useLanguage();
@@ -74,7 +75,10 @@ export default function SignupPage() {
         <LanguageSwitcher />
       </div>
       <Card className="w-full max-w-sm">
-        <CardHeader>
+        <CardHeader className="text-center">
+            <div className="mx-auto mb-4">
+                <Logo className="h-12 w-12 text-primary" />
+            </div>
           <CardTitle className="text-2xl">{t('signupTitle')}</CardTitle>
           <CardDescription>
             {t('signupDescription')}

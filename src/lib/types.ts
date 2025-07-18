@@ -55,3 +55,23 @@ export type NeondaraEntry = {
 export type NeondaraEntryDTO = Omit<NeondaraEntry, 'id' | 'date' | 'person'> & {
   date: Timestamp;
 };
+
+export type SharedBillParticipant = {
+  personId: string;
+  shareAmount: number;
+  isPaid: boolean;
+};
+
+export type SharedBill = {
+  id: string;
+  userId: string;
+  description: string;
+  totalAmount: number;
+  date: Date;
+  payerId: string;
+  participants: SharedBillParticipant[];
+};
+
+export type SharedBillDTO = Omit<SharedBill, 'id' | 'date'> & {
+  date: Timestamp;
+};

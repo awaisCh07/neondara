@@ -3,7 +3,7 @@
 
 import { useAuth } from './auth-provider';
 import { useRouter, usePathname } from 'next/navigation';
-import { LogOut, User as UserIcon, Users, Home as HomeIcon, Languages, Download, Menu } from 'lucide-react';
+import { LogOut, User as UserIcon, Users, Home as HomeIcon, Languages, Download, Menu, Receipt } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,6 +76,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navItems = [
       { href: '/', label: t('navHistory'), icon: HomeIcon },
       { href: '/people', label: t('navPeople'), icon: Users },
+      { href: '/shared-bills', label: t('sharedBills'), icon: Receipt },
   ];
 
   // If loading, or if the user is not logged in, or if the user's email is not verified,

@@ -1,12 +1,12 @@
 
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback, useMemo } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import type { User } from 'firebase/auth';
 import { useAuth } from './auth-provider';
-import type { NeondaraEntry, NeondaraEntryDTO, Person, RelationType } from '@/lib/types';
+import type { NeondaraEntry, NeondaraEntryDTO, Person, RelationType, SharedBill, SharedBillDTO } from '@/lib/types';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, Timestamp, orderBy, getDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, Timestamp, orderBy, writeBatch } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from './language-provider';
 import { format } from 'date-fns';
@@ -17,11 +17,12 @@ type EntryInput = Omit<NeondaraEntry, 'id' | 'userId' | 'person'>;
 type EntryUpdate = Omit<NeondaraEntry, 'userId' | 'person'>;
 type PersonInput = { name: string; relation: string; };
 type PersonUpdate = Person;
-
+type SharedBillInput = Omit<SharedBill, 'id' | 'userId'>;
 
 interface DataContextType {
   entries: NeondaraEntry[];
   people: Person[];
+  sharedBills: SharedBill[];
   loading: boolean;
   addEntry: (entry: EntryInput) => Promise<void>;
   updateEntry: (entry: EntryUpdate) => Promise<void>;
@@ -29,6 +30,10 @@ interface DataContextType {
   addPerson: (person: PersonInput) => Promise<void>;
   updatePerson: (person: PersonUpdate) => Promise<void>;
   deletePerson: (id: string) => Promise<void>;
+  addSharedBill: (bill: SharedBillInput) => Promise<void>;
+  updateSharedBill: (bill: SharedBillInput, id: string) => Promise<void>;
+  deleteSharedBill: (id: string) => Promise<void>;
+  updateParticipantStatus: (billId: string, personId: string, isPaid: boolean) => Promise<void>;
   getPersonById: (id: string) => Person | undefined;
   exportData: (options?: { personId?: string }) => void;
 }
@@ -39,6 +44,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [entries, setEntries] = useState<NeondaraEntry[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
+  const [sharedBills, setSharedBills] = useState<SharedBill[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -46,16 +52,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const fetchData = useCallback(async (currentUser: User) => {
     setLoading(true);
     try {
+      // Fetch People
       const peopleQuery = query(collection(db, "people"), where("userId", "==", currentUser.uid));
       const peopleSnapshot = await getDocs(peopleQuery);
       const peopleData = peopleSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Person));
-      
       const peopleMap = new Map(peopleData.map(p => [p.id, p.name]));
       setPeople(peopleData);
 
+      // Fetch Neondara Entries
       const entriesQuery = query(collection(db, "neondara_entries"), where("userId", "==", currentUser.uid), orderBy("date", "desc"));
       const entriesSnapshot = await getDocs(entriesQuery);
-      
       const entriesData = entriesSnapshot.docs.map(docSnapshot => {
         const data = docSnapshot.data() as NeondaraEntryDTO;
         return {
@@ -65,8 +71,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
           date: data.date.toDate(),
         } as NeondaraEntry;
       });
-
       setEntries(entriesData);
+
+      // Fetch Shared Bills
+      const billsQuery = query(collection(db, "shared_bills"), where("userId", "==", currentUser.uid), orderBy("date", "desc"));
+      const billsSnapshot = await getDocs(billsQuery);
+      const billsData = billsSnapshot.docs.map(docSnapshot => {
+          const data = docSnapshot.data() as SharedBillDTO;
+          return {
+              id: docSnapshot.id,
+              ...data,
+              date: data.date.toDate(),
+          } as SharedBill;
+      });
+      setSharedBills(billsData);
 
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -77,12 +95,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [t, toast]);
 
   useEffect(() => {
-    if (user) {
+    if (user && user.emailVerified) {
       fetchData(user);
     } else {
       setLoading(false);
       setEntries([]);
       setPeople([]);
+      setSharedBills([]);
     }
   }, [user, fetchData]);
 
@@ -193,15 +212,27 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const deletePerson = async (personId: string) => {
     if (!user) return;
     try {
-      const entriesQuery = query(collection(db, "neondara_entries"), where("userId", "==", user.uid), where("personId", "==", personId));
-      const entriesSnapshot = await getDocs(entriesQuery);
-      
       const batch = writeBatch(db);
 
-      entriesSnapshot.forEach(doc => {
-          batch.delete(doc.ref);
-      });
+      // Delete Neondara entries
+      const entriesQuery = query(collection(db, "neondara_entries"), where("userId", "==", user.uid), where("personId", "==", personId));
+      const entriesSnapshot = await getDocs(entriesQuery);
+      entriesSnapshot.forEach(doc => batch.delete(doc.ref));
 
+      // Delete person from shared bills
+      const billsQuery = query(collection(db, "shared_bills"), where("userId", "==", user.uid), where("participants", "array-contains", personId));
+      const billsSnapshot = await getDocs(billsQuery);
+      billsSnapshot.forEach(doc => {
+          const bill = doc.data() as SharedBill;
+          const updatedParticipants = bill.participants.filter(p => p.personId !== personId);
+          if (updatedParticipants.length > 0) {
+            batch.update(doc.ref, { participants: updatedParticipants });
+          } else {
+            batch.delete(doc.ref);
+          }
+      });
+      
+      // Delete person doc
       const personRef = doc(db, 'people', personId);
       batch.delete(personRef);
       
@@ -209,11 +240,81 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
       setPeople(prev => prev.filter(p => p.id !== personId));
       setEntries(prev => prev.filter(e => e.personId !== personId));
+      setSharedBills(prev => {
+        return prev.map(bill => ({
+            ...bill,
+            participants: bill.participants.filter(p => p.personId !== personId)
+        })).filter(bill => bill.participants.length > 0);
+      });
       
       toast({ title: t('success'), description: t('personDeletedSuccess') });
     } catch (error) {
       console.error("Error deleting person and their history: ", error);
       toast({ title: t('error'), description: t('deletePersonError'), variant: "destructive" });
+    }
+  };
+  
+  const addSharedBill = async (billData: SharedBillInput) => {
+      if (!user) return;
+      try {
+          const docRef = await addDoc(collection(db, 'shared_bills'), {
+              ...billData,
+              userId: user.uid,
+              date: Timestamp.fromDate(billData.date)
+          });
+          const newBill = { ...billData, id: docRef.id, userId: user.uid };
+          setSharedBills(prev => [newBill, ...prev]);
+          toast({ title: t('success'), description: t('billAddedSuccess') });
+      } catch (error) {
+          console.error("Error adding shared bill:", error);
+          toast({ title: t('error'), description: t('addBillError'), variant: "destructive" });
+      }
+  };
+
+  const updateSharedBill = async (billData: SharedBillInput, id: string) => {
+      if (!user) return;
+      try {
+          const billRef = doc(db, 'shared_bills', id);
+          await updateDoc(billRef, {
+              ...billData,
+              date: Timestamp.fromDate(billData.date)
+          });
+          setSharedBills(prev => prev.map(b => b.id === id ? { ...b, ...billData, id, userId: user.uid } : b));
+          toast({ title: t('success'), description: t('billUpdatedSuccess') });
+      } catch (error) {
+          console.error("Error updating shared bill:", error);
+          toast({ title: t('error'), description: t('updateBillError'), variant: "destructive" });
+      }
+  };
+
+  const deleteSharedBill = async (id: string) => {
+      if (!user) return;
+      try {
+          await deleteDoc(doc(db, 'shared_bills', id));
+          setSharedBills(prev => prev.filter(b => b.id !== id));
+          toast({ title: t('success'), description: t('billDeletedSuccess') });
+      } catch (error) {
+          console.error("Error deleting shared bill:", error);
+          toast({ title: t('error'), description: t('deleteBillError'), variant: "destructive" });
+      }
+  };
+
+  const updateParticipantStatus = async (billId: string, personId: string, isPaid: boolean) => {
+    if (!user) return;
+    const bill = sharedBills.find(b => b.id === billId);
+    if (!bill) return;
+
+    const updatedParticipants = bill.participants.map(p => 
+        p.personId === personId ? { ...p, isPaid } : p
+    );
+
+    try {
+        const billRef = doc(db, 'shared_bills', billId);
+        await updateDoc(billRef, { participants: updatedParticipants });
+        setSharedBills(prev => prev.map(b => b.id === billId ? { ...b, participants: updatedParticipants } : b));
+    } catch (error) {
+        console.error("Error updating participant status:", error);
+        toast({ title: t('error'), description: t('updateParticipantError'), variant: "destructive" });
     }
   };
 
@@ -350,6 +451,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const value = {
     entries,
     people,
+    sharedBills,
     loading,
     addEntry,
     updateEntry,
@@ -357,6 +459,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     addPerson,
     updatePerson,
     deletePerson,
+    addSharedBill,
+    updateSharedBill,
+    deleteSharedBill,
+    updateParticipantStatus,
     getPersonById,
     exportData,
   };
@@ -371,7 +477,3 @@ export function useData() {
   }
   return context;
 }
-
-    
-
-    

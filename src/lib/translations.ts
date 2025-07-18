@@ -1,5 +1,4 @@
 
-
 export type Language = 'en' | 'ur';
 
 type Translations = {
@@ -10,7 +9,7 @@ type Translations = {
 
 export const translations: Translations = {
     // App Metadata
-    appTitle: { en: 'Niondra Ledger', ur: 'نیوندرا لیجر' },
+    appTitle: { en: 'Neondara Ledger', ur: 'نیوندرا لیجر' },
     appDescription: { en: 'Manage and store records for the cultural tradition of Niondra.', ur: 'نیوندرا کی ثقافتی روایت کے لیے ریکارڈز کا نظم اور ذخیرہ کریں۔' },
 
     // General
@@ -36,6 +35,8 @@ export const translations: Translations = {
     relation: { en: 'Relation', ur: 'رشتہ' },
     search: { en: 'Search', ur: 'تلاش کریں' },
     or: { en: 'OR', ur: 'یا' },
+    unknown: { en: 'Unknown', ur: 'نامعلوم' },
+    pickDate: { en: 'Pick a date', ur: 'ایک تاریخ منتخب کریں'},
     
     // Login Page
     loginTitle: { en: 'Login', ur: 'لاگ ان' },
@@ -68,10 +69,6 @@ export const translations: Translations = {
     resendVerificationEmail: { en: 'Resend Verification Email', ur: 'تصدیقی ای میل دوبارہ بھیجیں' },
     resendCooldown: { en: 'Resend available in {{seconds}}s', ur: '{{seconds}} سیکنڈ میں دوبارہ بھیجیں' },
     sending: { en: 'Sending...', ur: 'بھیجا جا رہا ہے۔۔۔'},
-    wrongAccount: { en: 'Wrong account?', ur: 'غلط اکاؤنٹ؟'},
-    logInWithDifferentAccount: { en: 'Log in with a different account', ur: 'مختلف اکاؤنٹ سے لاگ ان کریں' },
-    verificationEmailSentTitle: { en: 'Verification Email Sent', ur: 'تصدیقی ای میل بھیج دی گئی' },
-    verificationEmailSentDescription: { en: 'A new link to verify your account has been sent to your email address.', ur: 'آپ کے اکاؤنٹ کی تصدیق کے لیے ایک نیا لنک آپ کے ای میل ایڈریس پر بھیج دیا گیا ہے۔' },
     alreadyVerifiedPrompt: { en: 'Already verified your email?', ur: 'پہلے ہی اپنے ای میل کی تصدیق کر چکے ہیں؟' },
     goToLogin: { en: 'Go to Login', ur: 'لاگ ان پر جائیں' },
     redirecting: { en: 'Redirecting...', ur: 'ری ڈائریکٹ کیا جا رہا ہے۔۔۔' },
@@ -154,6 +151,8 @@ export const translations: Translations = {
     emailInUseError: { en: "This email is already registered.", ur: "یہ ای میل پہلے ہی رجسٹرڈ ہے۔" },
     invalidCredentialsError: { en: "Invalid credentials. Please check your email and password.", ur: "غلط اسناد۔ براہ کرم اپنا ای میل اور پاس ورڈ چیک کریں۔" },
     emailNotFoundError: { en: "No account found with this email address.", ur: "اس ای میل ایڈریس کے ساتھ کوئی اکاؤنٹ نہیں ملا۔" },
+    errorSelectPayer: { en: 'Please select who paid the bill.', ur: 'براہ کرم منتخب کریں کہ بل کس نے ادا کیا۔'},
+    errorAddParticipant: { en: 'Please add at least one participant.', ur: 'براہ کرم کم از کم ایک شریک شامل کریں۔'},
     
     // People Page
     backToHistory: { en: 'Back to History', ur: 'ہسٹری پر واپس' },
@@ -186,6 +185,30 @@ export const translations: Translations = {
     loadingDetails: { en: 'Loading details...', ur: 'تفصیلات لوڈ ہو رہی ہیں...' },
     personNotFound: { en: 'Person not found', ur: 'شخص نہیں ملا' },
 
+    // Shared Bills Page
+    sharedBills: { en: 'Shared Bills', ur: 'مشترکہ بل' },
+    addBill: { en: 'Add Bill', ur: 'بل شامل کریں' },
+    editBill: { en: 'Edit Bill', ur: 'بل میں ترمیم کریں' },
+    loadingBills: { en: 'Loading shared bills...', ur: 'مشترکہ بل لوڈ ہو رہے ہیں...' },
+    noBillsAdded: { en: 'No Shared Bills Yet', ur: 'ابھی تک کوئی مشترکہ بل نہیں' },
+    clickAddBill: { en: 'Click "Add Bill" to start tracking shared expenses.', ur: 'مشترکہ اخراجات کا ٹریک رکھنا شروع کرنے کے لیے "بل شامل کریں" پر کلک کریں۔' },
+    totalAmount: { en: 'Total Amount', ur: 'کل رقم' },
+    paidBy: { en: 'Paid by {{name}}', ur: '{{name}} نے ادا کیا' },
+    participants: { en: 'Participants', ur: 'شرکاء' },
+    shareAmount: { en: 'Share: {{amount}}', ur: 'حصہ: {{amount}}' },
+    paid: { en: 'Paid', ur: 'ادا' },
+    unpaid: { en: 'Unpaid', ur: 'غیر ادا شدہ' },
+    billSettled: { en: 'Settled', ur: 'طے ہو گیا' },
+    billUnsettled: { en: 'Unsettled', ur: 'طے نہیں ہوا' },
+    deleteBillConfirmDescription: { en: 'This will permanently delete this shared bill and all its details.', ur: 'یہ اس مشترکہ بل اور اس کی تمام تفصیلات کو مستقل طور پر حذف کر دے گا۔' },
+    billSheetDescription: { en: 'Track an expense shared with multiple people.', ur: 'متعدد لوگوں کے ساتھ اشتراک کردہ اخراجات کا ٹریک رکھیں۔' },
+    billDescriptionPlaceholder: { en: 'e.g., Dinner at BBQ Tonight', ur: 'مثلاً، بی بی کیو ٹونائٹ میں ڈنر' },
+    selectPayer: { en: 'Select who paid', ur: 'منتخب کریں کس نے ادا کیا' },
+    addParticipant: { en: 'Add Participant', ur: 'شریک شامل کریں' },
+    splitEqually: { en: 'Split Equally', ur: 'برابر تقسیم کریں' },
+    share: { en: 'Share', ur: 'حصہ' },
+    saveBill: { en: 'Save Bill', ur: 'بل محفوظ کریں' },
+    
     // Toast Messages
     fetchDataError: { en: "Failed to fetch history data.", ur: "ہسٹری ڈیٹا حاصل کرنے میں ناکامی۔" },
     addEntryError: { en: "Failed to add new entry.", ur: "نیا اندراج شامل کرنے میں ناکامی۔" },
@@ -205,6 +228,13 @@ export const translations: Translations = {
     personAddedSuccess: { en: "{{name}} has been added.", ur: "{{name}} کو شامل کر دیا گیا ہے۔" },
     personUpdatedSuccess: { en: "{{name}} has been updated.", ur: "{{name}} کو اپ ڈیٹ کر دیا گیا ہے۔" },
     personDeletedSuccess: { en: "Person and their history have been deleted.", ur: "شخص اور ان کی ہسٹری کو حذف کر دیا گیا ہے۔" },
+    billAddedSuccess: { en: 'New shared bill has been added.', ur: 'نیا مشترکہ بل شامل کر دیا گیا ہے۔' },
+    billUpdatedSuccess: { en: 'Shared bill has been updated.', ur: 'مشترکہ بل کو اپ ڈیٹ کر دیا گیا ہے۔' },
+    billDeletedSuccess: { en: 'Shared bill has been deleted.', ur: 'مشترکہ بل کو حذف کر دیا گیا ہے۔' },
+    addBillError: { en: 'Failed to add shared bill.', ur: 'مشترکہ بل شامل کرنے میں ناکامی۔' },
+    updateBillError: { en: 'Failed to update shared bill.', ur: 'مشترکہ بل کو اپ ڈیٹ کرنے میں ناکامی۔' },
+    deleteBillError: { en: 'Failed to delete shared bill.', ur: 'مشترکہ بل کو حذف کرنے میں ناکامی۔' },
+    updateParticipantError: { en: 'Failed to update participant status.', ur: 'شریک کی حیثیت کو اپ ڈیٹ کرنے میں ناکامی۔' },
 };
 
 export const useTranslation = (language: Language) => {

@@ -31,8 +31,9 @@ import { useData } from '@/components/data-provider';
 import { SharedBillSheet } from '@/components/shared-bill-sheet';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/components/auth-provider';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
 
 const getInitials = (name: string) => {
     if (!name) return '?';
@@ -149,42 +150,46 @@ export default function SharedBillsPage() {
                                 <p className="text-3xl font-bold">{`Rs ${new Intl.NumberFormat().format(bill.totalAmount)}`}</p>
                                 <p className="text-sm text-muted-foreground">{t('paidBy', { name: payerName || t('unknown') })}</p>
                             </div>
+                             <Separator />
                             <div>
                                 <h4 className="text-sm font-medium mb-2">{t('participants')}</h4>
-                                <TooltipProvider>
-                                <div className="flex flex-wrap gap-2">
+                                <div className="space-y-3">
                                     {bill.participants.map(participant => {
                                         const personName = getParticipantName(participant.personId);
                                         return (
-                                            <Tooltip key={participant.personId}>
-                                                <TooltipTrigger asChild>
-                                                    <div 
-                                                        onClick={() => handleTogglePaidStatus(bill.id, participant.personId, !participant.isPaid)}
-                                                        className="cursor-pointer"
-                                                    >
-                                                        <Avatar className={`border-2 ${participant.isPaid ? 'border-green-500' : 'border-muted'}`}>
-                                                            <AvatarFallback className={`${participant.isPaid ? 'bg-green-100 text-green-700' : 'bg-muted'}`}>
-                                                                {getInitials(personName || '')}
-                                                            </AvatarFallback>
-                                                        </Avatar>
+                                            <div key={participant.personId} className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarFallback>{getInitials(personName || '')}</AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <p className="font-medium text-sm">{personName}</p>
+                                                        <p className="text-xs text-muted-foreground">{t('shareAmount', { amount: `Rs ${new Intl.NumberFormat().format(participant.shareAmount)}` })}</p>
                                                     </div>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>{personName}</p>
-                                                    <p>{t('shareAmount', { amount: `Rs ${new Intl.NumberFormat().format(participant.shareAmount)}` })}</p>
-                                                    <p className={`font-bold ${participant.isPaid ? 'text-green-600' : 'text-red-600'}`}>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        id={`paid-${bill.id}-${participant.personId}`}
+                                                        checked={participant.isPaid}
+                                                        onCheckedChange={(checked) => handleTogglePaidStatus(bill.id, participant.personId, !!checked)}
+                                                    />
+                                                     <label
+                                                        htmlFor={`paid-${bill.id}-${participant.personId}`}
+                                                        className={`text-sm font-medium ${participant.isPaid ? 'text-green-600' : 'text-red-600'}`}
+                                                     >
                                                         {participant.isPaid ? t('paid') : t('unpaid')}
-                                                    </p>
-                                                </TooltipContent>
-                                            </Tooltip>
+                                                     </label>
+                                                </div>
+                                            </div>
                                         )
                                     })}
                                 </div>
-                                </TooltipProvider>
                             </div>
                         </CardContent>
                         <CardFooter>
-                           <Badge variant={allPaid ? 'default' : 'secondary'}>{allPaid ? t('billSettled') : t('billUnsettled')}</Badge>
+                           <Badge variant={allPaid ? 'default' : 'secondary'} className={allPaid ? 'bg-green-600 hover:bg-green-600/90' : ''}>
+                                {allPaid ? t('billSettled') : t('billUnsettled')}
+                            </Badge>
                         </CardFooter>
                     </Card>
                     );
@@ -194,6 +199,7 @@ export default function SharedBillsPage() {
                 <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
                 <h3 className="text-xl font-semibold text-foreground">{t('noBillsAdded')}</h3>
                 <p className="mt-2 mb-4">{t('clickAddBill')}</p>
+
                 <Button onClick={() => handleOpenSheet()}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     {t('addBill')}

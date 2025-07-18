@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import type { SharedBill } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Users, Receipt, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Receipt, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   DropdownMenu,
@@ -32,7 +32,7 @@ import { SharedBillSheet } from '@/components/shared-bill-sheet';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useAuth } from '../auth-provider';
+import { useAuth } from '@/components/auth-provider';
 
 const getInitials = (name: string) => {
     if (!name) return '?';
